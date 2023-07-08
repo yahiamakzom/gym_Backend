@@ -46,7 +46,7 @@ exports.searchSubscreptions = asyncHandler(async (req, res, next) => {
 
 exports.editClub = asyncHandler(async (req, res, next) => {
     const club_id = req.user.id
-    const { name, lat, long, description, gender, from, to, days } = req.body
+    const { name, lat, long, description, gender, from, to,allDay } = req.body
     let imgs_path = req.files && req.files.clubImg && await Promise.all(req.files.clubImg.map(async img => {
         const uploadImg = await cloudinary.uploader.upload(img.path);
         return uploadImg.secure_url;
@@ -59,22 +59,41 @@ exports.editClub = asyncHandler(async (req, res, next) => {
     }
     await User.findById(club_id).then(async club => {
         if (!club) return next(new ApiError("Club Not Found", 404))
-        await Club.findByIdAndUpdate(club.club,
-            {
-                name: name && name,
-                country: place_name && `${place_name.split(",")[place_name.split(",").length - 1]}`,
-                city: place_name && `${place_name.split(",")[place_name.split(",").length - 2]}`,
-                location: place_name && place_name,
-                description: description && description,
-                gender: gender && gender,
-                images: imgs_path && imgs_path,
-                logo: logo && logo,
-                lat: place_name && Number(lat),
-                long: place_name && Number(long),
-                from: from && from,
-                to: to && to,
-                days: days && days
-            }, { new: true }).then((newclub) => res.json({ club: newclub }))
+        if(allDay=='false'||allDay==undefined){
+            await Club.findByIdAndUpdate(club.club,
+                {
+                    name: name && name,
+                    country: place_name && `${place_name.split(",")[place_name.split(",").length - 1]}`,
+                    city: place_name && `${place_name.split(",")[place_name.split(",").length - 2]}`,
+                    location: place_name && place_name,
+                    description: description && description,
+                    gender: gender && gender,
+                    images: imgs_path && imgs_path,
+                    logo: logo && logo,
+                    lat: place_name && Number(lat),
+                    long: place_name && Number(long),
+                    from: from && from,
+                    to: to && to,
+                    allDay:false,
+                }, { new: true }).then((newclub) => res.json({ club: newclub }))
+        }else{
+            await Club.findByIdAndUpdate(club.club,
+                {
+                    name: name && name,
+                    country: place_name && `${place_name.split(",")[place_name.split(",").length - 1]}`,
+                    city: place_name && `${place_name.split(",")[place_name.split(",").length - 2]}`,
+                    location: place_name && place_name,
+                    description: description && description,
+                    gender: gender && gender,
+                    images: imgs_path && imgs_path,
+                    logo: logo && logo,
+                    lat: place_name && Number(lat),
+                    long: place_name && Number(long),
+                    allDay,
+                    from: null,
+                    to:null,
+                }, { new: true }).then((newclub) => res.json({ club: newclub }))
+        }
     })
 })
 

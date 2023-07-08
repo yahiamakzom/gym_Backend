@@ -37,7 +37,6 @@ exports.addClub = asyncHandler(async (req, res, next) => {
         console.log(allDay);
         if(allDay=='false'||allDay==undefined)
         {
-            console.log("asd");
             await Club.create(
                 {
                     name: name.trim(),
@@ -52,6 +51,7 @@ exports.addClub = asyncHandler(async (req, res, next) => {
                     logo,
                     from,
                     to,
+                    allDay:false,
                     commission
                 }).then(async club => {
                     await User.create(
@@ -66,7 +66,6 @@ exports.addClub = asyncHandler(async (req, res, next) => {
                     res.status(201).json({ club })
                 })
         }else{
-            console.log("asd2");
             await Club.create(
                 {
                     name: name.trim(),
@@ -79,6 +78,8 @@ exports.addClub = asyncHandler(async (req, res, next) => {
                     lat: Number(lat),
                     long: Number(long),
                     allDay,
+                    from: null,
+                    to:null,
                     commission
                 }).then(async club => {
                     await User.create(
@@ -186,7 +187,6 @@ exports.addRule = asyncHandler(async (req, res, next) => {
             if (rule) await Rules.findOneAndUpdate({ type }, { banner_img }, { new: true }).then((banner) => res.json({ banner }))
             else await Rules.create({ banner_img, type }).then((banner) => res.json({ banner }))
         })
-    } else if (type === "payment") {
     } else if (type === 'app_bg') {
         const app_bg = req.file && (await cloudinary.uploader.upload(req.file.path)).secure_url
         if (!app_bg && !req.body.bg_color) return next(new ApiError("Please Add a app_bg or bg_color", 400))

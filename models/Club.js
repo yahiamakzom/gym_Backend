@@ -17,15 +17,11 @@ module.exports = mongoose.model("Club", new mongoose.Schema({
     // },
     from: {
         type: String,
-        required: function () {
-          return this.allDay==false;
-        },
+        
       },
       to: {
         type: String,
-        required: function () {
-          return this.allDay==false;
-        },
+        
       },
       allDay: {
         type: Boolean,
