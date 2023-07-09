@@ -526,7 +526,7 @@ exports.updateProfile = async (req, res, next) => {
   
     try {
     //   const file = req.file;
-      let photo = 'default.jpg';
+      let photo = 'https://res.cloudinary.com/dqzrlkpo7/image/upload/v1688753202/wdsdizzmodrqbbxzi0ed.jpg';
      
       if (req.files.photo) {
         // Upload image to Cloudinary
