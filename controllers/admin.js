@@ -328,7 +328,7 @@ exports.addBlog = asyncHandler(async (req, res, next) => {
         const uploadImg = await cloudinary.uploader.upload(img.path);
         return uploadImg.secure_url;
     }));
-    const blog=  await Opinion.create(
+    const blog=  await Blog.create(
         {
             name: name.trim(),
             description,

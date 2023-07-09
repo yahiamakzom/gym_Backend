@@ -11,7 +11,7 @@ exports.Register = asyncHandler(async (req, res, next) => {
         if (user) return next(new ApiError("Email Or Phone Already Exists", 409))
         await User.create({ email, username, phone,role, password: await bcrypt.hash(password, 10), home_location, code, gender,wallet:0 })
         .then(user => res.status(201).json({ user }))
-        const token = sign({ id: user.id, role: user.role }, process.env.TOKEN, { expiresIn: "30d" })
+        const token = sign({ id: user.id, role: user.role }, process.env.TOKEN)
         user.token = token;
     })
 })
@@ -22,7 +22,7 @@ exports.Login = asyncHandler(async (req, res, next) => {
         if (!user) return next(new ApiError("User not found", 404))
         const match = await bcrypt.compare(password, user.password)
         if (!match) return next(new ApiError("Password Not Match", 400))
-        const token = sign({ id: user.id, role: user.role }, process.env.TOKEN, { expiresIn: "30d" })
+        const token = sign({ id: user.id, role: user.role }, process.env.TOKEN)
         delete user._doc.password
         user.token = token;
         res.json({user,token})
