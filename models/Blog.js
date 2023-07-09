@@ -15,6 +15,10 @@ module.exports = mongoose.model("Blog", new mongoose.Schema({
         type: String,
         required: [true, "Please Enter Description "]
     },
+    content: {
+        type: String,
+        required: [true, "Please Enter content "]
+    },
     images: Array,
     location: {
         type: String,

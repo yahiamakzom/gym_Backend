@@ -325,7 +325,7 @@ exports.deleteQuestion = asyncHandler(async (req, res, next) => {
 })
 
 exports.addBlog = asyncHandler(async (req, res, next) => {
-    const { name,description,nameblog } = req.body
+    const { name,description,nameblog,content } = req.body
     if (!req.files.blogImg) return next(new ApiError("Please Add blog Imgs", 409))
     const imgs_path = await Promise.all(req.files.blogImg.map(async img => {
         const uploadImg = await cloudinary.uploader.upload(img.path);
@@ -335,6 +335,7 @@ exports.addBlog = asyncHandler(async (req, res, next) => {
         {
             name: name.trim(),
             description,
+            content,
             nameblog,
             images: imgs_path,
         })

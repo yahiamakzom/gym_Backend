@@ -557,7 +557,10 @@ exports.getBlog = asyncHandler(async (req, res, next) => {
      const blog=  await Blog.find({})
        return res.json( blog );
 })
-
+exports.getBlogById = asyncHandler(async (req, res, next) => {
+    const blog=  await Blog.findById(req.params.blog_id)
+      return res.json( blog );
+})
 exports.getOpinnion = asyncHandler(async (req, res, next) => {
     const opinion=  await Opinion.find({})
       return res.json( opinion );
