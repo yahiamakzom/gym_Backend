@@ -28,5 +28,5 @@ module.exports = mongoose.model("Rules", new mongoose.Schema({
     location2: String,
     app_bg: String,
     app_bg_type: String,
-    banner_img:String
+    banner_img:[String]
 }))

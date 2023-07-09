@@ -12,7 +12,10 @@ router.post("/opinion", imgUploader.fields([{ name: "opinionImg" }, { name: "log
 router.put("/club/:club_id", imgUploader.fields([{ name: "clubImg" }, { name: "logo", maxCount: 1 }]), editClubValidator, editClub)
 router.delete("/club/:club_id",[check("club_id").isMongoId().withMessage("Please Add Valid Mongo Id ")] ,deleteClub)
 // Add New Rule 
-router.post("/rule", imgUploader.single("img"), [check("whatsapp").optional().isMobilePhone().withMessage("Enter Valid Phone Number"), validator], addRule)
+// router.post("/rule", imgUploader.single("img"), [check("whatsapp").optional().isMobilePhone().withMessage("Enter Valid Phone Number"), validator], addRule)
+router.post("/rule", imgUploader.array("img"), [check("whatsapp").optional().isMobilePhone().withMessage("Enter Valid Phone Number"), validator], addRule)
+
+
 // Activate Payment
 router.put("/payment/:payment_id", activePayment)
 
