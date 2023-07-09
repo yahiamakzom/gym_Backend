@@ -525,13 +525,14 @@ exports.updateProfile = async (req, res, next) => {
     const userId = decodedToken.id;
   
     try {
-      const file = req.file;
+    //   const file = req.file;
       let photo = 'default.jpg';
-  
-      if (file) {
+     
+      if (req.files.photo) {
         // Upload image to Cloudinary
-        const result = await cloudinary.uploader.upload(file.path);
-        photo = result.secure_url;
+        // const result = await cloudinary.uploader.upload(file.path);
+        // photo = result.secure_url;
+        photo = (await cloudinary.uploader.upload(req.files.photo[0].path)).secure_url
   
       }
   
