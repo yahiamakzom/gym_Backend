@@ -77,6 +77,7 @@ exports.addClub = asyncHandler(async (req, res, next) => {
                     images: imgs_path,
                     lat: Number(lat),
                     long: Number(long),
+                    logo,
                     allDay,
                     from: null,
                     to:null,
