@@ -343,24 +343,38 @@ exports.addBlog = asyncHandler(async (req, res, next) => {
         res.status(201).json({ blog });
 })
 
-exports.editBlog= asyncHandler(async (req, res, next) => {
-    const { name,description,nameblog,content } = req.body
-    if (!req.files.blogImg) return next(new ApiError("Please Add blog Imgs", 409))
-    const imgs_path = await Promise.all(req.files.blogImg.map(async img => {
+exports.editBlog = asyncHandler(async (req, res, next) => {
+  const { name, description, nameblog, content } = req.body;
+  const blog_id = req.params.blog_id;
+
+  let imgs_path = [];
+  if (req.files && req.files.blogImg) {
+    imgs_path = await Promise.all(
+      req.files.blogImg.map(async (img) => {
         const uploadImg = await cloudinary.uploader.upload(img.path);
         return uploadImg.secure_url;
-    }));
-    blog_id=req.params.blog_id;
-    await Blog.findByIdAndUpdate(blog_id,
-        {
-            name: name && name,
-            nameblog: nameblog && nameblog,
-            content: content && content,
-            description: description && description,
-            blogImg: imgs_path && imgs_path,
-        }, { new: true }).then((blog) => res.json({ blog }));
-})
+      })
+    );
+  }
 
+  const updatedBlog = await Blog.findByIdAndUpdate(
+    blog_id,
+    {
+      $set: {
+        name: name || undefined,
+        nameblog: nameblog || undefined,
+        content: content || undefined,
+        description: description || undefined,
+        images:imgs_path
+      },
+    //   $push: { images: { $each: imgs_path } },
+    },
+    { new: true }
+  );
+
+  console.log(updatedBlog);
+  res.json({ updatedBlog });
+})
 exports.deleteBlog= asyncHandler(async (req, res, next) => {
     blog_id=req.params.blog_id;
     await Blog.findByIdAndDelete(blog_id).then((blog) => res.json({ blog }));

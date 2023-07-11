@@ -26,6 +26,6 @@ router.get("/booking", verifyToken, userBooking)
 router.put("/fav/:club_id", verifyToken, addOrRemoveFav)
 router.get("/fav", verifyToken, getUserFav)
 router.get("/profile", verifyToken, getprofile)
-router.put("/profile", [verifyToken,imgUploader.fields([{ name: "photo" ,maxCount:1}])], updateProfile)
+router.patch("/profile", [verifyToken,imgUploader.fields([{ name: "photo" ,maxCount:1}])], updateProfile)
 
 module.exports = router
