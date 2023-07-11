@@ -466,7 +466,18 @@ exports.userBooking = asyncHandler(async (req, res, next) => {
     })
 })
 
-exports.getUserFav = asyncHandler(async (req, res, next) => await Favorite.find({ user: req.user.id }).then((data)=>res.json({data})))
+exports.getUserFav = asyncHandler(async (req, res, next) => {
+    await Favorite.find({ user: req.user.id })
+      .populate({
+        path: 'club',
+        select: 'location',
+      })
+      .populate({
+        path: 'user',
+        select: 'home_location',
+      })
+      .then((data) => res.json({ data }))
+  });
 
 exports.addOrRemoveFav = asyncHandler(async (req, res, next) => {
     const { club_id } = req.params
