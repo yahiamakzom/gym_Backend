@@ -515,55 +515,50 @@ exports.getprofile=asyncHandler(async (req, res, next) => {
       }
 })
 
+
 exports.updateProfile = async (req, res, next) => {
-    await body('username').notEmpty().withMessage('Username is required.');
-    await body('home_location').notEmpty().withMessage('Home location is required.');
-    await body('phone').notEmpty().withMessage('Phone number is required.');
-    await body('email').notEmpty().withMessage('Email is required.').isEmail().withMessage('Invalid email format.');
-    await body('password').notEmpty().withMessage('Password is required.').isLength({ min: 6 }).withMessage('Password should be at least 6 characters long.');
-    await body('gender').notEmpty().withMessage('Gender is required.');
-    await body('role').notEmpty().withMessage('Role is required.');
-  
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-  
-    const { username, home_location, phone, email, password, gender, role } = req.body;
-  
-    const token = req.headers.authorization && req.headers.authorization.split(" ")[1];
-    const decodedToken = jwt.decode(token);
-    const userId = decodedToken.id;
-  
     try {
-    //   const file = req.file;
-      let photo = 'https://res.cloudinary.com/dqzrlkpo7/image/upload/v1688753202/wdsdizzmodrqbbxzi0ed.jpg';
-     
-      if (req.files.photo) {
-        // Upload image to Cloudinary
-        // const result = await cloudinary.uploader.upload(file.path);
-        // photo = result.secure_url;
-        photo = (await cloudinary.uploader.upload(req.files.photo[0].path)).secure_url
+      await body('username').optional().notEmpty().withMessage('Username is required.').run(req);
+      await body('home_location').optional().notEmpty().withMessage('Home location is required.').run(req);
+      await body('phone').optional().notEmpty().withMessage('Phone number is required.').run(req);
+      await body('email').optional().notEmpty().withMessage('Email is required.').isEmail().withMessage('Invalid email format.').run(req);
+      await body('password').optional().notEmpty().withMessage('Password is required.').isLength({ min: 6 }).withMessage('Password should be at least 6 characters long.').run(req);
+      await body('gender').optional().notEmpty().withMessage('Gender is required.').run(req);
+      await body('role').optional().notEmpty().withMessage('Role is required.').run(req);
   
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
       }
   
-      const updatedUser = await User.findByIdAndUpdate(
-        userId,
-        { username, home_location, phone, email, password, gender, role, photo },
-        { new: true }
-      );
+      const { username, home_location, phone, email, password, gender, role } = req.body;
   
-      if (updatedUser) {
-        return res.json(updatedUser);
-      } else {
+      const token = req.headers.authorization && req.headers.authorization.split(" ")[1];
+      const decodedToken = jwt.decode(token);
+      const userId = decodedToken.id;
+  
+      const currentUser = await User.findById(userId);
+      if (!currentUser) {
         return res.status(404).json({ message: "User not found" });
       }
+  
+      // Update only the fields that are provided in the request body
+      currentUser.username = username || currentUser.username;
+      currentUser.home_location = home_location || currentUser.home_location;
+      currentUser.phone = phone || currentUser.phone;
+      currentUser.email = email || currentUser.email;
+      currentUser.password = password || currentUser.password;
+      currentUser.gender = gender || currentUser.gender;
+      currentUser.role = role || currentUser.role;
+  
+      const updatedUser = await currentUser.save();
+  
+      return res.json(updatedUser);
     } catch (error) {
       console.error("Error updating user profile:", error);
       res.status(500).json({ message: "Failed to update user profile. Please try again later." });
     }
   };
-  
 exports.getBlog = asyncHandler(async (req, res, next) => {
      const blog=  await Blog.find({})
        return res.json( blog );
