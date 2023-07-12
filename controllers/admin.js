@@ -407,7 +407,7 @@ exports.editOpininon= asyncHandler(async (req, res, next) => {
         {
             name: name && name,
             description: description && description,
-            blogImg: imgs_path && imgs_path,
+            images: imgs_path && imgs_path,
         }, { new: true }).then((opinion) => res.json({ opinion }));
 })
 
