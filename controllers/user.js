@@ -13,6 +13,7 @@ const paypal = require("paypal-rest-sdk")
 const axios = require("axios");
 const { calcDistance } = require("../utils/Map")
 const jwt = require('jsonwebtoken');
+const moment = require("moment");
 const { body, validationResult } = require('express-validator');
 const cloudinary = require('cloudinary').v2;
 cloudinary.config({
@@ -85,9 +86,29 @@ exports.getClubAuth = asyncHandler(async (req, res, next) => {
     const { club_id } = req.params
     await Club.findById(club_id).then(async (club) => {
         await Subscriptions.find({ club: req.params.club_id })
-            .then(async subscriptions => await userSub.findOne({ club: club_id, user: id,expired:false }).populate({ path: "subscription", select: "name price" })
+            .then(async subscriptions => await userSub.findOne({ club: club_id, user: id,expired:false }).populate({ path: "subscription", select: "name price type numberType" })
                 .then(async sub => {
                     if (lat && long) {
+                        let start_date, end_date;
+                        if (sub && sub.subscription) {
+                            const { type, numberType } = sub.subscription;
+                            const startDate = moment().startOf("day");
+                      
+                            if (type === "شهري") {
+                              end_date = moment(startDate).add(numberType, "months").endOf("day");
+                            } else if (type === "سنوي") {
+                              end_date = moment(startDate).add(numberType, "years").endOf("day");
+                            } else if (type === "اسبوعي") {
+                              end_date = moment(startDate).add(numberType, "weeks").endOf("day");
+                            } else if (type === "يومي") {
+                              end_date = moment(startDate).add(numberType, "days").endOf("day");
+                            }
+                      
+                            if (end_date) {
+                              start_date = startDate.format("DD-MM-YYYY");
+                              end_date = end_date.format("DD-MM-YYYY");
+                            }
+                          }
                         let distance = await calcDistance(`${club.lat},${club.long}`, `${lat},${long}`)
                         if (!distance) return next(new ApiError("Invalid distance", 400))
                         const isFave = await Favorite.findOne({ club_id: req.params.club_id ,user:id})
@@ -103,8 +124,10 @@ exports.getClubAuth = asyncHandler(async (req, res, next) => {
                                     username: (await User.findById(sub.user)).username,
                                     club_name: club.name,
                                     club_location: club.location,
-                                    start_date: `${sub.start_date.getDate()}-${sub.start_date.getMonth() + 1}-${sub.start_date.getFullYear()}`,
-                                    end_date: `${sub.end_date.getDate()}-${sub.end_date.getMonth() + 1}-${sub.end_date.getFullYear()}`,
+                                    // start_date: `${sub.start_date.getDate()}-${sub.start_date.getMonth() + 1}-${sub.start_date.getFullYear()}`,
+                                    // end_date: `${sub.end_date.getDate()}-${sub.end_date.getMonth() + 1}-${sub.end_date.getFullYear()}`,
+                                    start_date,
+                                    end_date,
                                     subscription_id: sub.subscription.id,
                                     subscription_name: sub.subscription.name,
                                     subscription_price: sub.subscription.price,
