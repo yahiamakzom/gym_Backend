@@ -145,7 +145,7 @@ exports.deleteClub = asyncHandler(async (req, res, next) => {
 
 // Add Rule
 exports.addRule = asyncHandler(async (req, res, next) => {
-    const { type } = req.query
+    const { type } = req.query;
     if (type === "uses" || type==="privacy"||type==="wallet") {
         const { textBody } = req.body
         if (!textBody.length) return next(new ApiError("Please Add a textBody", 400))
@@ -202,7 +202,7 @@ exports.addRule = asyncHandler(async (req, res, next) => {
         const { payment_type } = req.body
         if (payment_type === "paypal") {
             const { clientId, clientSecert, mode } = req.body
-            await axios.post(`${mode === "sandbox" ? "https://api.sandbox.paypal.com/v1/oauth2/token" : "https://api.paypal.com/v1/oauth2/token"}`, null, {
+            await axios.post(`${mode === "Sandbox" ? "https://api.sandbox.paypal.com/v1/oauth2/token" : "https://api.paypal.com/v1/oauth2/token"}`, null, {
                 params: {
                     grant_type: 'client_credentials',
                 },
