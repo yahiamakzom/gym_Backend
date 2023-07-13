@@ -69,11 +69,31 @@ exports.getClubs = asyncHandler(async (req, res, next) => {
 
 exports.getMinClubs=asyncHandler(async (req, res, next) => {
     try {
-        const minSubscriptions = await Subscriptions.find({ type: 'يومي' })
-        .populate({
-            path: 'club',
-          })
-          .sort({ price: 1 })
+        const minSubscriptions = await Subscriptions.aggregate([
+            {
+              $match: { type: 'يومي' }
+            },
+            {
+              $addFields: {
+                pricePerDay: { $divide: ['$price', '$numberType'] }
+              }
+            },
+            {
+              $sort: { pricePerDay: 1 }
+            },
+            {
+              $lookup: {
+                from: 'clubs', // Replace 'clubs' with the actual collection name for clubs
+                localField: 'club',
+                foreignField: '_id',
+                as: 'club'
+              }
+            },
+            {
+              $unwind: '$club'
+            }
+          ]);
+
          
         if(minSubscriptions)
         return res.json(minSubscriptions);
