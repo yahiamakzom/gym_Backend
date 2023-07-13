@@ -67,6 +67,24 @@ exports.getClubs = asyncHandler(async (req, res, next) => {
 
 });
 
+exports.getMinClubs=asyncHandler(async (req, res, next) => {
+    try {
+        const minSubscriptions = await Subscriptions.find({ type: 'يومي' })
+        .populate({
+            path: 'club',
+          })
+          .sort({ price: 1 })
+         
+        if(minSubscriptions)
+        return res.json(minSubscriptions);
+        else
+        return res.json([]);
+      } catch (error) {
+        // Handle error if needed
+        console.error(error);
+        throw new Error('Failed to get daily subscriptions.');
+      }
+});
 exports.getClub = asyncHandler(async (req, res, next) => {
     const { lat, long } = req.body;
     await Club.findById(req.params.club_id).then(async (club) => {
@@ -492,7 +510,7 @@ exports.userBooking = asyncHandler(async (req, res, next) => {
 exports.getUserFav = asyncHandler(async (req, res, next) => {
     await Favorite.find({ user: req.user.id })
       .populate({
-        path: 'club',
+        path: 'club_id',
         select: 'location',
       })
       .populate({

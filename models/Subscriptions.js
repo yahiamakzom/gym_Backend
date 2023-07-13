@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 module.exports = mongoose.model("Subscriptions", new mongoose.Schema({
     club: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User"
+        ref: "Club"
     },
     name: {
         type: String,

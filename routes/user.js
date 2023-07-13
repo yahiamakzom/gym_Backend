@@ -1,4 +1,4 @@
-const { getClubs, getClub, getRules, makeReport, userMakeSub, confirmPayment, getClubAuth, searchClub, searchClubByName, filterClubs, depositWallet, confirmDeposit, getUserWallet, userBooking, addOrRemoveFav, getUserFav, renewClubByWallet ,getprofile,updateProfile,getBlog,getOpinnion,getBlogById} = require("../controllers/user")
+const { getClubs, getClub, getRules, makeReport, userMakeSub, confirmPayment, getClubAuth, searchClub, searchClubByName, filterClubs, depositWallet, confirmDeposit, getUserWallet, userBooking, addOrRemoveFav, getUserFav, renewClubByWallet ,getprofile,updateProfile,getBlog,getOpinnion,getBlogById,getMinClubs} = require("../controllers/user")
 const router = require("express").Router()
 const verifyToken = require("../middlewares/verifyToken")
 const upload = require("../middlewares/upload");
@@ -6,6 +6,7 @@ const imgUploader = require("../middlewares/imgUploader")
 
 
 router.get("/clubs", getClubs)
+router.get("/minclubs", getMinClubs)
 router.get("/blogs", getBlog)
 router.get("/blog/:blog_id", getBlogById)
 router.get("/opinions", getOpinnion)
