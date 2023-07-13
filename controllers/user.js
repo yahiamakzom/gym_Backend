@@ -67,44 +67,102 @@ exports.getClubs = asyncHandler(async (req, res, next) => {
 
 });
 
-exports.getMinClubs=asyncHandler(async (req, res, next) => {
-    try {
-        const minSubscriptions = await Subscriptions.aggregate([
-            {
-              $match: { type: 'يومي' }
-            },
-            {
-              $addFields: {
-                pricePerDay: { $divide: ['$price', '$numberType'] }
-              }
-            },
-            {
-              $sort: { pricePerDay: 1 }
-            },
-            {
-              $lookup: {
-                from: 'clubs', // Replace 'clubs' with the actual collection name for clubs
-                localField: 'club',
-                foreignField: '_id',
-                as: 'club'
-              }
-            },
-            {
-              $unwind: '$club'
-            }
-          ]);
+// exports.getMinClubs=asyncHandler(async (req, res, next) => {
+//     try {
+//         const minSubscriptions = await Subscriptions.aggregate([
+//             {
+//               $match: { type: 'يومي' }
+//             },
+//             {
+//               $addFields: {
+//                 pricePerDay: { $divide: ['$price', '$numberType'] }
+//               }
+//             },
+//             {
+//               $sort: { pricePerDay: 1 }
+//             },
+//             {
+//               $lookup: {
+//                 from: 'clubs', // Replace 'clubs' with the actual collection name for clubs
+//                 localField: 'club',
+//                 foreignField: '_id',
+//                 as: 'club'
+//               }
+//             },
+//             {
+//               $unwind: '$club'
+//             }
+//           ]);
 
          
-        if(minSubscriptions)
-        return res.json(minSubscriptions);
-        else
-        return res.json([]);
-      } catch (error) {
-        // Handle error if needed
-        console.error(error);
-        throw new Error('Failed to get daily subscriptions.');
+//         if(minSubscriptions)
+//         return res.json(minSubscriptions);
+//         else
+//         return res.json([]);
+//       } catch (error) {
+//         // Handle error if needed
+//         console.error(error);
+//         throw new Error('Failed to get daily subscriptions.');
+//       }
+// });
+
+exports.getMinClubs = asyncHandler(async (req, res, next) => {
+    try {
+        const { lat, long } = req.body;
+      const minSubscriptions = await Subscriptions.aggregate([
+        {
+          $match: { type: 'يومي' }
+        },
+        {
+          $addFields: {
+            pricePerDay: { $divide: ['$price', '$numberType'] }
+          }
+        },
+        {
+          $sort: { pricePerDay: 1 }
+        },
+        {
+          $lookup: {
+            from: 'clubs', // Replace 'clubs' with the actual collection name for clubs
+            localField: 'club',
+            foreignField: '_id',
+            as: 'club'
+          }
+        },
+        {
+          $unwind: '$club'
+        }
+      ]);
+  
+      const clubs = minSubscriptions.map((subscription) => subscription.club);
+    //   return res.json({Clubs:clubs});
+      const countries = {};
+      for (const club of clubs) {
+          if (countries[club.country]) {
+              countries[club.country].push(club.city);
+          } else {
+              countries[club.country] = [club.city];
+          }
       }
-});
+      if (lat && long) {
+          const clubsWithDistance = [];
+          for (const club of clubs) {
+              let distance;
+  
+              distance = await calcDistance(`${club.lat},${club.long}`, `${lat},${long}`)
+              if (!distance) return next(new ApiError("Invalid distance", 400))
+              clubsWithDistance.push({ ...club.toObject(), distance: distance && distance });
+          }
+  
+          res.json({ Clubs: clubsWithDistance, countries });
+      } else res.json({ Clubs: clubs, countries });
+    } catch (error) {
+      console.error(error);
+      throw new Error('Failed to get min clubs.');
+    }
+  });
+
+
 exports.getClub = asyncHandler(async (req, res, next) => {
     const { lat, long } = req.body;
     await Club.findById(req.params.club_id).then(async (club) => {
