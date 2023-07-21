@@ -400,6 +400,7 @@ exports.getUserWallet = asyncHandler(async (req, res, next) => {
                     total_price += Number(subscription.price)
                     return {
                         _id: sub._id,
+                        club_id:club._id,
                         club_name: club.name,
                         club_logo: club.logo,
                         start_date: sub.start_date,
