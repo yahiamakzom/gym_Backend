@@ -401,6 +401,7 @@ exports.getUserWallet = asyncHandler(async (req, res, next) => {
                     return {
                         _id: sub._id,
                         club_id:club._id,
+                        subprice:sub.price,
                         club_name: club.name,
                         club_logo: club.logo,
                         start_date: sub.start_date,
