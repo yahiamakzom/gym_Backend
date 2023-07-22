@@ -671,7 +671,7 @@ exports.updateProfile = async (req, res, next) => {
       currentUser.password = password || currentUser.password;
       currentUser.gender = gender || currentUser.gender;
       currentUser.role = role || currentUser.role;
-  
+      currentUser.photo= currentUser.photo;
       const updatedUser = await currentUser.save();
   
       return res.json(updatedUser);
