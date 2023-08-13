@@ -57,6 +57,6 @@ router.patch(
   [verifyToken, imgUploader.fields([{ name: "photo", maxCount: 1 }])],
   updateProfile
 );
-router.post("/pay-visa/:subId", verifyToken, hyperCheckout);
-router.post("/check-pay/:id", verifyToken, checkPayment);
+router.post("/pay-visa", verifyToken, hyperCheckout);
+router.post("/check-pay/:paymentId/:subId", verifyToken, checkPayment);
 module.exports = router;

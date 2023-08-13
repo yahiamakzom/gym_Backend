@@ -22,101 +22,6 @@ cloudinary.config({
   api_secret: process.env.CLOUD_API_SECRET,
 });
 
-exports.hyperCheckout = asyncHandler(async (req, res, next) => {
-  const { subId } = req.params;
-  const { id } = req.user;
-  const https = require("https");
-  const querystring = require("querystring");
-
-  const request = async () => {
-    const path = "/v1/checkouts";
-    const data = querystring.stringify({
-      entityId: "8a8294174b7ecb28014b9699220015ca",
-      amount: "92.00",
-      currency: "EUR",
-      paymentType: "DB",
-    });
-    const options = {
-      port: 443,
-      host: "eu-test.oppwa.com",
-      path: path,
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        "Content-Length": data.length,
-        Authorization:
-          "Bearer OGE4Mjk0MTc0YjdlY2IyODAxNGI5Njk5MjIwMDE1Y2N8c3k2S0pzVDg=",
-      },
-    };
-    return new Promise((resolve, reject) => {
-      const postRequest = https.request(options, function (res) {
-        const buf = [];
-        res.on("data", (chunk) => {
-          buf.push(Buffer.from(chunk));
-        });
-        res.on("end", () => {
-          const jsonString = Buffer.concat(buf).toString("utf8");
-          try {
-            resolve(JSON.parse(jsonString));
-          } catch (error) {
-            reject(error);
-          }
-        });
-      });
-      postRequest.on("error", reject);
-      postRequest.write(data);
-      postRequest.end();
-    });
-  };
-
-  request()
-    .then((response) => res.send(response))
-    .catch(console.error);
-});
-
-exports.checkPayment = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  const https = require("https");
-  const querystring = require("querystring");
-
-  const request = async () => {
-    var path = `/v1/checkouts/${id}/payment`;
-    path += "?entityId=8a8294174b7ecb28014b9699220015ca";
-    const options = {
-      port: 443,
-      host: "eu-test.oppwa.com",
-      path: path,
-      method: "GET",
-      headers: {
-        Authorization:
-          "Bearer OGE4Mjk0MTc0YjdlY2IyODAxNGI5Njk5MjIwMDE1Y2N8c3k2S0pzVDg=",
-      },
-    };
-    return new Promise((resolve, reject) => {
-      const postRequest = https.request(options, function (res) {
-        const buf = [];
-        res.on("data", (chunk) => {
-          buf.push(Buffer.from(chunk));
-        });
-        res.on("end", () => {
-          const jsonString = Buffer.concat(buf).toString("utf8");
-          try {
-            resolve(JSON.parse(jsonString));
-          } catch (error) {
-            reject(error);
-          }
-        });
-      });
-      postRequest.on("error", reject);
-      postRequest.end();
-    });
-  };
-
-  request()
-    .then((response) => res.send(response))
-    .catch(console.error);
-});
-
 exports.getRules = asyncHandler(async (req, res) => {
   if (req.query.type && req.query.type === "banner") {
     const banner = await Rules.find({ type: "banner" });
@@ -404,6 +309,7 @@ exports.getClubAuth = asyncHandler(async (req, res, next) => {
     );
   });
 });
+
 exports.userMakeSub = asyncHandler(async (req, res, next) => {
   const { subId } = req.params;
   const { id } = req.user;
@@ -540,6 +446,157 @@ exports.renewClubByWallet = asyncHandler(async (req, res, next) => {
       });
     });
   });
+});
+
+exports.hyperCheckout = asyncHandler(async (req, res, next) => {
+  const { price } = req.body;
+  const { id } = req.user;
+  const https = require("https");
+  const querystring = require("querystring");
+
+  const request = async () => {
+    const path = "/v1/checkouts";
+    const data = querystring.stringify({
+      entityId: "8a8294174b7ecb28014b9699220015ca",
+      amount: price,
+      currency: "USD",
+      paymentType: "DB",
+    });
+    const options = {
+      port: 443,
+      host: "eu-test.oppwa.com",
+      path: path,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Length": data.length,
+        Authorization:
+          "Bearer OGE4Mjk0MTc0YjdlY2IyODAxNGI5Njk5MjIwMDE1Y2N8c3k2S0pzVDg=",
+      },
+    };
+    return new Promise((resolve, reject) => {
+      const postRequest = https.request(options, function (res) {
+        const buf = [];
+        res.on("data", (chunk) => {
+          buf.push(Buffer.from(chunk));
+        });
+        res.on("end", () => {
+          const jsonString = Buffer.concat(buf).toString("utf8");
+          try {
+            resolve(JSON.parse(jsonString));
+          } catch (error) {
+            reject(error);
+          }
+        });
+      });
+      postRequest.on("error", reject);
+      postRequest.write(data);
+      postRequest.end();
+    });
+  };
+
+  request()
+    .then((response) => res.send(response))
+    .catch(console.error);
+});
+
+exports.checkPayment = asyncHandler(async (req, res, next) => {
+  const { paymentId, subId } = req.params;
+  const { id } = req.user;
+  const { userSubId } = req.body;
+  const https = require("https");
+  const querystring = require("querystring");
+
+  const request = async () => {
+    var path = `/v1/checkouts/${id}/payment`;
+    path += "?entityId=8a8294174b7ecb28014b9699220015ca";
+    const options = {
+      port: 443,
+      host: "eu-test.oppwa.com",
+      path: path,
+      method: "GET",
+      headers: {
+        Authorization:
+          "Bearer OGE4Mjk0MTc0YjdlY2IyODAxNGI5Njk5MjIwMDE1Y2N8c3k2S0pzVDg=",
+      },
+    };
+    return new Promise((resolve, reject) => {
+      const postRequest = https.request(options, function (res) {
+        const buf = [];
+        res.on("data", (chunk) => {
+          buf.push(Buffer.from(chunk));
+        });
+        res.on("end", () => {
+          const jsonString = Buffer.concat(buf).toString("utf8");
+          try {
+            resolve(JSON.parse(jsonString));
+          } catch (error) {
+            reject(error);
+          }
+        });
+      });
+      postRequest.on("error", reject);
+      postRequest.end();
+    });
+  };
+
+  request()
+    .then(async (response) => {
+      if (response.id) {
+        res.send(response.id);
+        await Subscriptions.findById(subId).then(async (subscription) => {
+          console.log(subId);
+          if (!subscription)
+            return next(new ApiError("Can't find subscription", 404));
+          const start_date = new Date(Date.now());
+          let end_date = new Date(Date.now());
+          end_date =
+            subscription.type === "يومي"
+              ? end_date.setDate(end_date.getDate() + 1)
+              : subscription.type === "اسبوعي"
+              ? end_date.setDate(end_date.getDate() + 7)
+              : subscription.type === "شهري"
+              ? end_date.setMonth(end_date.getMonth() + 1)
+              : subscription.type === "سنوي" &&
+                end_date.setFullYear(end_date.getFullYear() + 1);
+          if (userSubId) {
+            await userSub.findById(userSubId).then(async (sub) => {
+              if (!sub)
+                return next(
+                  new ApiError("Can't Find User Pervious Subscription", 404)
+                );
+              await userSub
+                .findByIdAndUpdate(
+                  userSubId,
+                  { start_date, end_date, expired: false },
+                  { new: true }
+                )
+                .then((sub) => res.json({ sub }));
+            });
+          } else {
+            userSub
+              .create({
+                user: id,
+                club: subscription.club,
+                subscription,
+                start_date,
+                end_date,
+                code: userData.code,
+              })
+              .then(() =>
+                res.status(200).json({
+                  status: true,
+                })
+              );
+          }
+        });
+      } else {
+        res.status(422).json({
+          status: false,
+        });
+      }
+    })
+    .catch(console.error);
 });
 
 exports.confirmPayment = asyncHandler(async (req, res, next) => {
@@ -980,11 +1037,9 @@ exports.updateProfile = async (req, res, next) => {
     return res.json(updatedUser);
   } catch (error) {
     console.error("Error updating user profile:", error);
-    res
-      .status(500)
-      .json({
-        message: "Failed to update user profile. Please try again later.",
-      });
+    res.status(500).json({
+      message: "Failed to update user profile. Please try again later.",
+    });
   }
 };
 exports.getBlog = asyncHandler(async (req, res, next) => {
