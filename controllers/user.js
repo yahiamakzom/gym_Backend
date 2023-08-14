@@ -508,7 +508,7 @@ exports.checkPayment = asyncHandler(async (req, res, next) => {
   const querystring = require("querystring");
 
   const request = async () => {
-    var path = `/v1/checkouts/${id}/payment`;
+    var path = `/v1/checkouts/${paymentId}/payment`;
     path += "?entityId=8a8294174b7ecb28014b9699220015ca";
     const options = {
       port: 443,
