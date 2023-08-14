@@ -543,7 +543,8 @@ exports.checkPayment = asyncHandler(async (req, res, next) => {
   request()
     .then(async (response) => {
       if (response.id) {
-        res.send(response.id);
+        const userData = await User.findById(id);
+
         await Subscriptions.findById(subId).then(async (subscription) => {
           console.log(subId);
           if (!subscription)
@@ -559,36 +560,20 @@ exports.checkPayment = asyncHandler(async (req, res, next) => {
               ? end_date.setMonth(end_date.getMonth() + 1)
               : subscription.type === "سنوي" &&
                 end_date.setFullYear(end_date.getFullYear() + 1);
-          if (userSubId) {
-            await userSub.findById(userSubId).then(async (sub) => {
-              if (!sub)
-                return next(
-                  new ApiError("Can't Find User Pervious Subscription", 404)
-                );
-              await userSub
-                .findByIdAndUpdate(
-                  userSubId,
-                  { start_date, end_date, expired: false },
-                  { new: true }
-                )
-                .then((sub) => res.json({ sub }));
-            });
-          } else {
-            userSub
-              .create({
-                user: id,
-                club: subscription.club,
-                subscription,
-                start_date,
-                end_date,
-                code: userData.code,
+          userSub
+            .create({
+              user: id,
+              club: subscription.club,
+              subscription,
+              start_date,
+              end_date,
+              code: userData.code,
+            })
+            .then(() =>
+              res.status(200).json({
+                status: "success",
               })
-              .then(() =>
-                res.status(200).json({
-                  status: "success",
-                })
-              );
-          }
+            );
         });
       } else {
         res.status(422).json({
