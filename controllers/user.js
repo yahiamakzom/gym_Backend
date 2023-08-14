@@ -585,14 +585,14 @@ exports.checkPayment = asyncHandler(async (req, res, next) => {
               })
               .then(() =>
                 res.status(200).json({
-                  status: true,
+                  status: "success",
                 })
               );
           }
         });
       } else {
         res.status(422).json({
-          status: false,
+          status: "cancel",
         });
       }
     })
