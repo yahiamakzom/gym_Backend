@@ -458,8 +458,8 @@ exports.hyperCheckout = asyncHandler(async (req, res, next) => {
     const path = "/v1/checkouts";
     const data = querystring.stringify({
       entityId: "8a8294174b7ecb28014b9699220015ca",
-      amount: price,
-      currency: "USD",
+      amount: price * 3.75,
+      currency: "SAR",
       paymentType: "DB",
     });
     const options = {
