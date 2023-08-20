@@ -173,6 +173,16 @@ exports.getMinClubs = asyncHandler(async (req, res, next) => {
     ]);
 
     const clubs = minSubscriptions.map((subscription) => subscription.club);
+    const subscriptionPrices = await Promise.all(
+      clubs.map(async (club) => {
+        const dailySubscription = await Subscriptions.findOne({
+          club: club._id,
+          type: "يومي", // Filter by subscription type
+        });
+        const price = dailySubscription ? dailySubscription.price : null;
+        return { clubId: club._id, price };
+      })
+    );
     //   return res.json({Clubs:clubs});
     const countries = {};
     for (const club of clubs) {
@@ -184,7 +194,7 @@ exports.getMinClubs = asyncHandler(async (req, res, next) => {
     }
     if (lat && long) {
       const clubsWithDistance = [];
-      for (const club of clubs) {
+      for (const [index, club] of clubs.entries()) {
         let distance;
 
         distance = await calcDistance(
@@ -195,11 +205,22 @@ exports.getMinClubs = asyncHandler(async (req, res, next) => {
         clubsWithDistance.push({
           ...club.toObject(),
           distance: distance && distance,
+          subscriptionPrice: subscriptionPrices[index].price,
         });
       }
 
       res.json({ Clubs: clubsWithDistance, countries });
-    } else res.json({ Clubs: clubs, countries });
+    } else {
+
+      const clubsWithPrices = [];
+      for (const [index, club] of clubs.entries()) {
+        clubsWithPrices.push({
+          ...club,
+          subscriptionPrice: subscriptionPrices[index].price,
+        });
+      }
+        res.json({ Clubs: clubsWithPrices, countries });
+    } 
   } catch (error) {
     console.error(error);
     throw new Error("Failed to get min clubs.");
