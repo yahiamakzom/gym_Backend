@@ -808,9 +808,19 @@ exports.filterClubs = asyncHandler(async (req, res, next) => {
   const { filter } = req.query;
   const { lat, long } = req.query;
   await Club.find({}).then(async (clubs) => {
+    const subscriptionPrices = await Promise.all(
+      clubs.map(async (club) => {
+        const dailySubscription = await Subscriptions.findOne({
+          club: club._id,
+          type: "يومي", // Filter by subscription type
+        });
+        const price = dailySubscription ? dailySubscription.price : null;
+        return { clubId: club._id, price };
+      })
+    );
     if (filter === "nearby") {
       const clubsWithDistance = [];
-      for (const club of clubs) {
+      for (const [index, club] of clubs.entries()) {
         let distance;
         distance = await calcDistance(
           `${club.lat},${club.long}`,
@@ -820,6 +830,7 @@ exports.filterClubs = asyncHandler(async (req, res, next) => {
         clubsWithDistance.push({
           ...club.toObject(),
           distance: distance && distance,
+          subscriptionPrice: subscriptionPrices[index].price,
         });
       }
       res.json({
