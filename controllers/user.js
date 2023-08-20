@@ -211,7 +211,6 @@ exports.getMinClubs = asyncHandler(async (req, res, next) => {
 
       res.json({ Clubs: clubsWithDistance, countries });
     } else {
-
       const clubsWithPrices = [];
       for (const [index, club] of clubs.entries()) {
         clubsWithPrices.push({
@@ -219,7 +218,13 @@ exports.getMinClubs = asyncHandler(async (req, res, next) => {
           subscriptionPrice: subscriptionPrices[index].price,
         });
       }
-        res.json({ Clubs: clubsWithPrices, countries });
+      // Sort clubsWithPrices by subscriptionPrice in ascending order
+      clubsWithPrices.sort((a, b) => {
+        const priceA = a.subscriptionPrice || Number.MAX_SAFE_INTEGER;
+        const priceB = b.subscriptionPrice || Number.MAX_SAFE_INTEGER;
+        return priceA - priceB;
+      });
+      res.json({ Clubs: clubsWithPrices, countries });
     } 
   } catch (error) {
     console.error(error);
