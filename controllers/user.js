@@ -842,6 +842,16 @@ exports.filterClubs = asyncHandler(async (req, res, next) => {
       });
     } else if (filter === "lowest") {
       const clubs = await Club.find({}).lean();
+      const subscriptionPrices = await Promise.all(
+        clubs.map(async (club) => {
+          const dailySubscription = await Subscriptions.findOne({
+            club: club._id,
+            type: "يومي", // Filter by subscription type
+          });
+          const price = dailySubscription ? dailySubscription.price : null;
+          return { clubId: club._id, price };
+        })
+      );
       const clubIds = clubs.map((club) => club._id);
       const lowestSubscriptions = await Subscriptions.aggregate([
         {
@@ -872,7 +882,15 @@ exports.filterClubs = asyncHandler(async (req, res, next) => {
       sortedClubs.sort(
         (a, b) => a.lowestSubscriptionPrice - b.lowestSubscriptionPrice
       );
-      res.json({ Clubs: sortedClubs });
+
+        const clubsWithPrices = [];
+        for (const [index, club] of sortedClubs.entries()) {
+          clubsWithPrices.push({
+            ...club,
+            subscriptionPrice: subscriptionPrices[index].price,
+          });
+        }
+      res.json({ Clubs: clubsWithPrices });
     } else if (filter === "best") {
       await Club.aggregate([
         {
