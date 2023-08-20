@@ -53,7 +53,22 @@ exports.makeReport = asyncHandler(
 
 exports.getClubs = asyncHandler(async (req, res, next) => {
   const { lat, long } = req.body;
+
+  // Retrieve all clubs
   const clubs = await Club.find({});
+
+  // Retrieve subscription prices for type "يومي" for all clubs
+  const subscriptionPrices = await Promise.all(
+    clubs.map(async (club) => {
+      const dailySubscription = await Subscriptions.findOne({
+        club: club._id,
+        type: "يومي", // Filter by subscription type
+      });
+      const price = dailySubscription ? dailySubscription.price : null;
+      return { clubId: club._id, price };
+    })
+  );
+
   const countries = {};
   for (const club of clubs) {
     if (countries[club.country]) {
@@ -62,12 +77,11 @@ exports.getClubs = asyncHandler(async (req, res, next) => {
       countries[club.country] = [club.city];
     }
   }
+
   if (lat && long) {
     const clubsWithDistance = [];
-    for (const club of clubs) {
-      let distance;
-
-      distance = await calcDistance(
+    for (const [index, club] of clubs.entries()) {
+      const distance = await calcDistance(
         `${club.lat},${club.long}`,
         `${lat},${long}`
       );
@@ -75,12 +89,22 @@ exports.getClubs = asyncHandler(async (req, res, next) => {
       clubsWithDistance.push({
         ...club.toObject(),
         distance: distance && distance,
+        subscriptionPrice: subscriptionPrices[index].price,
       });
     }
 
     res.json({ Clubs: clubsWithDistance, countries });
-  } else res.json({ Clubs: clubs, countries });
+  } else {
+    const clubsWithPrices = clubs.map((club, index) => ({
+      ...club.toObject(),
+      subscriptionPrice: subscriptionPrices[index].price,
+    }));
+    res.json({ Clubs: clubsWithPrices, countries });
+  }
 });
+
+
+
 
 // exports.getMinClubs=asyncHandler(async (req, res, next) => {
 //     try {
