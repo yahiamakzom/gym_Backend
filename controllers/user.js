@@ -821,13 +821,30 @@ exports.searchClubByName = asyncHandler(async (req, res, next) => {
 
 exports.searchClub = asyncHandler(async (req, res, next) => {
   const { search } = req.query; // User input for searching
-  await Club.find()
-    .or([
-      { name: { $regex: search, $options: "i" } },
-      { city: { $regex: search, $options: "i" } },
-      { location: { $regex: search, $options: "i" } },
-    ])
-    .then((Clubs) => res.json({ Clubs }));
+  const Clubs = await Club.find().or([
+    { name: { $regex: search, $options: "i" } },
+    { city: { $regex: search, $options: "i" } },
+    { location: { $regex: search, $options: "i" } },
+  ]);
+    const subscriptionPrices = await Promise.all(
+      Clubs.map(async (club) => {
+        const dailySubscription = await Subscriptions.findOne({
+          club: club._id,
+          type: "يومي", // Filter by subscription type
+        });
+        const price = dailySubscription ? dailySubscription.price : null;
+        return { clubId: club._id, price };
+      })
+    );
+    const clubsWithPrices = [];
+    for (const [index, club] of Clubs.entries()) {
+      Clubs[index] = {...Clubs[index].toObject(), subscriptionPrice: subscriptionPrices[index].price};
+      // clubsWithPrices.push({
+        // ...club,
+        // subscriptionPrice: subscriptionPrices[index].price,
+      // });
+    }
+      res.json({ Clubs });
 });
 
 exports.filterClubs = asyncHandler(async (req, res, next) => {
