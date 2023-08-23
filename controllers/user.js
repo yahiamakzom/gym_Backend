@@ -15,6 +15,7 @@ const { calcDistance } = require("../utils/Map");
 const jwt = require("jsonwebtoken");
 const moment = require("moment");
 const { body, validationResult } = require("express-validator");
+const { log } = require("console");
 const cloudinary = require("cloudinary").v2;
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
@@ -989,14 +990,40 @@ exports.getUserFav = asyncHandler(async (req, res, next) => {
   await Favorite.find({ user: req.user.id })
     .populate({
       path: "club_id",
-      select: "location",
+      select: "-__v", // Select all fields except __v
     })
     .populate({
       path: "user",
       select: "home_location",
     })
-    .then((data) => res.json({ data }));
+    .then(async (data) => {
+      const modifiedData = await Promise.all(
+        data.map(async (fav) => {
+          // Extract relevant club data
+          const clubData = fav.club_id;
+          const dailySubscription = await Subscriptions.findOne({
+            club: clubData._id,
+            type: "يومي", // Filter by subscription type
+          });
+          const subPrice = dailySubscription ? dailySubscription.price : 0;
+          console.log(subPrice);
+          // Modify club data if needed
+          // Example: clubData.someField = newValue;
+
+          // Add the modified club data to the favorite object
+          const modifiedFav = {
+            ...fav.toObject(),
+            subscriptionPrice: subPrice,
+          };
+          return modifiedFav;
+        })
+      );
+
+      res.json({ data: modifiedData });
+    });
 });
+;
+
 
 exports.addOrRemoveFav = asyncHandler(async (req, res, next) => {
   const { club_id } = req.params;
