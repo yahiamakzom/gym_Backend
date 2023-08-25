@@ -24,6 +24,7 @@ const {
   getMinClubs,
   hyperCheckout,
   checkPayment,
+  walletDeposit,
 } = require("../controllers/user");
 const router = require("express").Router();
 const verifyToken = require("../middlewares/verifyToken");
@@ -59,4 +60,5 @@ router.patch(
 );
 router.post("/pay-visa", verifyToken, hyperCheckout);
 router.post("/check-pay/:paymentId/:subId", verifyToken, checkPayment);
+router.post("/wallet_deposit", verifyToken, walletDeposit);
 module.exports = router;
