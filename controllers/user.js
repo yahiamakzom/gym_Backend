@@ -11,7 +11,7 @@ const Favorite = require("../models/Favorite");
 const ApiError = require("../utils/ApiError");
 const paypal = require("paypal-rest-sdk");
 const axios = require("axios");
-const { calcDistance } = require("../utils/Map");
+const { calcDistance, calculateDistance } = require("../utils/Map");
 const jwt = require("jsonwebtoken");
 const moment = require("moment");
 const { body, validationResult } = require("express-validator");
@@ -867,10 +867,12 @@ exports.filterClubs = asyncHandler(async (req, res, next) => {
       const clubsWithDistance = [];
       for (const [index, club] of clubs.entries()) {
         let distance;
-        distance = await calcDistance(
-          `${club.lat},${club.long}`,
-          `${lat},${long}`
-        );
+        // distance = await calcDistance(
+        //   `${club.lat},${club.long}`,
+        //   `${lat},${long}`
+        // );
+        distance = calculateDistance(`${club.lat},${club.long}`,
+          `${lat},${long}`)
         if (!distance) return next(new ApiError("Invalid distance", 400));
         clubsWithDistance.push({
           ...club.toObject(),
