@@ -1176,3 +1176,34 @@ exports.walletDeposit = asyncHandler(async (req, res, next) => {
   await userData.save();
   res.sendStatus(200);
 });
+
+exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
+  const { subId } = req.body;
+  const { id } = req.user;
+  const userData = await User.findById(id);
+  const subscription = await Subscriptions.findById(subId);
+    console.log(subId);
+    if (!subscription)
+      return next(new ApiError("Can't find subscription", 404));
+  const start_date = new Date(Date.now());
+  let end_date = new Date(Date.now());
+  end_date =
+    subscription.type === "يومي"
+      ? end_date.setDate(end_date.getDate() + 1)
+      : subscription.type === "اسبوعي"
+      ? end_date.setDate(end_date.getDate() + 7)
+      : subscription.type === "شهري"
+      ? end_date.setMonth(end_date.getMonth() + 1)
+      : subscription.type === "سنوي" &&
+        end_date.setFullYear(end_date.getFullYear() + 1);
+    userSub
+      .create({
+        user: id,
+        club: subscription.club,
+        subscription,
+        start_date,
+        end_date,
+        code: userData.code,
+      })
+      .then(() => res.status(200).send("Payment successful"));
+});
