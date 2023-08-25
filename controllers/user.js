@@ -571,6 +571,7 @@ exports.checkPayment = asyncHandler(async (req, res, next) => {
           "Bearer OGE4Mjk0MTc0YjdlY2IyODAxNGI5Njk5MjIwMDE1Y2N8c3k2S0pzVDg=",
       },
     };
+    
     return new Promise((resolve, reject) => {
       const postRequest = https.request(options, function (res) {
         const buf = [];
@@ -1161,4 +1162,17 @@ exports.getBlogById = asyncHandler(async (req, res, next) => {
 exports.getOpinnion = asyncHandler(async (req, res, next) => {
   const opinion = await Opinion.find({});
   return res.json(opinion);
+});
+
+exports.walletDeposit = asyncHandler(async (req, res, next) => {
+  const { amount } = req.body;
+  const { id } = req.user;
+  const userData = await User.findById(id);
+  // check if user not found
+  if (!userData) return next(new ApiError("User Not Found", 404));
+  
+  // we add the amount to the user wallet
+  userData.wallet += Number(amount);
+  await userData.save();
+  res.sendStatus(200);
 });
