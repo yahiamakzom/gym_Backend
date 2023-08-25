@@ -294,9 +294,16 @@ exports.getClubAuth = asyncHandler(async (req, res, next) => {
                   end_date = end_date.format("DD-MM-YYYY");
                 }
               }
-              let distance = await calcDistance(
-                `${club.lat},${club.long}`,
-                `${lat},${long}`
+              // let distance = await calcDistance(
+              //   `${club.lat},${club.long}`,
+              //   `${lat},${long}`
+              // );
+              let distance;
+              distance = calculateDistance(
+                `${club.lat}`,
+                `${club.long}`,
+                `${lat}`,
+                `${long}`
               );
               if (!distance) return next(new ApiError("Invalid distance", 400));
               const isFave = await Favorite.findOne({
