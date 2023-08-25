@@ -38,8 +38,17 @@ exports.calcDistance = async (origin, destination) => {
 };
 
 exports.calculateDistance = (lat1, lon1, lat2, lon2) => {
+    console.log("Input values:", lat1, lon1, lat2, lon2);
   const earthRadius = 6371; // Earth's radius in kilometers
-
+ lat1 = parseFloat(lat1);
+ lon1 = parseFloat(lon1);
+ lat2 = parseFloat(lat2);
+ lon2 = parseFloat(lon2);
+ 
+  console.log("lat1:", lat1);
+  console.log("lon1:", lon1);
+  console.log("lat2:", lat2);
+  console.log("lon2:", lon2);
   const dLat = degreesToRadians(lat2 - lat1);
   const dLon = degreesToRadians(lon2 - lon1);
 
@@ -51,7 +60,8 @@ exports.calculateDistance = (lat1, lon1, lat2, lon2) => {
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
   let distance = earthRadius * c;
-  distance = parseFloat(distance.toFixed(2));
+
+  distance = parseFloat(distance.toFixed(2)).toString();
   return distance;
 }
 
