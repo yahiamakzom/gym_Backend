@@ -421,7 +421,7 @@ exports.userMakeSub = asyncHandler(async (req, res, next) => {
             );
           } else if (type === "wallet") {
             await User.findById(id).then(async (user) => {
-              if (user.wallet < subscription.price)
+              if (user.wallet < subscription.price * 3.75)
                 return next(
                   new ApiError("Your Balance in Wallet Not Enough", 400)
                 );
@@ -447,7 +447,7 @@ exports.userMakeSub = asyncHandler(async (req, res, next) => {
                     code: user.code,
                   })
                   .then(async () => {
-                    user.wallet -= Number(subscription.price);
+                    user.wallet -= Number(subscription.price) * 3.75;
                     await user.save();
                     res.sendStatus(200);
                   });
@@ -470,7 +470,7 @@ exports.renewClubByWallet = asyncHandler(async (req, res, next) => {
       if (!subscription)
         return next(new ApiError("Can't find subscription", 404));
       await User.findById(id).then(async (user) => {
-        if (user.wallet < subscription.price)
+        if (user.wallet < subscription.price * 3.75)
           return next(new ApiError("Your Balance in Wallet Not Enough", 400));
         else {
           const start_date = new Date(Date.now());
