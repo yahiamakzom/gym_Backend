@@ -515,10 +515,11 @@ exports.hyperCheckout = asyncHandler(async (req, res, next) => {
   const request = async () => {
     const path = "/v1/checkouts";
     const data = querystring.stringify({
-      entityId: "8a8294174b7ecb28014b9699220015ca",
+      entityId: "8ac7a4c789cce7da0189cef121f1010e",
       amount: price * 3.75,
       currency: "SAR",
       paymentType: "DB",
+      "applePay.paymentToken": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJpc3MiOiI4RzRHN0o4VUc4IiwiaWF0IjoxNjk4NTQzNDE5LCJkb21haW5zIjpbImd5bWJhY2tlbmQtcjVudy5vbnJlbmRlci5jb20iXX0.YuUSdN80wuqWEC4u3goIurzd2w_nsx3xPIuivqF9d7Oqc_TO-mUtPPySkkPCaSv1XbrHwYYAQLT58Vm_GdBnXQ"
     });
     const options = {
       port: 443,
@@ -529,7 +530,7 @@ exports.hyperCheckout = asyncHandler(async (req, res, next) => {
         "Content-Type": "application/x-www-form-urlencoded",
         "Content-Length": data.length,
         Authorization:
-          "Bearer OGE4Mjk0MTc0YjdlY2IyODAxNGI5Njk5MjIwMDE1Y2N8c3k2S0pzVDg=",
+          "Bearer OGFjN2E0Yzc4OWNjZTdkYTAxODljZWYwYTYxMTAxMGF8S3czc3lqRk5Hdw==",
       },
     };
     return new Promise((resolve, reject) => {
