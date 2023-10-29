@@ -9,6 +9,7 @@ const verifyRoles = require("./middlewares/verifyRoles")
 const validateSub = require("./middlewares/validateSub")
 
 app.use(express.static(path.join(__dirname, "images")))
+app.use(express.static('public'));
 app.use(express.json())
 process.env.NODE_ENV !== app.use(require("morgan")("dev"))
 app.use(express.urlencoded({ extended: true }))
