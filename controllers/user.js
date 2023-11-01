@@ -507,19 +507,48 @@ exports.renewClubByWallet = asyncHandler(async (req, res, next) => {
 });
 
 exports.hyperCheckout = asyncHandler(async (req, res, next) => {
-  const { price } = req.body;
+  const { price, brand } = req.body;
   const { id } = req.user;
   const https = require("https");
   const querystring = require("querystring");
 
   const request = async () => {
     const path = "/v1/checkouts";
+    let entityId;
+
+    if(!brand) {
+      return Promise.reject(new Error("brand is required"));
+    }
+
+    brand = brand.toLowerCase();
+    
+    if (brand == "visa" || brand == "mastercard" || brand == "stcpay") {
+      entityId = "8ac7a4c789cce7da0189cef121f1010e";
+    } else if (brand == "mada") {
+      entityId = "8ac7a4c789cce7da0189cef21f1b0112";
+    } else if (brand == "applepay") {
+      entityId = "8ac7a4c88ac93f4f018acc6f1377032b";
+    } else {
+      return Promise.reject(new Error("brand is not valid"));
+    }
+
     const data = querystring.stringify({
-      entityId: "8ac7a4c88ac93f4f018acc6f1377032b", //"8ac7a4c789cce7da0189cef121f1010e",
+      entityId,
       amount: price * 3.75,
       currency: "SAR",
       paymentType: "DB",
+      customParameters:true,
+      merchantTransactionId: req.body.merchantTransactionId,
+      "customer.email" : req.body["customer.email"],
+      "billing.street1": read.body["billing.street1"],       
+      "billing.city": req.body["billing.city"],
+      "billing.state": req.body["billing.state"], 
+      "billing.country": req.body["billing.country"],
+      "billing.postcode" : req.body["billing.postcode"],
+      "customer.givenName" : req.body["customer.givenName"],
+      "customer.surname" : req.body["customer.surname"],
     });
+
     const options = {
       port: 443,
       host: "eu-test.oppwa.com",
@@ -532,6 +561,7 @@ exports.hyperCheckout = asyncHandler(async (req, res, next) => {
           "Bearer OGFjN2E0Yzc4OWNjZTdkYTAxODljZWYwYTYxMTAxMGF8S3czc3lqRk5Hdw==",
       },
     };
+
     return new Promise((resolve, reject) => {
       const postRequest = https.request(options, function (res) {
         const buf = [];
