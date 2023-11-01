@@ -515,11 +515,10 @@ exports.hyperCheckout = asyncHandler(async (req, res, next) => {
   const request = async () => {
     const path = "/v1/checkouts";
     const data = querystring.stringify({
-      entityId: "8ac7a4c789cce7da0189cef121f1010e",
+      entityId: "8ac7a4c88ac93f4f018acc6f1377032b", //"8ac7a4c789cce7da0189cef121f1010e",
       amount: price * 3.75,
       currency: "SAR",
       paymentType: "DB",
-      "applePay.paymentToken": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJpc3MiOiI4RzRHN0o4VUc4IiwiaWF0IjoxNjk4NTQzNDE5LCJkb21haW5zIjpbImd5bWJhY2tlbmQtcjVudy5vbnJlbmRlci5jb20iXX0.YuUSdN80wuqWEC4u3goIurzd2w_nsx3xPIuivqF9d7Oqc_TO-mUtPPySkkPCaSv1XbrHwYYAQLT58Vm_GdBnXQ"
     });
     const options = {
       port: 443,
