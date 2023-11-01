@@ -519,8 +519,6 @@ exports.hyperCheckout = asyncHandler(async (req, res, next) => {
     if(!brand) {
       return Promise.reject(new Error("brand is required"));
     }
-
-    brand = brand.toLowerCase();
     
     if (brand == "visa" || brand == "mastercard" || brand == "stcpay") {
       entityId = "8ac7a4c789cce7da0189cef121f1010e";
