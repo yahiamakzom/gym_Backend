@@ -520,6 +520,8 @@ exports.hyperCheckout = asyncHandler(async (req, res, next) => {
       return Promise.reject(new Error("brand is required"));
     }
     
+    console.log("Brand: " + brand);
+    
     if (brand == "visa" || brand == "mastercard" || brand == "stcpay") {
       entityId = "8ac7a4c789cce7da0189cef121f1010e";
     } else if (brand == "mada") {
@@ -535,7 +537,7 @@ exports.hyperCheckout = asyncHandler(async (req, res, next) => {
       amount: price * 3.75,
       currency: "SAR",
       paymentType: "DB",
-      customParameters:true,
+      "customParameters[3DS2_enrolled]": true,
       merchantTransactionId: req.body.merchantTransactionId,
       "customer.email" : req.body["customer.email"],
       "billing.street1": req.body["billing.street1"],       
@@ -546,6 +548,9 @@ exports.hyperCheckout = asyncHandler(async (req, res, next) => {
       "customer.givenName" : req.body["customer.givenName"],
       "customer.surname" : req.body["customer.surname"],
     });
+
+    console.log("Data: ");
+    console.log(data);
 
     const options = {
       port: 443,
@@ -575,6 +580,7 @@ exports.hyperCheckout = asyncHandler(async (req, res, next) => {
           }
         });
       });
+
       postRequest.on("error", reject);
       postRequest.write(data);
       postRequest.end();
