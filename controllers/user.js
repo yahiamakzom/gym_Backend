@@ -538,7 +538,7 @@ exports.hyperCheckout = asyncHandler(async (req, res, next) => {
       customParameters:true,
       merchantTransactionId: req.body.merchantTransactionId,
       "customer.email" : req.body["customer.email"],
-      "billing.street1": read.body["billing.street1"],       
+      "billing.street1": req.body["billing.street1"],       
       "billing.city": req.body["billing.city"],
       "billing.state": req.body["billing.state"], 
       "billing.country": req.body["billing.country"],
