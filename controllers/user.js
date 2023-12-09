@@ -523,9 +523,9 @@ exports.hyperCheckout = asyncHandler(async (req, res, next) => {
     console.log("Brand: " + brand);
     
     if (brand == "visa" || brand == "mastercard" || brand == "stcpay") {
-      entityId = "8ac7a4c789cce7da0189cef121f1010e";
+      entityId = "8ac9a4c88c152af8018c34bdd8db1eda";
     } else if (brand == "mada") {
-      entityId = "8ac7a4c789cce7da0189cef21f1b0112";
+      entityId = "8ac9a4c88c152af8018c34be7f601ee3";
     } else if (brand == "applepay") {
       entityId = "8ac7a4c88ac93f4f018acc6f1377032b";
     } else {
@@ -537,8 +537,9 @@ exports.hyperCheckout = asyncHandler(async (req, res, next) => {
       amount: price * 3.75,
       currency: "SAR",
       paymentType: "DB",
-      "customParameters[3DS2_enrolled]": true,
-      merchantTransactionId: req.body.merchantTransactionId,
+      //  Also please remove testMode=EXTERNAL and customParameters[3DS2_enrolled]=true from this step's code, as they are only required for testing
+      // "customParameters[3DS2_enrolled]": true,
+      "merchantTransactionId": req.body.merchantTransactionId,
       "customer.email" : req.body["customer.email"],
       "billing.street1": req.body["billing.street1"],       
       "billing.city": req.body["billing.city"],
@@ -554,14 +555,14 @@ exports.hyperCheckout = asyncHandler(async (req, res, next) => {
 
     const options = {
       port: 443,
-      host: "eu-test.oppwa.com",
+      host: "eu-prod.oppwa.com",
       path: path,
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
         "Content-Length": data.length,
         Authorization:
-          "Bearer OGFjN2E0Yzc4OWNjZTdkYTAxODljZWYwYTYxMTAxMGF8S3czc3lqRk5Hdw==",
+          "Bearer OGFjOWE0Yzg4YzE1MmFmODAxOGMzNGJkNDk5NzFlZDJ8cXRqMnlhR0Y0ZVQ5UHFKcA==",
       },
     };
 
@@ -604,12 +605,12 @@ exports.checkPayment = asyncHandler(async (req, res, next) => {
     path += "?entityId=8a8294174b7ecb28014b9699220015ca";
     const options = {
       port: 443,
-      host: "eu-test.oppwa.com",
+      host: "eu-prod.oppwa.com",
       path: path,
       method: "GET",
       headers: {
         Authorization:
-          "Bearer OGE4Mjk0MTc0YjdlY2IyODAxNGI5Njk5MjIwMDE1Y2N8c3k2S0pzVDg=",
+          "Bearer OGFjOWE0Yzg4YzE1MmFmODAxOGMzNGJkNDk5NzFlZDJ8cXRqMnlhR0Y0ZVQ5UHFKcA==",
       },
     };
     
