@@ -562,7 +562,8 @@ exports.hyperCheckout = asyncHandler(async (req, res, next) => {
         "Content-Type": "application/x-www-form-urlencoded",
         "Content-Length": data.length,
         Authorization:
-          "Bearer OGFjOWE0Yzg4YzE1MmFmODAxOGMzNGJkNDk5NzFlZDJ8cXRqMnlhR0Y0ZVQ5UHFKcA==",
+          // "Bearer OGFjOWE0Yzg4YzE1MmFmODAxOGMzNGJkNDk5NzFlZDJ8cXRqMnlhR0Y0ZVQ5UHFKcA==",
+          "Bearer OGFjN2E0Yzc4OWNjZTdkYTAxODljZWYwYTYxMTAxMGF8S3czc3lqRk5Hdw==",
       },
     };
 
@@ -605,16 +606,16 @@ exports.checkPaymentNew = asyncHandler(async (req, res, next) => {
   if (!brand) {
     return Promise.reject(new Error("brand is required"));
   }
-
-  if (brand == "visa" || brand == "mastercard" || brand == "stcpay") {
-    entityId = "8ac9a4c88c152af8018c34bdd8db1eda";
-  } else if (brand == "mada") {
-    entityId = "8ac9a4c88c152af8018c34be7f601ee3";
-  } else if (brand == "applepay") {
-    entityId = "8ac7a4c88ac93f4f018acc6f1377032b";
-  } else {
-    return Promise.reject(new Error("brand is not valid"));
-  }
+  entityId = "8a8294174b7ecb28014b9699220015ca";
+  // if (brand == "visa" || brand == "mastercard" || brand == "stcpay") {
+  //   entityId = "8ac9a4c88c152af8018c34bdd8db1eda";
+  // } else if (brand == "mada") {
+  //   entityId = "8ac9a4c88c152af8018c34be7f601ee3";
+  // } else if (brand == "applepay") {
+  //   entityId = "8ac7a4c88ac93f4f018acc6f1377032b";
+  // } else {
+  //   return Promise.reject(new Error("brand is not valid"));
+  // }
   const request = async () => {
     var path = `/v1/checkouts/${paymentId}/payment`;
     // path += "?entityId=8a8294174b7ecb28014b9699220015ca";
@@ -628,7 +629,8 @@ exports.checkPaymentNew = asyncHandler(async (req, res, next) => {
       method: "GET",
       headers: {
         Authorization:
-          "Bearer OGFjOWE0Yzg4YzE1MmFmODAxOGMzNGJkNDk5NzFlZDJ8cXRqMnlhR0Y0ZVQ5UHFKcA==",
+          // "Bearer OGFjOWE0Yzg4YzE1MmFmODAxOGMzNGJkNDk5NzFlZDJ8cXRqMnlhR0Y0ZVQ5UHFKcA==",
+          "Bearer OGFjN2E0Yzc4OWNjZTdkYTAxODljZWYwYTYxMTAxMGF8S3czc3lqRk5Hdw==",
       },
     };
 
