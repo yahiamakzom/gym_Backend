@@ -26,6 +26,7 @@ const {
   checkPayment,
   walletDeposit,
   subscriptionConfirmation,
+  checkPaymentNew,
 } = require("../controllers/user");
 const router = require("express").Router();
 const verifyToken = require("../middlewares/verifyToken");
