@@ -536,7 +536,7 @@ exports.hyperCheckout = asyncHandler(async (req, res, next) => {
       paymentType: "DB",
       //  Also please remove testMode=EXTERNAL and customParameters[3DS2_enrolled]=true from this step's code, as they are only required for testing
       // "customParameters[3DS2_enrolled]": true,
-      merchantTransactionId: req.body.merchantTransactionId,
+      "merchantTransactionId": req.body.merchantTransactionId,
       "customer.email": req.body["customer.email"],
       "billing.street1": req.body["billing.street1"],
       "billing.city": req.body["billing.city"],
@@ -591,8 +591,8 @@ exports.hyperCheckout = asyncHandler(async (req, res, next) => {
     .catch(console.error);
 });
 
-exports.checkPayment = asyncHandler(async (req, res, next) => {
-  const {brand} = req.body;
+exports.checkPaymentNew = asyncHandler(async (req, res, next) => {
+  const { brand } = req.body;
   const { paymentId, subId } = req.params;
   const { id } = req.user;
   const { userSubId } = req.body;
@@ -694,6 +694,96 @@ exports.checkPayment = asyncHandler(async (req, res, next) => {
     })
     .catch(console.error);
 });
+
+exports.checkPayment = asyncHandler(async (req, res, next) => {
+  const { paymentId, subId } = req.params;
+  const { id } = req.user;
+  const { userSubId } = req.body;
+  const https = require("https");
+  const querystring = require("querystring");
+  
+  const request = async () => {
+    var path = `/v1/checkouts/${paymentId}/payment`;
+    path += "?entityId=8a8294174b7ecb28014b9699220015ca";
+
+    const options = {
+      port: 443,
+      // host: "eu-prod.oppwa.com",
+      host: "eu-test.oppwa.com",
+      path: path,
+      method: "GET",
+      headers: {
+        Authorization:
+          "Bearer OGFjOWE0Yzg4YzE1MmFmODAxOGMzNGJkNDk5NzFlZDJ8cXRqMnlhR0Y0ZVQ5UHFKcA==",
+      },
+    };
+
+    return new Promise((resolve, reject) => {
+      const postRequest = https.request(options, function (res) {
+        const buf = [];
+        res.on("data", (chunk) => {
+          buf.push(Buffer.from(chunk));
+        });
+        res.on("end", () => {
+          const jsonString = Buffer.concat(buf).toString("utf8");
+          try {
+            resolve(JSON.parse(jsonString));
+          } catch (error) {
+            reject(error);
+          }
+        });
+      });
+      postRequest.on("error", reject);
+      postRequest.end();
+    });
+  };
+
+  request()
+    .then(async (response) => {
+      console.log(response);
+      console.log(response.result.parameterErrors);
+      if (response.id) {
+        const userData = await User.findById(id);
+
+        await Subscriptions.findById(subId).then(async (subscription) => {
+          if (!subscription)
+            return next(new ApiError("Can't find subscription", 404));
+          const start_date = new Date(Date.now());
+          let end_date = new Date(Date.now());
+          end_date =
+            subscription.type === "يومي"
+              ? end_date.setDate(end_date.getDate() + 1)
+              : subscription.type === "اسبوعي"
+              ? end_date.setDate(end_date.getDate() + 7)
+              : subscription.type === "شهري"
+              ? end_date.setMonth(end_date.getMonth() + 1)
+              : subscription.type === "سنوي" &&
+                end_date.setFullYear(end_date.getFullYear() + 1);
+          userSub
+            .create({
+              user: id,
+              club: subscription.club,
+              subscription,
+              start_date,
+              end_date,
+              code: userData.code,
+            })
+            .then(() =>
+              res.status(200).json({
+                status: "success",
+              })
+            );
+        });
+      } else {
+        res.status(422).json({
+          status: "cancel",
+        });
+      }
+    })
+    .catch(console.error);
+});
+
+
 
 exports.confirmPayment = asyncHandler(async (req, res, next) => {
   const { subId } = req.params;
