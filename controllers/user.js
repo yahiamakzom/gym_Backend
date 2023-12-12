@@ -519,15 +519,17 @@ exports.hyperCheckout = asyncHandler(async (req, res, next) => {
 
     console.log("Brand: " + brand);
 
-    if (brand == "visa" || brand == "mastercard" || brand == "stcpay") {
-      entityId = "8ac9a4c88c152af8018c34bdd8db1eda";
-    } else if (brand == "mada") {
-      entityId = "8ac9a4c88c152af8018c34be7f601ee3";
-    } else if (brand == "applepay") {
-      entityId = "8ac7a4c88ac93f4f018acc6f1377032b";
-    } else {
-      return Promise.reject(new Error("brand is not valid"));
-    }
+
+    entityId = "8a8294174b7ecb28014b9699220015ca";
+    // if (brand == "visa" || brand == "mastercard" || brand == "stcpay") {
+    //   entityId = "8ac9a4c88c152af8018c34bdd8db1eda";
+    // } else if (brand == "mada") {
+    //   entityId = "8ac9a4c88c152af8018c34be7f601ee3";
+    // } else if (brand == "applepay") {
+    //   entityId = "8ac7a4c88ac93f4f018acc6f1377032b";
+    // } else {
+    //   return Promise.reject(new Error("brand is not valid"));
+    // }
 
     const data = querystring.stringify({
       entityId,
@@ -536,7 +538,7 @@ exports.hyperCheckout = asyncHandler(async (req, res, next) => {
       paymentType: "DB",
       //  Also please remove testMode=EXTERNAL and customParameters[3DS2_enrolled]=true from this step's code, as they are only required for testing
       // "customParameters[3DS2_enrolled]": true,
-      "merchantTransactionId": req.body.merchantTransactionId,
+      "merchantTransactionId": req.body["merchantTransactionId"],
       "customer.email": req.body["customer.email"],
       "billing.street1": req.body["billing.street1"],
       "billing.city": req.body["billing.city"],
