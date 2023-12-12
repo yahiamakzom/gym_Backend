@@ -104,9 +104,6 @@ exports.getClubs = asyncHandler(async (req, res, next) => {
   }
 });
 
-
-
-
 // exports.getMinClubs=asyncHandler(async (req, res, next) => {
 //     try {
 //         const minSubscriptions = await Subscriptions.aggregate([
@@ -226,7 +223,7 @@ exports.getMinClubs = asyncHandler(async (req, res, next) => {
         return priceA - priceB;
       });
       res.json({ Clubs: clubsWithPrices, countries });
-    } 
+    }
   } catch (error) {
     console.error(error);
     throw new Error("Failed to get min clubs.");
@@ -516,12 +513,12 @@ exports.hyperCheckout = asyncHandler(async (req, res, next) => {
     const path = "/v1/checkouts";
     let entityId;
 
-    if(!brand) {
+    if (!brand) {
       return Promise.reject(new Error("brand is required"));
     }
-    
+
     console.log("Brand: " + brand);
-    
+
     if (brand == "visa" || brand == "mastercard" || brand == "stcpay") {
       entityId = "8ac9a4c88c152af8018c34bdd8db1eda";
     } else if (brand == "mada") {
@@ -539,15 +536,15 @@ exports.hyperCheckout = asyncHandler(async (req, res, next) => {
       paymentType: "DB",
       //  Also please remove testMode=EXTERNAL and customParameters[3DS2_enrolled]=true from this step's code, as they are only required for testing
       // "customParameters[3DS2_enrolled]": true,
-      "merchantTransactionId": req.body.merchantTransactionId,
-      "customer.email" : req.body["customer.email"],
-      "billing.street1": req.body["billing.street1"],       
+      merchantTransactionId: req.body.merchantTransactionId,
+      "customer.email": req.body["customer.email"],
+      "billing.street1": req.body["billing.street1"],
       "billing.city": req.body["billing.city"],
-      "billing.state": req.body["billing.state"], 
+      "billing.state": req.body["billing.state"],
       "billing.country": req.body["billing.country"],
-      "billing.postcode" : req.body["billing.postcode"],
-      "customer.givenName" : req.body["customer.givenName"],
-      "customer.surname" : req.body["customer.surname"],
+      "billing.postcode": req.body["billing.postcode"],
+      "customer.givenName": req.body["customer.givenName"],
+      "customer.surname": req.body["customer.surname"],
     });
 
     console.log("Data: ");
@@ -555,7 +552,8 @@ exports.hyperCheckout = asyncHandler(async (req, res, next) => {
 
     const options = {
       port: 443,
-      host: "eu-prod.oppwa.com",
+      // host: "eu-prod.oppwa.com",
+      host: "eu-test.oppwa.com",
       path: path,
       method: "POST",
       headers: {
@@ -594,18 +592,36 @@ exports.hyperCheckout = asyncHandler(async (req, res, next) => {
 });
 
 exports.checkPayment = asyncHandler(async (req, res, next) => {
+  const {brand} = req.body;
   const { paymentId, subId } = req.params;
   const { id } = req.user;
   const { userSubId } = req.body;
   const https = require("https");
   const querystring = require("querystring");
+  let entityId;
 
+  if (!brand) {
+    return Promise.reject(new Error("brand is required"));
+  }
+
+  if (brand == "visa" || brand == "mastercard" || brand == "stcpay") {
+    entityId = "8ac9a4c88c152af8018c34bdd8db1eda";
+  } else if (brand == "mada") {
+    entityId = "8ac9a4c88c152af8018c34be7f601ee3";
+  } else if (brand == "applepay") {
+    entityId = "8ac7a4c88ac93f4f018acc6f1377032b";
+  } else {
+    return Promise.reject(new Error("brand is not valid"));
+  }
   const request = async () => {
     var path = `/v1/checkouts/${paymentId}/payment`;
-    path += "?entityId=8a8294174b7ecb28014b9699220015ca";
+    // path += "?entityId=8a8294174b7ecb28014b9699220015ca";
+
+    path += `?entityId=${entityId}`;
     const options = {
       port: 443,
-      host: "eu-prod.oppwa.com",
+      // host: "eu-prod.oppwa.com",
+      host: "eu-test.oppwa.com",
       path: path,
       method: "GET",
       headers: {
@@ -613,7 +629,7 @@ exports.checkPayment = asyncHandler(async (req, res, next) => {
           "Bearer OGFjOWE0Yzg4YzE1MmFmODAxOGMzNGJkNDk5NzFlZDJ8cXRqMnlhR0Y0ZVQ5UHFKcA==",
       },
     };
-    
+
     return new Promise((resolve, reject) => {
       const postRequest = https.request(options, function (res) {
         const buf = [];
@@ -636,11 +652,12 @@ exports.checkPayment = asyncHandler(async (req, res, next) => {
 
   request()
     .then(async (response) => {
+      console.log(response);
+      console.log(response.result.parameterErrors);
       if (response.id) {
         const userData = await User.findById(id);
 
         await Subscriptions.findById(subId).then(async (subscription) => {
-          console.log(subId);
           if (!subscription)
             return next(new ApiError("Can't find subscription", 404));
           const start_date = new Date(Date.now());
@@ -684,7 +701,6 @@ exports.confirmPayment = asyncHandler(async (req, res, next) => {
   const { id } = req.user;
   const userData = await User.findById(id);
   await Subscriptions.findById(subId).then(async (subscription) => {
-    console.log(subId);
     if (!subscription)
       return next(new ApiError("Can't find subscription", 404));
     await Rules.findOne({ payment_type: "paypal", active: true }).then(
@@ -870,25 +886,28 @@ exports.searchClub = asyncHandler(async (req, res, next) => {
     { city: { $regex: search, $options: "i" } },
     { location: { $regex: search, $options: "i" } },
   ]);
-    const subscriptionPrices = await Promise.all(
-      Clubs.map(async (club) => {
-        const dailySubscription = await Subscriptions.findOne({
-          club: club._id,
-          type: "يومي", // Filter by subscription type
-        });
-        const price = dailySubscription ? dailySubscription.price : null;
-        return { clubId: club._id, price };
-      })
-    );
-    const clubsWithPrices = [];
-    for (const [index, club] of Clubs.entries()) {
-      Clubs[index] = {...Clubs[index].toObject(), subscriptionPrice: subscriptionPrices[index].price};
-      // clubsWithPrices.push({
-        // ...club,
-        // subscriptionPrice: subscriptionPrices[index].price,
-      // });
-    }
-      res.json({ Clubs });
+  const subscriptionPrices = await Promise.all(
+    Clubs.map(async (club) => {
+      const dailySubscription = await Subscriptions.findOne({
+        club: club._id,
+        type: "يومي", // Filter by subscription type
+      });
+      const price = dailySubscription ? dailySubscription.price : null;
+      return { clubId: club._id, price };
+    })
+  );
+  const clubsWithPrices = [];
+  for (const [index, club] of Clubs.entries()) {
+    Clubs[index] = {
+      ...Clubs[index].toObject(),
+      subscriptionPrice: subscriptionPrices[index].price,
+    };
+    // clubsWithPrices.push({
+    // ...club,
+    // subscriptionPrice: subscriptionPrices[index].price,
+    // });
+  }
+  res.json({ Clubs });
 });
 
 exports.filterClubs = asyncHandler(async (req, res, next) => {
@@ -915,8 +934,12 @@ exports.filterClubs = asyncHandler(async (req, res, next) => {
         //   `${club.lat},${club.long}`,
         //   `${lat},${long}`
         // );
-        distance = calculateDistance(`${club.lat}`,`${club.long}`,
-          `${lat}`,`${long}`)
+        distance = calculateDistance(
+          `${club.lat}`,
+          `${club.long}`,
+          `${lat}`,
+          `${long}`
+        );
         if (!distance) return next(new ApiError("Invalid distance", 400));
         clubsWithDistance.push({
           ...club.toObject(),
@@ -974,13 +997,13 @@ exports.filterClubs = asyncHandler(async (req, res, next) => {
         (a, b) => a.lowestSubscriptionPrice - b.lowestSubscriptionPrice
       );
 
-        const clubsWithPrices = [];
-        for (const [index, club] of sortedClubs.entries()) {
-          clubsWithPrices.push({
-            ...club,
-            subscriptionPrice: subscriptionPrices[index].price,
-          });
-        }
+      const clubsWithPrices = [];
+      for (const [index, club] of sortedClubs.entries()) {
+        clubsWithPrices.push({
+          ...club,
+          subscriptionPrice: subscriptionPrices[index].price,
+        });
+      }
       res.json({ Clubs: clubsWithPrices });
     } else if (filter === "best") {
       await Club.aggregate([
@@ -1069,9 +1092,6 @@ exports.getUserFav = asyncHandler(async (req, res, next) => {
       res.json({ data: modifiedData });
     });
 });
-;
-
-
 exports.addOrRemoveFav = asyncHandler(async (req, res, next) => {
   const { club_id } = req.params;
   const { id } = req.user;
@@ -1216,7 +1236,7 @@ exports.walletDeposit = asyncHandler(async (req, res, next) => {
   const userData = await User.findById(id);
   // check if user not found
   if (!userData) return next(new ApiError("User Not Found", 404));
-  
+
   // we add the amount to the user wallet
   userData.wallet += Number(amount);
   await userData.save();
@@ -1228,9 +1248,8 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
   const { id } = req.user;
   const userData = await User.findById(id);
   const subscription = await Subscriptions.findById(subId);
-    console.log(subId);
-    if (!subscription)
-      return next(new ApiError("Can't find subscription", 404));
+  console.log(subId);
+  if (!subscription) return next(new ApiError("Can't find subscription", 404));
   const start_date = new Date(Date.now());
   let end_date = new Date(Date.now());
   end_date =
@@ -1242,14 +1261,14 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
       ? end_date.setMonth(end_date.getMonth() + 1)
       : subscription.type === "سنوي" &&
         end_date.setFullYear(end_date.getFullYear() + 1);
-    userSub
-      .create({
-        user: id,
-        club: subscription.club,
-        subscription,
-        start_date,
-        end_date,
-        code: userData.code,
-      })
-      .then(() => res.status(200).send("Payment successful"));
+  userSub
+    .create({
+      user: id,
+      club: subscription.club,
+      subscription,
+      start_date,
+      end_date,
+      code: userData.code,
+    })
+    .then(() => res.status(200).send("Payment successful"));
 });
