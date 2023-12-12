@@ -519,8 +519,18 @@ exports.hyperCheckout = asyncHandler(async (req, res, next) => {
 
     console.log("Brand: " + brand);
 
-
     entityId = "8a8294174b7ecb28014b9699220015ca";
+    //for test
+    if (brand == "visa" || brand == "mastercard" || brand == "stcpay") {
+      entityId = "8ac7a4c789cce7da0189cef121f1010e";
+    } else if (brand == "mada") {
+      entityId = "8ac7a4c789cce7da0189cef21f1b0112";
+    } else if (brand == "applepay") {
+      entityId = "8ac7a4c88ac93f4f018acc6f1377032b";
+    } else {
+      return Promise.reject(new Error("brand is not valid"));
+    }
+    // for prod
     // if (brand == "visa" || brand == "mastercard" || brand == "stcpay") {
     //   entityId = "8ac9a4c88c152af8018c34bdd8db1eda";
     // } else if (brand == "mada") {
@@ -537,8 +547,9 @@ exports.hyperCheckout = asyncHandler(async (req, res, next) => {
       currency: "SAR",
       paymentType: "DB",
       //  Also please remove testMode=EXTERNAL and customParameters[3DS2_enrolled]=true from this step's code, as they are only required for testing
-      // "customParameters[3DS2_enrolled]": true,
-      "merchantTransactionId": req.body["merchantTransactionId"],
+      customParameters: true,
+      "customParameters[3DS2_enrolled]": true,
+      merchantTransactionId: req.body["merchantTransactionId"],
       "customer.email": req.body["customer.email"],
       "billing.street1": req.body["billing.street1"],
       "billing.city": req.body["billing.city"],
@@ -606,7 +617,17 @@ exports.checkPaymentNew = asyncHandler(async (req, res, next) => {
   if (!brand) {
     return Promise.reject(new Error("brand is required"));
   }
-  entityId = "8a8294174b7ecb28014b9699220015ca";
+  //for test
+  if (brand == "visa" || brand == "mastercard" || brand == "stcpay") {
+    entityId = "8ac7a4c789cce7da0189cef121f1010e";
+  } else if (brand == "mada") {
+    entityId = "8ac7a4c789cce7da0189cef21f1b0112";
+  } else if (brand == "applepay") {
+    entityId = "8ac7a4c88ac93f4f018acc6f1377032b";
+  } else {
+    return Promise.reject(new Error("brand is not valid"));
+  }
+
   // if (brand == "visa" || brand == "mastercard" || brand == "stcpay") {
   //   entityId = "8ac9a4c88c152af8018c34bdd8db1eda";
   // } else if (brand == "mada") {
@@ -705,7 +726,7 @@ exports.checkPayment = asyncHandler(async (req, res, next) => {
   const { userSubId } = req.body;
   const https = require("https");
   const querystring = require("querystring");
-  
+
   const request = async () => {
     var path = `/v1/checkouts/${paymentId}/payment`;
     path += "?entityId=8a8294174b7ecb28014b9699220015ca";
@@ -786,8 +807,6 @@ exports.checkPayment = asyncHandler(async (req, res, next) => {
     })
     .catch(console.error);
 });
-
-
 
 exports.confirmPayment = asyncHandler(async (req, res, next) => {
   const { subId } = req.params;
