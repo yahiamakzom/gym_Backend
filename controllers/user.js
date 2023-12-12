@@ -547,7 +547,6 @@ exports.hyperCheckout = asyncHandler(async (req, res, next) => {
       currency: "SAR",
       paymentType: "DB",
       //  Also please remove testMode=EXTERNAL and customParameters[3DS2_enrolled]=true from this step's code, as they are only required for testing
-      customParameters: true,
       "customParameters[3DS2_enrolled]": true,
       merchantTransactionId: req.body["merchantTransactionId"],
       "customer.email": req.body["customer.email"],
