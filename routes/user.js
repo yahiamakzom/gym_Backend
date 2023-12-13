@@ -67,7 +67,7 @@ router.post(
 // old
 router.post("/wallet", depositWallet);
 router.post("/check-pay/:paymentId/:subId", verifyToken, checkPayment);
-router.post("/check-pay-new/:paymentId/:subId", verifyToken, checkPaymentNew);
+router.post("/check-pay-new/:paymentId", verifyToken, checkPaymentNew);
 router.post("/wallet_confirm", verifyToken, confirmDeposit);
 router.post("/make_sub/:subId", verifyToken, userMakeSub);
 router.post("/confirm_payment/:subId", verifyToken, confirmPayment);
