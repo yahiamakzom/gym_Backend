@@ -521,25 +521,25 @@ exports.hyperCheckout = asyncHandler(async (req, res, next) => {
 
     entityId = "8a8294174b7ecb28014b9699220015ca";
     //for test
-    if (brand == "visa" || brand == "mastercard" || brand == "stcpay") {
-      entityId = "8ac7a4c789cce7da0189cef121f1010e";
-    } else if (brand == "mada") {
-      entityId = "8ac7a4c789cce7da0189cef21f1b0112";
-    } else if (brand == "applepay") {
-      entityId = "8ac7a4c88ac93f4f018acc6f1377032b";
-    } else {
-      return Promise.reject(new Error("brand is not valid"));
-    }
-    // for prod
     // if (brand == "visa" || brand == "mastercard" || brand == "stcpay") {
-    //   entityId = "8ac9a4c88c152af8018c34bdd8db1eda";
+    //   entityId = "8ac7a4c789cce7da0189cef121f1010e";
     // } else if (brand == "mada") {
-    //   entityId = "8ac9a4c88c152af8018c34be7f601ee3";
+    //   entityId = "8ac7a4c789cce7da0189cef21f1b0112";
     // } else if (brand == "applepay") {
     //   entityId = "8ac7a4c88ac93f4f018acc6f1377032b";
     // } else {
     //   return Promise.reject(new Error("brand is not valid"));
     // }
+    // for prod
+    if (brand == "visa" || brand == "mastercard" || brand == "stcpay") {
+      entityId = "8ac9a4c88c152af8018c34bdd8db1eda";
+    } else if (brand == "mada") {
+      entityId = "8ac9a4c88c152af8018c34be7f601ee3";
+    } else if (brand == "applepay") {
+      entityId = "8ac7a4c88ac93f4f018acc6f1377032b";
+    } else {
+      return Promise.reject(new Error("brand is not valid"));
+    }
 
     const data = querystring.stringify({
       entityId,
@@ -564,16 +564,16 @@ exports.hyperCheckout = asyncHandler(async (req, res, next) => {
 
     const options = {
       port: 443,
-      // host: "eu-prod.oppwa.com",
-      host: "eu-test.oppwa.com",
+      host: "eu-prod.oppwa.com",
+      // host: "eu-test.oppwa.com",
       path: path,
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
         "Content-Length": data.length,
         Authorization:
-          // "Bearer OGFjOWE0Yzg4YzE1MmFmODAxOGMzNGJkNDk5NzFlZDJ8cXRqMnlhR0Y0ZVQ5UHFKcA==",
-          "Bearer OGFjN2E0Yzc4OWNjZTdkYTAxODljZWYwYTYxMTAxMGF8S3czc3lqRk5Hdw==",
+          "Bearer OGFjOWE0Yzg4YzE1MmFmODAxOGMzNGJkNDk5NzFlZDJ8cXRqMnlhR0Y0ZVQ5UHFKcA==",
+          // "Bearer OGFjN2E0Yzc4OWNjZTdkYTAxODljZWYwYTYxMTAxMGF8S3czc3lqRk5Hdw==",
       },
     };
 
@@ -616,25 +616,25 @@ exports.checkPaymentNew = asyncHandler(async (req, res, next) => {
     return Promise.reject(new Error("brand is required"));
   }
   //for test
-  if (brand == "visa" || brand == "mastercard" || brand == "stcpay") {
-    entityId = "8ac7a4c789cce7da0189cef121f1010e";
-  } else if (brand == "mada") {
-    entityId = "8ac7a4c789cce7da0189cef21f1b0112";
-  } else if (brand == "applepay") {
-    entityId = "8ac7a4c88ac93f4f018acc6f1377032b";
-  } else {
-    return Promise.reject(new Error("brand is not valid"));
-  }
-
   // if (brand == "visa" || brand == "mastercard" || brand == "stcpay") {
-  //   entityId = "8ac9a4c88c152af8018c34bdd8db1eda";
+  //   entityId = "8ac7a4c789cce7da0189cef121f1010e";
   // } else if (brand == "mada") {
-  //   entityId = "8ac9a4c88c152af8018c34be7f601ee3";
+  //   entityId = "8ac7a4c789cce7da0189cef21f1b0112";
   // } else if (brand == "applepay") {
   //   entityId = "8ac7a4c88ac93f4f018acc6f1377032b";
   // } else {
   //   return Promise.reject(new Error("brand is not valid"));
   // }
+
+  if (brand == "visa" || brand == "mastercard" || brand == "stcpay") {
+    entityId = "8ac9a4c88c152af8018c34bdd8db1eda";
+  } else if (brand == "mada") {
+    entityId = "8ac9a4c88c152af8018c34be7f601ee3";
+  } else if (brand == "applepay") {
+    entityId = "8ac7a4c88ac93f4f018acc6f1377032b";
+  } else {
+    return Promise.reject(new Error("brand is not valid"));
+  }
   const request = async () => {
     var path = `/v1/checkouts/${paymentId}/payment`;
     // path += "?entityId=8a8294174b7ecb28014b9699220015ca";
@@ -642,14 +642,14 @@ exports.checkPaymentNew = asyncHandler(async (req, res, next) => {
     path += `?entityId=${entityId}`;
     const options = {
       port: 443,
-      // host: "eu-prod.oppwa.com",
-      host: "eu-test.oppwa.com",
+      host: "eu-prod.oppwa.com",
+      // host: "eu-test.oppwa.com",
       path: path,
       method: "GET",
       headers: {
         Authorization:
-          // "Bearer OGFjOWE0Yzg4YzE1MmFmODAxOGMzNGJkNDk5NzFlZDJ8cXRqMnlhR0Y0ZVQ5UHFKcA==",
-          "Bearer OGFjN2E0Yzc4OWNjZTdkYTAxODljZWYwYTYxMTAxMGF8S3czc3lqRk5Hdw==",
+          "Bearer OGFjOWE0Yzg4YzE1MmFmODAxOGMzNGJkNDk5NzFlZDJ8cXRqMnlhR0Y0ZVQ5UHFKcA==",
+          // "Bearer OGFjN2E0Yzc4OWNjZTdkYTAxODljZWYwYTYxMTAxMGF8S3czc3lqRk5Hdw==",
       },
     };
 
