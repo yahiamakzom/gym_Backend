@@ -520,7 +520,7 @@ exports.hyperCheckout = asyncHandler(async (req, res, next) => {
     console.log("Brand: " + brand);
 
     entityId = "8a8294174b7ecb28014b9699220015ca";
-    for test
+    //for test
     if (brand == "visa" || brand == "mastercard" || brand == "stcpay") {
       entityId = "8ac7a4c789cce7da0189cef121f1010e";
     } else if (brand == "mada") {
