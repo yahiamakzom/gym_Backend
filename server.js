@@ -16,7 +16,10 @@ app.use(express.urlencoded({ extended: true }))
 app.use(cors())
 
 app.use(validateSub)
-app.use("/auth",require("./routes/auth"))
+app.use("/auth",require("./routes/auth")) 
+app.use("/MustafaTest" ,(req ,res) =>{
+  res.send("Mustafa Test ...")
+})
 app.use("/admin",require("./middlewares/verifyRoles")("admin"),require("./routes/admin"))
 app.use("/user", require("./routes/user"));
 app.use("/club",verifyRoles("club"),require("./routes/club"))
