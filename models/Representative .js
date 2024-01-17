@@ -22,7 +22,8 @@ const representativeSchema = new mongoose.Schema({
     commission: {
       type: Number,
       default: 0
-  }
+  } ,
+  token: String,
 });
 
 module.exports = mongoose.model("Representative", representativeSchema);

@@ -98,8 +98,6 @@ router.get("/user_reports", getUserReports);
 router.get("/clubs/report", clubReports);
 
 router.post("/rule/question", deleteQuestion);
-// add representatives
-// router.post("/add_representative",(req ,res) =>{
-//   res.status(200).json({data:"connected"})
-// });
+
+router.post("/add_representative",addRepresentative);
 module.exports = router;

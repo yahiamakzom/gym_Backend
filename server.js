@@ -21,9 +21,7 @@ app.use("/auth",require("./routes/auth"))
 app.use("/admin",require("./middlewares/verifyRoles")("admin"),require("./routes/admin"))
 app.use("/user", require("./routes/user"));
 app.use("/club",verifyRoles("club"),require("./routes/club"))
-app.post("/mustafa/add_representative",(req,res) =>{
-  res.status(200).json({success})
-})
+
 app.use("*",(req,res,next)=>res.status(404).json({message:"Page Not Found"}))
 app.use(require("./middlewares/globalError"))
 DB.then(con => {
