@@ -414,4 +414,9 @@ exports.editOpininon= asyncHandler(async (req, res, next) => {
 exports.deleteOpinion= asyncHandler(async (req, res, next) => {
     opinion_id=req.params.opinion_id;
     await Opinion.findByIdAndDelete(opinion_id).then((opinion) => res.json({ opinion }));
+})  
+// add Representative  and delete it 
+exports.addRepresentative =asyncHandler(async(req,res,next)=>{
+
+res.status(200).json({ data:req.data})
 })
