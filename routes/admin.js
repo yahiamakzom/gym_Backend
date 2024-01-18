@@ -15,6 +15,8 @@ const {
   editOpininon,
   deleteOpinion,
   addRepresentative,
+  GetRepresentatives,
+  DeleteRepersentative
 } = require("../controllers/admin");
 const {
   addClubValidator,
@@ -100,4 +102,6 @@ router.get("/clubs/report", clubReports);
 router.post("/rule/question", deleteQuestion);
 
 router.post("/add_representative",addRepresentative);
+router.get("/get_representatives" ,GetRepresentatives)
+router.delete('/delete_representative/:id',DeleteRepersentative)
 module.exports = router;

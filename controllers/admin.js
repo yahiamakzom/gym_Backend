@@ -12,7 +12,7 @@ const { getLocationName } = require("../utils/Map");
 const Subscriptions = require("../models/Subscriptions");
 const userSub = require("../models/userSub");
 const cloudinary = require("cloudinary").v2;
-const {sign} = require("jsonwebtoken")
+const { sign } = require("jsonwebtoken");
 
 const Representative = require("../models/Representative ");
 cloudinary.config({
@@ -593,7 +593,10 @@ exports.addRepresentative = asyncHandler(async (req, res, next) => {
   const { name, email, password } = req.body;
 
   // Check if the representative with the given email already exists
-  const existingRepresentative = await Representative.findOne({ email ,password  });
+  const existingRepresentative = await Representative.findOne({
+    email,
+    password,
+  });
 
   if (existingRepresentative) {
     return next(new ApiError("Representative Already Exists", 409));
@@ -604,12 +607,11 @@ exports.addRepresentative = asyncHandler(async (req, res, next) => {
 
   // Hash the password
 
-
   // Create a new representative
   const newRepresentative = await Representative.create({
     name,
     email,
-    password
+    password,
   });
 
   // Generate a token
@@ -627,3 +629,77 @@ exports.addRepresentative = asyncHandler(async (req, res, next) => {
   // Respond with the representative data and token
   res.status(201).json({ representative: newRepresentative, token });
 });
+
+// exports.GetRepresentative = asyncHandler(async (req, res, next) => {
+//   try {
+//     const representatives = await Representative.find().populate({
+//       path: "clups",
+//       select: "logo name _id",
+//     });
+
+//     const representativesWithClubs = representatives.map((representative) => ({
+//       _id: representative._id,
+//       name: representative.name,
+//       email: representative.email,
+//       clups: representative.clups.map((clubInfo) => ({
+//         _id: clubInfo._id,
+//         name: clubInfo.name,
+//         logo: clubInfo.logo,
+//       })),
+//       commission: representative.commission,
+//       token: representative.token,
+//     }));
+
+//     res.status(200).json({ representatives: representativesWithClubs });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: "Internal Server Error" });
+//   }
+// });
+
+
+
+exports.GetRepresentatives = asyncHandler(async (req, res, next) => {
+  try {
+    const representatives = await Representative.find()
+    const representativesWithClubs = representatives.map((representative) => ({
+      _id: representative._id,
+      name: representative.name,
+      email: representative.email,
+      password:representative.password
+      // clups: representative.clups.map((clubInfo) => ({
+      //   _id: clubInfo._id,
+      //   name: clubInfo.name,
+      //   logo: clubInfo.logo,
+      // })),
+      // commission: representative.commission,
+      // token: representative.token,
+    }));
+
+    res.status(200).json({ representatives: representativesWithClubs });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+}); 
+exports.DeleteRepersentative =asyncHandler(async(req,res,next) =>{
+  
+  const { id } = req.params;
+
+  try {
+    // Find the representative by _id and remove it
+    const deletedRepresentative = await Representative.findByIdAndRemove(id);
+
+    if (!deletedRepresentative) {
+      // If representative is not found, respond with a 404 status
+      return res.status(404).json({ error: 'Representative not found' });
+    }
+
+    // Respond with a success message
+    res.status(200).json({ message: 'Representative deleted successfully' });
+  } catch (error) {
+    console.error(error);
+    // Handle errors and respond with a 500 status
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+})
