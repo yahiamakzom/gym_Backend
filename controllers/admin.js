@@ -630,32 +630,42 @@ exports.addRepresentative = asyncHandler(async (req, res, next) => {
   res.status(201).json({ representative: newRepresentative, token });
 });
 
-// exports.GetRepresentative = asyncHandler(async (req, res, next) => {
-//   try {
-//     const representatives = await Representative.find().populate({
-//       path: "clups",
-//       select: "logo name _id",
-//     });
+exports.GetRepresentative = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
 
-//     const representativesWithClubs = representatives.map((representative) => ({
-//       _id: representative._id,
-//       name: representative.name,
-//       email: representative.email,
-//       clups: representative.clups.map((clubInfo) => ({
-//         _id: clubInfo._id,
-//         name: clubInfo.name,
-//         logo: clubInfo.logo,
-//       })),
-//       commission: representative.commission,
-//       token: representative.token,
-//     }));
+  try {
+    const representative = await Representative.findById(id).populate({
+      path: 'clups',
+      select: 'logo name _id',
+    });
 
-//     res.status(200).json({ representatives: representativesWithClubs });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ error: "Internal Server Error" });
-//   }
-// });
+    if (!representative) {
+      // If representative is not found, respond with a 404 status
+      return res.status(404).json({ error: 'Representative not found' });
+    }
+
+    // Respond with the representative data and associated club information
+    res.status(200).json({
+      representative: {
+        _id: representative._id,
+        name: representative.name,
+        email: representative.email,
+        password:representative.password ,
+        commission:representative.commission ,
+        // Add other representative fields as needed
+        clups: representative.clups.map((clubInfo) => ({
+          _id: clubInfo._id,
+          name: clubInfo.name,
+          logo: clubInfo.logo,
+        })),
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    // Handle errors and respond with a 500 status
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
 
 
@@ -667,13 +677,7 @@ exports.GetRepresentatives = asyncHandler(async (req, res, next) => {
       name: representative.name,
       email: representative.email,
       password:representative.password
-      // clups: representative.clups.map((clubInfo) => ({
-      //   _id: clubInfo._id,
-      //   name: clubInfo.name,
-      //   logo: clubInfo.logo,
-      // })),
-      // commission: representative.commission,
-      // token: representative.token,
+  
     }));
 
     res.status(200).json({ representatives: representativesWithClubs });
