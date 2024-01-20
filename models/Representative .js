@@ -24,6 +24,7 @@ const representativeSchema = new mongoose.Schema({
       default: 0
   } ,
   token: String,
+  role:'representative'
 });
 
 module.exports = mongoose.model("Representative", representativeSchema);
