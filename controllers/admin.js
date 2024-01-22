@@ -10,11 +10,12 @@ const axios = require("axios");
 const UserReports = require("../models/userReports");
 const { getLocationName } = require("../utils/Map");
 const Subscriptions = require("../models/Subscriptions");
-const userSub = require("../models/userSub");
+const userSub = require("../models/userSub"); 
+const Representative  =require("../models/Representative ")
 const cloudinary = require("cloudinary").v2;
 const { sign } = require("jsonwebtoken");
 
-const Representative = require("../models/Representative ");
+
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.CLOUD_API_KEY,
@@ -34,7 +35,9 @@ exports.addClub = asyncHandler(async (req, res, next) => {
     to,
     allDay,
     commission,
-  } = req.body;
+    repreentative_id
+  } = req.body; 
+  console.log(repreentative_id)
   if (!req.files.clubImg)
     return next(new ApiError("Please Add Club Imgs", 409));
   if (!req.files.logo) return next(new ApiError("Please Add Club logo", 409));
@@ -72,7 +75,14 @@ exports.addClub = asyncHandler(async (req, res, next) => {
         to,
         allDay: false,
         commission,
-      }).then(async (club) => {
+      }).then(async (club) => { 
+
+        let representative = await Representative.findById(repreentative_id); 
+        if(representative){
+           representative.clups.push(club.id)
+           representative.save()
+          console.log(representative)
+        }
         await User.create({
           email,
           password: await bcrypt.hash(password, 10),
@@ -103,7 +113,13 @@ exports.addClub = asyncHandler(async (req, res, next) => {
         from: null,
         to: null,
         commission,
-      }).then(async (club) => {
+      }).then(async (club) => { 
+        let representative = await Representative.findById(repreentative_id); 
+        if(representative){
+           representative.clups.push(club.id)
+           representative.save()
+          console.log(representative)
+        }
         await User.create({
           email,
           password: await bcrypt.hash(password, 10),

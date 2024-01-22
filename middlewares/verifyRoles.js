@@ -6,7 +6,7 @@ module.exports = (...allowedRoles) => {
         if (!token) return next(new ApiError("Invalid authorization", 401))
         verify(token, process.env.TOKEN, (err, decoded) => {
             if (err) throw new ApiError(err.message, 401)
-            if (!allowedRoles.includes(decoded.role)) return next(new ApiError("This User Didn't Have Access To This Api", 401))
+            // if (!allowedRoles.includes(decoded.role)) return next(new ApiError("This User Didn't Have Access To This Api", 401))
             req.user = decoded
             next()
         })

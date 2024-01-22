@@ -18,6 +18,7 @@ module.exports = mongoose.model("User", new mongoose.Schema({
         default: "client",
         enum: ["admin", "club","client"]
     },
+    
     code: Number,
     club: {
         type: mongoose.Schema.Types.ObjectId,
