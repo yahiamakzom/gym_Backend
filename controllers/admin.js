@@ -743,3 +743,30 @@ try{
   res.status(500).json({error:e.message})
 }
  });
+ exports.AddActivity = asyncHandler(async (req, res, next) => {
+  try {
+     const activity = await Activities.findOne({ sportName: req.body.sportName });
+     if (activity) {
+       return res.status(409).json({ error: "activity is found" });
+     } else {
+       const newActivity = await Activities.create({
+         sportName: req.body.sportName,
+       });
+       res.status(200).json({ newActivity });
+     }
+  } catch (e) {
+     res.status(500).json({ error: e.message });
+  }
+ });
+ exports.deleteActivity = asyncHandler(async (req, res, next) => {
+  try {
+     // Get the ID from the request params
+     const id = req.params.id;
+ 
+     const result = await Activities.findByIdAndDelete(id);
+     res.status(200).json({result});
+  } catch (e) {
+     res.status(500).json({error: e.message});
+  }
+ });
+ 

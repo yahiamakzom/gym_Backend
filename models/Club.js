@@ -49,6 +49,7 @@ module.exports = mongoose.model("Club", new mongoose.Schema({
         type: String,
         required: [true, "Please Enter Description "]
     },
+    sports:Array,
     images: Array,
     location: {
         type: String,
