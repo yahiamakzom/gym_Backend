@@ -10,11 +10,11 @@ const axios = require("axios");
 const UserReports = require("../models/userReports");
 const { getLocationName } = require("../utils/Map");
 const Subscriptions = require("../models/Subscriptions");
-const userSub = require("../models/userSub"); 
-const Representative  =require("../models/Representative ")
+const userSub = require("../models/userSub");
+const Representative = require("../models/Representative ");
 const cloudinary = require("cloudinary").v2;
 const { sign } = require("jsonwebtoken");
-
+const Activities = require("../models/Activities");
 
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
@@ -35,9 +35,9 @@ exports.addClub = asyncHandler(async (req, res, next) => {
     to,
     allDay,
     commission,
-    repreentative_id
-  } = req.body; 
-  console.log(repreentative_id)
+    repreentative_id,
+  } = req.body;
+  console.log(repreentative_id);
   if (!req.files.clubImg)
     return next(new ApiError("Please Add Club Imgs", 409));
   if (!req.files.logo) return next(new ApiError("Please Add Club logo", 409));
@@ -75,13 +75,12 @@ exports.addClub = asyncHandler(async (req, res, next) => {
         to,
         allDay: false,
         commission,
-      }).then(async (club) => { 
-
-        let representative = await Representative.findById(repreentative_id); 
-        if(representative){
-           representative.clups.push(club.id)
-           representative.save()
-          console.log(representative)
+      }).then(async (club) => {
+        let representative = await Representative.findById(repreentative_id);
+        if (representative) {
+          representative.clups.push(club.id);
+          representative.save();
+          console.log(representative);
         }
         await User.create({
           email,
@@ -113,12 +112,12 @@ exports.addClub = asyncHandler(async (req, res, next) => {
         from: null,
         to: null,
         commission,
-      }).then(async (club) => { 
-        let representative = await Representative.findById(repreentative_id); 
-        if(representative){
-           representative.clups.push(club.id)
-           representative.save()
-          console.log(representative)
+      }).then(async (club) => {
+        let representative = await Representative.findById(repreentative_id);
+        if (representative) {
+          representative.clups.push(club.id);
+          representative.save();
+          console.log(representative);
         }
         await User.create({
           email,
@@ -651,13 +650,13 @@ exports.GetRepresentative = asyncHandler(async (req, res, next) => {
 
   try {
     const representative = await Representative.findById(id).populate({
-      path: 'clups',
-      select: 'logo name _id',
+      path: "clups",
+      select: "logo name _id",
     });
 
     if (!representative) {
       // If representative is not found, respond with a 404 status
-      return res.status(404).json({ error: 'Representative not found' });
+      return res.status(404).json({ error: "Representative not found" });
     }
 
     // Respond with the representative data and associated club information
@@ -666,8 +665,8 @@ exports.GetRepresentative = asyncHandler(async (req, res, next) => {
         _id: representative._id,
         name: representative.name,
         email: representative.email,
-        password:representative.password ,
-        commission:representative.commission ,
+        password: representative.password,
+        commission: representative.commission,
         // Add other representative fields as needed
         clups: representative.clups.map((clubInfo) => ({
           _id: clubInfo._id,
@@ -679,21 +678,18 @@ exports.GetRepresentative = asyncHandler(async (req, res, next) => {
   } catch (error) {
     console.error(error);
     // Handle errors and respond with a 500 status
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
-
-
 exports.GetRepresentatives = asyncHandler(async (req, res, next) => {
   try {
-    const representatives = await Representative.find()
+    const representatives = await Representative.find();
     const representativesWithClubs = representatives.map((representative) => ({
       _id: representative._id,
       name: representative.name,
       email: representative.email,
-      password:representative.password
-  
+      password: representative.password,
     }));
 
     res.status(200).json({ representatives: representativesWithClubs });
@@ -701,9 +697,8 @@ exports.GetRepresentatives = asyncHandler(async (req, res, next) => {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
   }
-}); 
-exports.DeleteRepersentative =asyncHandler(async(req,res,next) =>{
-  
+});
+exports.DeleteRepersentative = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
 
   try {
@@ -712,14 +707,39 @@ exports.DeleteRepersentative =asyncHandler(async(req,res,next) =>{
 
     if (!deletedRepresentative) {
       // If representative is not found, respond with a 404 status
-      return res.status(404).json({ error: 'Representative not found' });
+      return res.status(404).json({ error: "Representative not found" });
     }
 
     // Respond with a success message
-    res.status(200).json({ message: 'Representative deleted successfully' });
+    res.status(200).json({ message: "Representative deleted successfully" });
   } catch (error) {
     console.error(error);
     // Handle errors and respond with a 500 status
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ error: "Internal Server Error" });
   }
-})
+});
+exports.AddActivity = asyncHandler(async (req, res, next) => {
+  try {
+     const activity = await Activities.findOne({ sportName: req.body.sportName });
+     if (activity) {
+       return res.status(409).json({ error: "activity is found" });
+     } else {
+       const newActivity = await Activities.create({
+         sportName: req.body.sportName,
+       });
+       res.status(200).json({ newActivity });
+     }
+  } catch (e) {
+     res.status(500).json({ error: e.message });
+  }
+ });
+ exports.GetActivities = asyncHandler(async (req, res, next) => {
+try{
+  
+  const activities = await Activities.find()
+  res.status(200).json({activities})
+
+}catch(e){
+  res.status(500).json({error:e.message})
+}
+ });
