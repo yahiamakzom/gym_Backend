@@ -23,7 +23,11 @@ const representativeSchema = new mongoose.Schema({
       type: Number,
       default: 0
   } ,
-  token: String,
+  token: String, 
+  role:{
+    type:String ,
+    default:"representative"
+  }
 
 });
 
