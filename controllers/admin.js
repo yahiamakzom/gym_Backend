@@ -36,8 +36,12 @@ exports.addClub = asyncHandler(async (req, res, next) => {
     allDay,
     commission,
     repreentative_id,
+    sports,
+    days
   } = req.body;
-  console.log(repreentative_id);
+
+  let SportData  =sports.split(",") ;
+let Days = days.split(",")
   if (!req.files.clubImg)
     return next(new ApiError("Please Add Club Imgs", 409));
   if (!req.files.logo) return next(new ApiError("Please Add Club logo", 409));
@@ -75,6 +79,8 @@ exports.addClub = asyncHandler(async (req, res, next) => {
         to,
         allDay: false,
         commission,
+        sports:[...SportData] ,
+        Days:[...Days]
       }).then(async (club) => {
         let representative = await Representative.findById(repreentative_id);
         if (representative) {
@@ -112,6 +118,11 @@ exports.addClub = asyncHandler(async (req, res, next) => {
         from: null,
         to: null,
         commission,
+        sports:[...SportData],
+        WorkingDays:[...Days]
+
+
+
       }).then(async (club) => {
         let representative = await Representative.findById(repreentative_id);
         if (representative) {

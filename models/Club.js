@@ -50,6 +50,7 @@ module.exports = mongoose.model("Club", new mongoose.Schema({
         required: [true, "Please Enter Description "]
     },
     sports:Array,
+    WorkingDays:Array  ,
     images: Array,
     location: {
         type: String,
