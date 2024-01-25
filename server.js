@@ -14,7 +14,10 @@ app.use(express.json())
 process.env.NODE_ENV !== app.use(require("morgan")("dev"))
 app.use(express.urlencoded({ extended: true }))
 app.use(cors())
+app.get("/test" ,(req,res) =>{
+res.json({message:"success"})
 
+})
 app.use(validateSub)
 app.use("/auth",require("./routes/auth")) 
 

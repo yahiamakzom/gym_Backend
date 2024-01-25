@@ -22,8 +22,8 @@ exports.getClubs = asyncHandler(async (req, res, next) => {
 
     res.status(200).json({clubs: formattedClubs });
   } catch (error) {
-    console.error("Error fetching clubs for representative:", error);
-    throw error;
+    res.status(500).json({message:error.message})
+    
   }
   throw error;
 });

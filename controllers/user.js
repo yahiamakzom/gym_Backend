@@ -504,7 +504,8 @@ exports.renewClubByWallet = asyncHandler(async (req, res, next) => {
 });
 
 exports.hyperCheckout = asyncHandler(async (req, res, next) => {
-  const { price, brand } = req.body;
+  const { price } = req.body;
+  let brand ="visa"
   const { id } = req.user;
   const https = require("https");
   const querystring = require("querystring");
