@@ -513,7 +513,7 @@ exports.renewClubByWallet = asyncHandler(async (req, res, next) => {
 
 exports.hyperCheckout = asyncHandler(async (req, res, next) => {
   const { price } = req.body;
-  let brand ="visa"
+  let brand = "visa";
   const { id } = req.user;
   const https = require("https");
   const querystring = require("querystring");
@@ -582,7 +582,7 @@ exports.hyperCheckout = asyncHandler(async (req, res, next) => {
         "Content-Length": data.length,
         Authorization:
           "Bearer OGFjOWE0Yzg4YzE1MmFmODAxOGMzNGJkNDk5NzFlZDJ8cXRqMnlhR0Y0ZVQ5UHFKcA==",
-          // "Bearer OGFjN2E0Yzc4OWNjZTdkYTAxODljZWYwYTYxMTAxMGF8S3czc3lqRk5Hdw==",
+        // "Bearer OGFjN2E0Yzc4OWNjZTdkYTAxODljZWYwYTYxMTAxMGF8S3czc3lqRk5Hdw==",
       },
     };
 
@@ -658,7 +658,7 @@ exports.checkPaymentNew = asyncHandler(async (req, res, next) => {
       headers: {
         Authorization:
           "Bearer OGFjOWE0Yzg4YzE1MmFmODAxOGMzNGJkNDk5NzFlZDJ8cXRqMnlhR0Y0ZVQ5UHFKcA==",
-          // "Bearer OGFjN2E0Yzc4OWNjZTdkYTAxODljZWYwYTYxMTAxMGF8S3czc3lqRk5Hdw==",
+        // "Bearer OGFjN2E0Yzc4OWNjZTdkYTAxODljZWYwYTYxMTAxMGF8S3czc3lqRk5Hdw==",
       },
     };
 
@@ -999,7 +999,19 @@ exports.searchClub = asyncHandler(async (req, res, next) => {
   }
   res.json({ Clubs });
 });
-
+// find clubs  by Activity
+exports.getClubByActivity = asyncHandler(async (req, res, next) => {
+  try {
+    const filterCondition = req.body.filterCondition;
+    console.log(filterCondition);
+    const result = await Club.find({
+      sports: { $elemMatch: { $eq: filterCondition } },
+    });
+    res.status(200).json({ result });
+  } catch (e) {
+    res.status(500).json({ message: e.message });
+  }
+});
 exports.filterClubs = asyncHandler(async (req, res, next) => {
   const { filter } = req.query;
   const { lat, long } = req.query;

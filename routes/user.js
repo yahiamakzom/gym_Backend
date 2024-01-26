@@ -27,7 +27,8 @@ const {
   walletDeposit,
   subscriptionConfirmation,
   checkPaymentNew,
-  GetActivities
+  GetActivities,
+  getClubByActivity
 } = require("../controllers/user");
 const router = require("express").Router();
 const verifyToken = require("../middlewares/verifyToken");
@@ -47,6 +48,8 @@ router.get("/clubs/filter", filterClubs);
 router.get("/rules", getRules);
 router.post("/user_reports", makeReport);
 router.post("/renew_club_wallet/:subId", verifyToken, renewClubByWallet);
+// get club by its catogery 
+router.post("/clubs_by_activity" , getClubByActivity);
 // this wallet depost is deprecated and doesn't use real payments
 router.post("/wallet_deposit", verifyToken, walletDeposit);
 router.get("/wallet", verifyToken, getUserWallet);
