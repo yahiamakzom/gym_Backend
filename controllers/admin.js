@@ -743,14 +743,7 @@ exports.AddActivity = asyncHandler(async (req, res, next) => {
     res.status(500).json({ error: e.message });
   }
 });
-exports.GetActivities = asyncHandler(async (req, res, next) => {
-  try {
-    const activities = await Activities.find();
-    res.status(200).json({ activities });
-  } catch (e) {
-    res.status(500).json({ error: e.message });
-  }
-});
+
 exports.AddActivity = asyncHandler(async (req, res, next) => {
   try {
     const activity = await Activities.findOne({

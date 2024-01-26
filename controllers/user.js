@@ -16,6 +16,7 @@ const jwt = require("jsonwebtoken");
 const moment = require("moment");
 const { body, validationResult } = require("express-validator");
 const { log } = require("console");
+const Activities = require("../models/Activities.js");
 const cloudinary = require("cloudinary").v2;
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
@@ -39,7 +40,14 @@ exports.getRules = asyncHandler(async (req, res) => {
     res.json({ rules: await Rules.find({}) });
   }
 });
-
+exports.GetActivities = asyncHandler(async (req, res, next) => {
+  try {
+    const activities = await Activities.find();
+    res.status(200).json({ activities });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
 exports.makeReport = asyncHandler(
   async (req, res) =>
     await userReports

@@ -27,6 +27,7 @@ const {
   walletDeposit,
   subscriptionConfirmation,
   checkPaymentNew,
+  GetActivities
 } = require("../controllers/user");
 const router = require("express").Router();
 const verifyToken = require("../middlewares/verifyToken");
@@ -76,3 +77,4 @@ router.post("/confirm_payment/:subId", verifyToken, confirmPayment);
 router.post("/pay-visa", verifyToken, hyperCheckout);
 
 module.exports = router;
+router.get("/activities",GetActivities)

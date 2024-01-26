@@ -111,6 +111,5 @@ router.get("/get_representative/:id" ,GetRepresentative)
 router.delete('/delete_representative/:id',DeleteRepersentative) 
 // add sport activity 
 router.post("/add-activity",AddActivity)
-router.get("/activities",GetActivities)
 router.delete("/delete-activity/:id",deleteActivity)
 module.exports = router;
