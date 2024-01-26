@@ -37,11 +37,11 @@ exports.addClub = asyncHandler(async (req, res, next) => {
     commission,
     repreentative_id,
     sports,
-    days
+    days,
   } = req.body;
 
-  let SportData  =sports.split(",") ;
-let Days = days.split(",")
+  let SportData = sports.split(",");
+  let Days = days.split(",");
   if (!req.files.clubImg)
     return next(new ApiError("Please Add Club Imgs", 409));
   if (!req.files.logo) return next(new ApiError("Please Add Club logo", 409));
@@ -79,8 +79,8 @@ let Days = days.split(",")
         to,
         allDay: false,
         commission,
-        sports:[...SportData] ,
-        Days:[...Days]
+        sports: [...SportData],
+        Days: [...Days],
       }).then(async (club) => {
         let representative = await Representative.findById(repreentative_id);
         if (representative) {
@@ -118,11 +118,8 @@ let Days = days.split(",")
         from: null,
         to: null,
         commission,
-        sports:[...SportData],
-        WorkingDays:[...Days]
-
-
-
+        sports: [...SportData],
+        WorkingDays: [...Days],
       }).then(async (club) => {
         let representative = await Representative.findById(repreentative_id);
         if (representative) {
@@ -731,53 +728,54 @@ exports.DeleteRepersentative = asyncHandler(async (req, res, next) => {
 });
 exports.AddActivity = asyncHandler(async (req, res, next) => {
   try {
-     const activity = await Activities.findOne({ sportName: req.body.sportName });
-     if (activity) {
-       return res.status(409).json({ error: "activity is found" });
-     } else {
-       const newActivity = await Activities.create({
-         sportName: req.body.sportName,
-       });
-       res.status(200).json({ newActivity });
-     }
+    const activity = await Activities.findOne({
+      sportName: req.body.sportName,
+    });
+    if (activity) {
+      return res.status(409).json({ error: "activity is found" });
+    } else {
+      const newActivity = await Activities.create({
+        sportName: req.body.sportName,
+      });
+      res.status(200).json({ newActivity });
+    }
   } catch (e) {
-     res.status(500).json({ error: e.message });
+    res.status(500).json({ error: e.message });
   }
- });
- exports.GetActivities = asyncHandler(async (req, res, next) => {
-try{
-  
-  const activities = await Activities.find()
-  res.status(200).json({activities})
+});
+exports.GetActivities = asyncHandler(async (req, res, next) => {
+  try {
+    const activities = await Activities.find();
+    res.status(200).json({ activities });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+exports.AddActivity = asyncHandler(async (req, res, next) => {
+  try {
+    const activity = await Activities.findOne({
+      sportName: req.body.sportName,
+    });
+    if (activity) {
+      return res.status(409).json({ error: "activity is found" });
+    } else {
+      const newActivity = await Activities.create({
+        sportName: req.body.sportName,
+      });
+      res.status(200).json({ newActivity });
+    }
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+exports.deleteActivity = asyncHandler(async (req, res, next) => {
+  try {
+    // Get the ID from the request params
+    const id = req.params.id;
 
-}catch(e){
-  res.status(500).json({error:e.message})
-}
- });
- exports.AddActivity = asyncHandler(async (req, res, next) => {
-  try {
-     const activity = await Activities.findOne({ sportName: req.body.sportName });
-     if (activity) {
-       return res.status(409).json({ error: "activity is found" });
-     } else {
-       const newActivity = await Activities.create({
-         sportName: req.body.sportName,
-       });
-       res.status(200).json({ newActivity });
-     }
+    const result = await Activities.findByIdAndDelete(id);
+    res.status(200).json({ result });
   } catch (e) {
-     res.status(500).json({ error: e.message });
+    res.status(500).json({ error: e.message });
   }
- });
- exports.deleteActivity = asyncHandler(async (req, res, next) => {
-  try {
-     // Get the ID from the request params
-     const id = req.params.id;
- 
-     const result = await Activities.findByIdAndDelete(id);
-     res.status(200).json({result});
-  } catch (e) {
-     res.status(500).json({error: e.message});
-  }
- });
- 
+});
