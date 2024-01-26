@@ -15,7 +15,10 @@ app.use(express.urlencoded({ extended: true }))
 app.use(cors())
 app.use(validateSub)
 app.use("/auth",require("./routes/auth")) 
-app.use("/admin",require("./middlewares/verifyRoles")("admin"),require("./routes/admin"))
+// require("./middlewares/verifyRoles")("admin"), 
+// comment verification for token 
+
+app.use("/admin",require("./routes/admin"))
 app.use("/representative",require("./routes/representative"))
 app.use("/user", require("./routes/user"));
 app.use("/club",verifyRoles("club"),require("./routes/club"))
