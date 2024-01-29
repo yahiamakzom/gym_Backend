@@ -513,7 +513,7 @@ exports.renewClubByWallet = asyncHandler(async (req, res, next) => {
 
 exports.hyperCheckout = asyncHandler(async (req, res, next) => {
   const { price } = req.body;
-  let brand = "visa";
+  let brand = "mastercard";
   const { id } = req.user;
   const https = require("https");
   const querystring = require("querystring");
@@ -961,14 +961,16 @@ exports.confirmDeposit = asyncHandler(async (req, res, next) => {
 });
 
 exports.searchClubByName = asyncHandler(async (req, res, next) => {
-  const { country, city, gender } = req.body;
+  const { country, city, gender, sportType } = req.body;
+  console.log(req.body);
+
   await Club.find({
     $or: [
       { country, gender, city: { $regex: new RegExp(`.*${city}.*`, "i") } },
+      { sports: { $in: [sportType] } }, // Add this line to filter by sportType
     ],
   }).then((clubs) => res.json({ clubs }));
 });
-
 exports.searchClub = asyncHandler(async (req, res, next) => {
   const { search } = req.query; // User input for searching
   const Clubs = await Club.find().or([
