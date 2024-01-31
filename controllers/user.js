@@ -552,7 +552,7 @@ exports.hyperCheckout = asyncHandler(async (req, res, next) => {
 
     const data = querystring.stringify({
       entityId,
-      amount: 0.1,
+      amount: 1,
       currency: "SAR",
       paymentType: "DB",
       //  Also please remove testMode=EXTERNAL and customParameters[3DS2_enrolled]=true from this step's code, as they are only required for testing
