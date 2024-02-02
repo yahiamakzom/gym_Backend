@@ -553,7 +553,7 @@ exports.hyperCheckout = asyncHandler(async (req, res, next) => {
     const data = querystring.stringify({
       entityId,
       amount: 1,
-      currency: "EGP",
+      currency: "SAR",
       paymentType: "DB",
       //  Also please remove testMode=EXTERNAL and customParameters[3DS2_enrolled]=true from this step's code, as they are only required for testing
       // "customParameters[3DS2_enrolled]": true,
@@ -707,15 +707,18 @@ exports.checkPaymentNew = asyncHandler(async (req, res, next) => {
 });
 
 exports.checkPayment = asyncHandler(async (req, res, next) => {
-  const { paymentId, subId } = req.params;
-  const { id } = req.user;
-  const { userSubId } = req.body;
+ const { paymentId, subId } = req.params;
+ const { id, userSubId } = req.query;
+
+ console.log(req.query);
+ console.log(paymentId, subId, id, userSubId);
+
   const https = require("https");
   const querystring = require("querystring");
 
   const request = async () => {
     var path = `/v1/checkouts/${paymentId}/payment`;
-    path += "?entityId=8a8294174b7ecb28014b9699220015ca";
+    path += "?entityId=8ac9a4c88c152af8018c34bdd8db1eda";
 
     const options = {
       port: 443,
@@ -754,9 +757,11 @@ exports.checkPayment = asyncHandler(async (req, res, next) => {
       console.log(response);
       console.log(response.result.parameterErrors);
       if (response.id) {
-        const userData = await User.findById(id);
+        const userId = id.trim()
+        const subscriptionId = userSubId.trim()
+        const userData = await User.findById(userId);
 
-        await Subscriptions.findById(subId).then(async (subscription) => {
+        await Subscriptions.findById(subscriptionId).then(async (subscription) => {
           if (!subscription)
             return next(new ApiError("Can't find subscription", 404));
           const start_date = new Date(Date.now());
@@ -772,7 +777,7 @@ exports.checkPayment = asyncHandler(async (req, res, next) => {
                 end_date.setFullYear(end_date.getFullYear() + 1);
           userSub
             .create({
-              user: id,
+              user: userId,
               club: subscription.club,
               subscription,
               start_date,
