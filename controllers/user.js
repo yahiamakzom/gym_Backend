@@ -513,7 +513,7 @@ exports.renewClubByWallet = asyncHandler(async (req, res, next) => {
 
 exports.hyperCheckout = asyncHandler(async (req, res, next) => {
   const { price } = req.body;
-  let brand = "mastercard";
+  let brand = "visa";
   const { id } = req.user;
   const https = require("https");
   const querystring = require("querystring");
@@ -553,7 +553,7 @@ exports.hyperCheckout = asyncHandler(async (req, res, next) => {
     const data = querystring.stringify({
       entityId,
       amount: 1,
-      currency: "SAR",
+      currency: "EGP",
       paymentType: "DB",
       //  Also please remove testMode=EXTERNAL and customParameters[3DS2_enrolled]=true from this step's code, as they are only required for testing
       // "customParameters[3DS2_enrolled]": true,
@@ -719,8 +719,8 @@ exports.checkPayment = asyncHandler(async (req, res, next) => {
 
     const options = {
       port: 443,
-      // host: "eu-prod.oppwa.com",
-      host: "eu-test.oppwa.com",
+      host: "eu-prod.oppwa.com",
+      // host: "eu-test.oppwa.com",
       path: path,
       method: "GET",
       headers: {
