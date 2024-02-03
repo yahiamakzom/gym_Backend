@@ -28,7 +28,8 @@ const {
   subscriptionConfirmation,
   checkPaymentNew,
   GetActivities,
-  getClubByActivity
+  getClubByActivity ,
+  isFav
 } = require("../controllers/user");
 const router = require("express").Router();
 const verifyToken = require("../middlewares/verifyToken");
@@ -55,8 +56,10 @@ router.post("/wallet_deposit", verifyToken, walletDeposit);
 router.get("/wallet", verifyToken, getUserWallet);
 router.get("/booking", verifyToken, userBooking);
 router.put("/fav/:club_id", verifyToken, addOrRemoveFav);
+router.get("/isfav/:club_id", verifyToken, isFav);
 router.get("/fav", verifyToken, getUserFav);
 router.get("/profile", verifyToken, getprofile);
+
 router.patch(
   "/profile",
   [verifyToken, imgUploader.fields([{ name: "photo", maxCount: 1 }])],

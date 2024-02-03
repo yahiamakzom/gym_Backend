@@ -707,11 +707,11 @@ exports.checkPaymentNew = asyncHandler(async (req, res, next) => {
 });
 
 exports.checkPayment = asyncHandler(async (req, res, next) => {
- const { paymentId, subId } = req.params;
- const { id, userSubId } = req.query;
+  const { paymentId, subId } = req.params;
+  const { id, userSubId } = req.query;
 
- console.log(req.query);
- console.log(paymentId, subId, id, userSubId);
+  console.log(req.query);
+  console.log(paymentId, subId, id, userSubId);
 
   const https = require("https");
   const querystring = require("querystring");
@@ -757,39 +757,41 @@ exports.checkPayment = asyncHandler(async (req, res, next) => {
       console.log(response);
       console.log(response.result.parameterErrors);
       if (response.id) {
-        const userId = id.trim()
-        const subscriptionId = userSubId.trim()
+        const userId = id.trim();
+        const subscriptionId = userSubId.trim();
         const userData = await User.findById(userId);
 
-        await Subscriptions.findById(subscriptionId).then(async (subscription) => {
-          if (!subscription)
-            return next(new ApiError("Can't find subscription", 404));
-          const start_date = new Date(Date.now());
-          let end_date = new Date(Date.now());
-          end_date =
-            subscription.type === "يومي"
-              ? end_date.setDate(end_date.getDate() + 1)
-              : subscription.type === "اسبوعي"
-              ? end_date.setDate(end_date.getDate() + 7)
-              : subscription.type === "شهري"
-              ? end_date.setMonth(end_date.getMonth() + 1)
-              : subscription.type === "سنوي" &&
-                end_date.setFullYear(end_date.getFullYear() + 1);
-          userSub
-            .create({
-              user: userId,
-              club: subscription.club,
-              subscription,
-              start_date,
-              end_date,
-              code: userData.code,
-            })
-            .then(() =>
-              res.status(200).json({
-                status: "success",
+        await Subscriptions.findById(subscriptionId).then(
+          async (subscription) => {
+            if (!subscription)
+              return next(new ApiError("Can't find subscription", 404));
+            const start_date = new Date(Date.now());
+            let end_date = new Date(Date.now());
+            end_date =
+              subscription.type === "يومي"
+                ? end_date.setDate(end_date.getDate() + 1)
+                : subscription.type === "اسبوعي"
+                ? end_date.setDate(end_date.getDate() + 7)
+                : subscription.type === "شهري"
+                ? end_date.setMonth(end_date.getMonth() + 1)
+                : subscription.type === "سنوي" &&
+                  end_date.setFullYear(end_date.getFullYear() + 1);
+            userSub
+              .create({
+                user: userId,
+                club: subscription.club,
+                subscription,
+                start_date,
+                end_date,
+                code: userData.code,
               })
-            );
-        });
+              .then(() =>
+                res.status(200).json({
+                  status: "success",
+                })
+              );
+          }
+        );
       } else {
         res.status(422).json({
           status: "cancel",
@@ -1233,6 +1235,20 @@ exports.addOrRemoveFav = asyncHandler(async (req, res, next) => {
         club_name: club.name,
         price,
       }).then(() => res.sendStatus(200));
+    }
+  });
+});
+exports.isFav = asyncHandler(async (req, res, next) => {
+  const { club_id } = req.params;
+  const { id } = req.user;
+  await Favorite.findOne({ club_id, user: id }).then(async (fav) => {
+    console.log(await Favorite.find({}));
+    if (fav) {
+      res.status(200).json({ isFav: true });
+      return;
+    } else {
+      res.status(200).json({ isFav: false });
+      return;
     }
   });
 });
