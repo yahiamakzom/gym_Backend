@@ -28,8 +28,8 @@ const {
   subscriptionConfirmation,
   checkPaymentNew,
   GetActivities,
-  getClubByActivity ,
-  isFav
+  getClubByActivity,
+  isFav,
 } = require("../controllers/user");
 const router = require("express").Router();
 const verifyToken = require("../middlewares/verifyToken");
@@ -49,8 +49,8 @@ router.get("/clubs/filter", filterClubs);
 router.get("/rules", getRules);
 router.post("/user_reports", makeReport);
 router.post("/renew_club_wallet/:subId", verifyToken, renewClubByWallet);
-// get club by its catogery 
-router.post("/clubs_by_activity" , getClubByActivity);
+// get club by its catogery
+router.post("/clubs_by_activity", getClubByActivity);
 // this wallet depost is deprecated and doesn't use real payments
 router.post("/wallet_deposit", verifyToken, walletDeposit);
 router.get("/wallet", verifyToken, getUserWallet);
@@ -78,9 +78,9 @@ router.post("/check-pay-new/:paymentId", verifyToken, checkPaymentNew);
 router.post("/wallet_confirm", verifyToken, confirmDeposit);
 router.post("/make_sub/:subId", verifyToken, userMakeSub);
 router.post("/confirm_payment/:subId", verifyToken, confirmPayment);
-// new
-// this will be responsilbe for gettign the 
+
+// this will be responsilbe for gettign the
 router.post("/pay-visa", verifyToken, hyperCheckout);
 
+router.get("/activities", GetActivities);
 module.exports = router;
-router.get("/activities",GetActivities)
