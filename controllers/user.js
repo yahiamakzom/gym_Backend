@@ -512,8 +512,9 @@ exports.renewClubByWallet = asyncHandler(async (req, res, next) => {
 });
 
 exports.hyperCheckout = asyncHandler(async (req, res, next) => {
-  const { price } = req.body;
-  let brand = "visa";
+  const { price  } = req.body;
+brand ='visa'
+
   const { id } = req.user;
   const https = require("https");
   const querystring = require("querystring");
@@ -566,15 +567,15 @@ exports.hyperCheckout = asyncHandler(async (req, res, next) => {
       // "billing.postcode": req.body["billing.postcode"],
       // "customer.givenName": req.body["customer.givenName"],
       // "customer.surname": req.body["customer.surname"],
-      merchantTransactionId: "3243",
+      merchantTransactionId: Math.floor(Math.random() * 900) + 100,
       "customer.email": "mostafa@gmail.com",
-      "customer.givenName": "Mostafa",
-      "customer.surname": "Mostafa",
-      "billing.street1": "30 March Street",
-      "billing.city": "Naghmade",
-      "billing.state": "Qena",
-      "billing.country": "EG",
-      "billing.postcode": "83511",
+      // "customer.givenName": "Mostafa",
+      // "customer.surname": "Mostafa",
+      // "billing.street1": "30 March Street",
+      // "billing.city": "Naghmade",
+      // "billing.state": "Qena",
+      // "billing.country": "EG",
+      // "billing.postcode": "83511",
     });
 
     console.log("Data: ");
@@ -708,8 +709,8 @@ exports.checkPaymentNew = asyncHandler(async (req, res, next) => {
 
 exports.checkPayment = asyncHandler(async (req, res, next) => {
   const { paymentId, subId } = req.params;
-  const { id, userSubId } = req.query;
-
+  const {  userSubId } = req.query;
+  const { id } = req.user;
   console.log(req.query);
   console.log(paymentId, subId, id, userSubId);
 

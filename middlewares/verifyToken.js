@@ -6,6 +6,7 @@ module.exports = (req, res, next) => {
     verify(token, process.env.TOKEN, (err, decoded) => {
         if (err) throw new ApiError(err.message, 401)
         req.user = decoded
+
         next()
     })
 }
