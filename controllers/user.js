@@ -873,7 +873,7 @@ exports.getUserWallet = asyncHandler(async (req, res, next) => {
   const { id } = req.user;
   let total_price = 0;
   await User.findById(id).then(async (user) => {
-    await userSub.find({ user: id, expired: false }).then(async (subs) => {
+    await userSub.find({ user: id}).then(async (subs) => {
       if (subs.length > 0) {
         const filterSubs = await Promise.all(
           subs.map(async (sub) => {
