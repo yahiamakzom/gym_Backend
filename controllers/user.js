@@ -886,6 +886,7 @@ exports.getUserWallet = asyncHandler(async (req, res, next) => {
             return {
               _id: sub._id,
               expired: sub.expired,
+              code:sub.code ,
               club_id: club._id,
               subprice: subscription.price,
               type: subscription.type,
