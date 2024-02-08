@@ -512,8 +512,8 @@ exports.renewClubByWallet = asyncHandler(async (req, res, next) => {
 });
 
 exports.hyperCheckout = asyncHandler(async (req, res, next) => {
-  const { price  } = req.body;
-brand ='visa'
+  const { price } = req.body;
+  brand = "visa";
 
   const { id } = req.user;
   const https = require("https");
@@ -709,7 +709,7 @@ exports.checkPaymentNew = asyncHandler(async (req, res, next) => {
 
 exports.checkPayment = asyncHandler(async (req, res, next) => {
   const { paymentId, subId } = req.params;
-  const {  userSubId } = req.query;
+  const { userSubId } = req.query;
   const { id } = req.user;
   console.log(req.query);
   console.log(paymentId, subId, id, userSubId);
@@ -885,9 +885,10 @@ exports.getUserWallet = asyncHandler(async (req, res, next) => {
             total_price += Number(subscription.price);
             return {
               _id: sub._id,
+              expired: sub.expired,
               club_id: club._id,
               subprice: subscription.price,
-              type:subscription.type,
+              type: subscription.type,
               club_name: club.name,
               club_logo: club.logo,
               start_date: sub.start_date,
