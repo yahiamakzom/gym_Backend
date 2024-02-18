@@ -26,6 +26,7 @@ module.exports = mongoose.model(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Club",
     },
+    
     wallet: Number,
     token: String,
     photo: String,

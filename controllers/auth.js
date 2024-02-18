@@ -14,7 +14,7 @@ exports.Register = asyncHandler(async (req, res, next) => {
     email,
     gender,
     lat,
-    lang,
+    long,
   } = req.body;
   await User.findOne({ email }).then(async (user) => {
     const code = Math.floor(Math.random() * 1000000);
@@ -30,7 +30,7 @@ exports.Register = asyncHandler(async (req, res, next) => {
       gender,
       wallet: 0,
       lat,
-      lang,
+      long,
     }).then((user) => res.status(201).json({ user }));
     const token = sign({ id: user.id, role: user.role }, process.env.TOKEN);
     user.token = token;
