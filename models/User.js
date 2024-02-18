@@ -29,7 +29,7 @@ module.exports = mongoose.model(
     wallet: Number,
     token: String,
     photo: String,
-    lat,
-    lang,
+    lat:String,
+    lang:String,
   })
 );
