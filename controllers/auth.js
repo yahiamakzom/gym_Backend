@@ -7,7 +7,7 @@ const ApiError = require("../utils/ApiError");
 const { sign } = require("jsonwebtoken");
 
 exports.Register = asyncHandler(async (req, res, next) => {
-  const { username, phone, password, role, home_location, email, gender } =
+  const { username, phone, password, role, home_location, email, gender ,lat ,lang } =
     req.body;
   await User.findOne({ email }).then(async (user) => {
     const code = Math.floor(Math.random() * 1000000);
@@ -22,6 +22,8 @@ exports.Register = asyncHandler(async (req, res, next) => {
       code,
       gender,
       wallet: 0,
+      lat,
+      lang,
     }).then((user) => res.status(201).json({ user }));
     const token = sign({ id: user.id, role: user.role }, process.env.TOKEN);
     user.token = token;
@@ -36,7 +38,9 @@ exports.Login = asyncHandler(async (req, res, next) => {
 
     if (representative) {
       console.log(representative);
-      res.status(200).json({ user:representative, token: representative.token });
+      res
+        .status(200)
+        .json({ user: representative, token: representative.token });
       return;
     }
 
@@ -52,7 +56,7 @@ exports.Login = asyncHandler(async (req, res, next) => {
       return next(new ApiError("Password Not Match", 400));
     }
 
-    const token = sign({ id: user.id, role: user.role }, process.env.TOKEN);
+    const token = sign({ id: user.id, role: user.role },process.env.TOKEN);
     delete user._doc.password;
     user.token = token;
     res.json({ user, token });
@@ -61,4 +65,3 @@ exports.Login = asyncHandler(async (req, res, next) => {
     return next(new ApiError("Internal Server Error", 500));
   }
 });
-
