@@ -60,7 +60,7 @@ router.put("/fav/:club_id", verifyToken, addOrRemoveFav);
 router.get("/isfav/:club_id", verifyToken, isFav);
 router.get("/fav", verifyToken, getUserFav);
 router.get("/profile", verifyToken, getprofile);
-router.post("freeze", verifyToken, userFreezing);
+router.post("/freeze", verifyToken, userFreezing);
 router.patch(
   "/profile",
   [verifyToken, imgUploader.fields([{ name: "photo", maxCount: 1 }])],

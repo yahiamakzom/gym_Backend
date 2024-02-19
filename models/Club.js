@@ -1,64 +1,71 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-module.exports = mongoose.model("Club", new mongoose.Schema({
-    name: {
+module.exports = mongoose.model(
+  "Club",
+  new mongoose.Schema(
+    {
+      name: {
         type: String,
         required: [true, "Please Enter Club Name"],
-        trim: true
-    },
-    gender: {
+        trim: true,
+      },
+      gender: {
         type: String,
         required: [true, "Please Enter Gender"],
-        enum: ["male", "female", "both"]
-    },
-    // days: {
-    //     type: String,
-    //     required:[true,"please add Days"]
-    // },
-    from: {
+        enum: ["male", "female", "both"],
+      },
+      // days: {
+      //     type: String,
+      //     required:[true,"please add Days"]
+      // },
+      from: {
         type: String,
-        
       },
       to: {
         type: String,
-        
       },
       allDay: {
         type: Boolean,
         default: false,
       },
-    country: {
+      country: {
         type: String,
         required: [true, "Please Enter country Name"],
-        trim: true
-    },
-    city: {
+        trim: true,
+      },
+      city: {
         type: String,
         required: [true, "Please Enter city Name"],
-        trim: true
-    },
-    lat: {
+        trim: true,
+      },
+      lat: {
         type: String,
-        required:[true,"please add club lat"]
-    },
-    long: {
+        required: [true, "please add club lat"],
+      },
+      long: {
         type: String,
-        required: [true,"please add club long"]
-    },
-    description: {
+        required: [true, "please add club long"],
+      },
+      description: {
         type: String,
-        required: [true, "Please Enter Description "]
-    },
-    sports:Array,
-    WorkingDays:Array  ,
-    images: Array,
-    location: {
+        required: [true, "Please Enter Description "],
+      },
+      sports: Array,
+      WorkingDays: Array,
+      images: Array,
+      location: {
         type: String,
-        trim: true
-    },
-    logo: String,
-    commission: {
+        trim: true,
+      },
+      logo: String,
+      commission: {
         type: Number,
-        required:[true,"Please Enter Commmission Of Club"]
-    }
-},{timestamps:true}))
+        required: [true, "Please Enter Commmission Of Club"],
+      },
+
+      discountCode: String,
+      discountQuantity: Number,
+    },
+    { timestamps: true }
+  )
+);
