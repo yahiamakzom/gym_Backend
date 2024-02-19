@@ -94,6 +94,8 @@ exports.addClub = asyncHandler(async (req, res, next) => {
           representative.save();
           console.log(representative);
         }
+
+        
         await User.create({
           email,
           password: await bcrypt.hash(password, 10),

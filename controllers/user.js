@@ -882,7 +882,7 @@ exports.userFreezing = asyncHandler(async (req, res, next) => {
 
   try {
     // Find the user subscription by ID
-    let usersub = await userSub.findById(userSubId).populate('subscription');
+    let usersub = await userSub.findById(userSubId).populate("subscription");
     if (!usersub) {
       return next(new ApiError("User subscription not found", 404));
     }
@@ -892,7 +892,9 @@ exports.userFreezing = asyncHandler(async (req, res, next) => {
 
     // Check if freezeCountTime is greater than 0
     if (freezeCountTime <= 0) {
-      return next(new ApiError("Freeze count time must be greater than 0", 400));
+      return next(
+        new ApiError("Freeze count time must be greater than 0", 400)
+      );
     }
 
     // Check if freeze exceeds freezeTime
@@ -909,14 +911,19 @@ exports.userFreezing = asyncHandler(async (req, res, next) => {
 
     // Update userSub end date
     usersub.end_date = newEndDate;
+    const freezeEndDate = new Date(Date.now() + 3 * 60 * 1000);
+
+    const isCurrentlyFrozen = freezeEndDate >= new Date();
+    usersub.isfreezen = isCurrentlyFrozen;
 
     await usersub.save();
 
-    
     usersub.subscription.freezeCountTime = freezeCountTime;
     await usersub.subscription.save();
 
-    res.status(200).json({ message: "User subscription frozen successfully", newEndDate });
+    res
+      .status(200)
+      .json({ message: "User subscription frozen successfully", newEndDate });
   } catch (error) {
     next(error);
   }
@@ -940,9 +947,11 @@ exports.getUserWallet = asyncHandler(async (req, res, next) => {
               _id: sub._id,
               expired: sub.expired,
               code: sub.code,
+              isfreezen: sub.isfreezen,
+              freezeCountTime: subscription.freezeCountTime,
               club_id: club._id,
               subscriptionId: subscription._id,
-              freezeTime:subscription.freezeTime,
+              freezeTime: subscription.freezeTime,
               subprice: subscription.price,
               type: subscription.type,
               club_name: club.name,
