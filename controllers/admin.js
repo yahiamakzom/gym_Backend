@@ -38,6 +38,8 @@ exports.addClub = asyncHandler(async (req, res, next) => {
     repreentative_id,
     sports,
     days,
+    discountCode,
+    discountQuantity
   } = req.body;
 
   let SportData = sports.split(",");
@@ -81,7 +83,11 @@ exports.addClub = asyncHandler(async (req, res, next) => {
         commission,
         sports: [...SportData],
         Days: [...Days],
+        discountCode,
+        discountQuantity
       }).then(async (club) => {
+        console.log(club)
+
         let representative = await Representative.findById(repreentative_id);
         if (representative) {
           representative.clups.push(club.id);
@@ -120,7 +126,10 @@ exports.addClub = asyncHandler(async (req, res, next) => {
         commission,
         sports: [...SportData],
         WorkingDays: [...Days],
+        discountCode,
+        discountQuantity
       }).then(async (club) => {
+        console.log(club)
         let representative = await Representative.findById(repreentative_id);
         if (representative) {
           representative.clups.push(club.id);
