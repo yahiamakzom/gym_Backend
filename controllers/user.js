@@ -915,10 +915,11 @@ exports.userFreezing = asyncHandler(async (req, res, next) => {
 
     usersub.isfreezen = true;
 
-    await usersub.save();
+
 
     usersub.subscription.freezeCountTime = freezeCountTime;
     await usersub.subscription.save();
+    await usersub.save();
 
     res
       .status(200)
