@@ -55,8 +55,6 @@ router.post("/clubs_by_activity", getClubByActivity);
 // this wallet depost is deprecated and doesn't use real payments
 router.post("/wallet_deposit", verifyToken, walletDeposit);
 router.get("/wallet", verifyToken, getUserWallet);
-// this belong to us
-
 router.get("/booking", verifyToken, userBooking);
 router.put("/fav/:club_id", verifyToken, addOrRemoveFav);
 router.get("/isfav/:club_id", verifyToken, isFav);
