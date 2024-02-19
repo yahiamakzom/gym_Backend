@@ -914,7 +914,7 @@ exports.userFreezing = asyncHandler(async (req, res, next) => {
     const freezeEndDate = new Date(Date.now() + 5 * 60 * 1000);
 
     usersub.isfreezen = freezeEndDate >= new Date();
-    userSub.freezenData = freezeEndDate;
+    usersub.freezenDate = freezeEndDate;
 
     usersub.subscription.freezeCountTime = freezeCountTime;
     await usersub.subscription.save();
@@ -922,7 +922,11 @@ exports.userFreezing = asyncHandler(async (req, res, next) => {
 
     res
       .status(200)
-      .json({ message: "User subscription frozen successfully", newEndDate ,freezenData });
+      .json({
+        message: "User subscription frozen successfully",
+        newEndDate,
+        freezenDate: usersub.freezenDate,
+      });
   } catch (error) {
     next(error);
   }

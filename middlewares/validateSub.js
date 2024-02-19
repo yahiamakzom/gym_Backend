@@ -5,7 +5,7 @@ module.exports = expressAsyncHandler(async (req, res, next) => {
     if (subs.length) {
       subs.forEach(async (sub) => {
         const end_date = sub.end_date;
-        const freezenData = sub.freezenData;
+        const freezenData = sub.freezenData || Date.now()
         if (end_date.getTime() < Date.now()) {
           await userSub.findByIdAndUpdate(sub.id, { expired: true });
         }
