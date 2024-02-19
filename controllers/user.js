@@ -882,7 +882,7 @@ exports.userFreezing = asyncHandler(async (req, res, next) => {
 
   try {
     // Find the user subscription by ID
-    let usersub = await userSub.findById(userSubId).populate('subscription');
+    let usersub = await userSub.findById(userSubId).populate("subscription");
     if (!usersub) {
       return next(new ApiError("User subscription not found", 404));
     }
@@ -892,7 +892,9 @@ exports.userFreezing = asyncHandler(async (req, res, next) => {
 
     // Check if freezeCountTime is greater than 0
     if (freezeCountTime <= 0) {
-      return next(new ApiError("Freeze count time must be greater than 0", 400));
+      return next(
+        new ApiError("Freeze count time must be greater than 0", 400)
+      );
     }
 
     // Check if freeze exceeds freezeTime
@@ -904,11 +906,13 @@ exports.userFreezing = asyncHandler(async (req, res, next) => {
     freezeCountTime--;
 
     // Calculate new end date after freezing
-    const newEndDate = new Date(usersub.end_date);
-    newEndDate.setDate(newEndDate.getDate() + freezeDuration);
+    // Calculate new end date after freezing
+    const newEndDate = new Date(
+      userSub.end_date.getTime() + freezeDuration * 24 * 60 * 60 * 1000
+    );
 
     // Update userSub end date
-    usersub.end_date = newEndDate;
+    userSub.end_date = newEndDate;
 
     // Save the updated user subscription
     await usersub.save();
@@ -917,7 +921,9 @@ exports.userFreezing = asyncHandler(async (req, res, next) => {
     usersub.subscription.freezeCountTime = freezeCountTime;
     await usersub.subscription.save();
 
-    res.status(200).json({ message: "User subscription frozen successfully", newEndDate });
+    res
+      .status(200)
+      .json({ message: "User subscription frozen successfully", newEndDate });
   } catch (error) {
     next(error);
   }
