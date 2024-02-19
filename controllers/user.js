@@ -911,7 +911,7 @@ exports.userFreezing = asyncHandler(async (req, res, next) => {
 
     // Update userSub end date
     usersub.end_date = newEndDate;
-    const freezeEndDate = new Date(Date.now() + 3 * 60 * 1000);
+    const freezeEndDate = new Date(Date.now() + 7 * 60 * 1000);
 
     const isCurrentlyFrozen = freezeEndDate >= new Date();
     usersub.isfreezen = isCurrentlyFrozen;
