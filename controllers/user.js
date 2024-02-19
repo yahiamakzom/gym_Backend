@@ -913,7 +913,7 @@ exports.userFreezing = asyncHandler(async (req, res, next) => {
     usersub.end_date = newEndDate;
     const freezeEndDate = new Date(Date.now() + 20 * 60 * 1000);
 
-    usersub.isfreezen = freezeEndDate >= new Date();
+    usersub.isfreezen = true;
 
     await usersub.save();
 
