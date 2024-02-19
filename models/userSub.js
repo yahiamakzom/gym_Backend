@@ -19,7 +19,7 @@ module.exports = mongoose.model(
     end_date: Date,
     isfreezen: {
       type: Boolean,
-  
+      default: false, 
     },
     expired: {
       type: Boolean,
