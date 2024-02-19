@@ -30,6 +30,7 @@ const {
   GetActivities,
   getClubByActivity,
   isFav,
+  userFreezing,
 } = require("../controllers/user");
 const router = require("express").Router();
 const verifyToken = require("../middlewares/verifyToken");
@@ -54,14 +55,14 @@ router.post("/clubs_by_activity", getClubByActivity);
 // this wallet depost is deprecated and doesn't use real payments
 router.post("/wallet_deposit", verifyToken, walletDeposit);
 router.get("/wallet", verifyToken, getUserWallet);
-// this belong to us 
+// this belong to us
 
 router.get("/booking", verifyToken, userBooking);
 router.put("/fav/:club_id", verifyToken, addOrRemoveFav);
 router.get("/isfav/:club_id", verifyToken, isFav);
 router.get("/fav", verifyToken, getUserFav);
 router.get("/profile", verifyToken, getprofile);
-
+router.post("freeze", verifyToken, userFreezing);
 router.patch(
   "/profile",
   [verifyToken, imgUploader.fields([{ name: "photo", maxCount: 1 }])],
@@ -75,7 +76,7 @@ router.post(
 // payment methods
 // old
 router.post("/wallet", depositWallet);
-// not belong to us  
+// not belong to us
 
 router.post("/check-pay/:paymentId/:subId", verifyToken, checkPayment);
 router.post("/check-pay-new/:paymentId", verifyToken, checkPaymentNew);
