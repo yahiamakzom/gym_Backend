@@ -923,7 +923,7 @@ exports.userFreezing = asyncHandler(async (req, res, next) => {
 
     res
       .status(200)
-      .json({ message: "User subscription frozen successfully", newEndDate });
+      .json({ message: "User subscription frozen successfully", usersub });
   } catch (error) {
     next(error);
   }
