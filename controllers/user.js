@@ -911,11 +911,10 @@ exports.userFreezing = asyncHandler(async (req, res, next) => {
 
     // Update userSub end date
     usersub.end_date = newEndDate;
-    const freezeEndDate = new Date(Date.now() + 20 * 60 * 1000);
+    const freezeEndDate = new Date(Date.now() + 5 * 60 * 1000);
 
     usersub.isfreezen = freezeEndDate >= new Date();
-
-
+    userSub.freezenData = freezeEndDate;
 
     usersub.subscription.freezeCountTime = freezeCountTime;
     await usersub.subscription.save();
