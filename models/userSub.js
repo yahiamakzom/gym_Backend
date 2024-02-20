@@ -21,7 +21,10 @@ module.exports = mongoose.model(
       type: Boolean,
       default: false, 
     },
-    freezenDate: Date ,
+    freezenDate:{
+      type:Date ,
+      default: Date.now 
+    } ,
     expired: {
       type: Boolean,
       default: false,
