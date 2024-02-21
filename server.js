@@ -23,7 +23,7 @@ app.use("*",(req,res,next)=>res.status(404).json({message:"Page Not Found"}))
 app.use(require("./middlewares/globalError"))
 // ss
 DB.then(con => {
-    app.listen(PORT, () => console.log("Listening On Port " + PORT + " DB Connect To" + con.connection.host))
+    app.listen(PORT, () => console.log("Listening On   " + PORT + " DB Connect To" + con.connection.host))
 }).catch(err => {
     throw new Error("Error Happend While Connecting TO DataBase\n" + err.message, err.status)
 })

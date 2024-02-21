@@ -515,7 +515,9 @@ exports.hyperCheckout = asyncHandler(async (req, res, next) => {
   const { price ,brand } = req.body;
   
 
-  const { id } = req.user;
+  const { id } = req.user; 
+  console.log(price ,brand ,id)
+
   const https = require("https");
   const querystring = require("querystring");
 console.log(price ,brand) 
@@ -546,11 +548,11 @@ const user = await User.findOne({ _id: id });
     //   return Promise.reject(new Error("brand is not valid"));
     // }
     // for prod
-    if (brand == "visa" || brand == "mastercard" || brand == "stcpay") {
+    if (brand.trim() == "visa" || brand.trim()  == "mastercard" || brand.trim() == "stcpay") {
       entityId = "8ac9a4c88c152af8018c34bdd8db1eda";
-    } else if (brand == "mada") {
+    } else if (brand.trim() == "mada") {
       entityId = "8ac9a4c88c152af8018c34be7f601ee3";
-    } else if (brand == "applepay") {
+    } else if (brand.trim() == "applepay") {
       entityId = "8ac9a4c88c152af8018c34bf34461eec";
     } else {
       return Promise.reject(new Error("brand is not valid"));
