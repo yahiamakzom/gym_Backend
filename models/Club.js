@@ -63,8 +63,14 @@ module.exports = mongoose.model(
         required: [true, "Please Enter Commmission Of Club"],
       },
 
-      discountCode: String,
-      discountQuantity: Number,
+      discountCode: {
+        type: String,
+        default: null,
+      },
+      discountQuantity: {
+        type: Number,
+        default: null,
+      },
     },
     { timestamps: true }
   )
