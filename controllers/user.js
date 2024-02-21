@@ -517,117 +517,121 @@ exports.hyperCheckout = asyncHandler(async (req, res, next) => {
 
   const { id } = req.user; 
   console.log(price ,brand ,id)
+   res.json({
+    brand:brand ,
+    price:price ,
+    message:"request successfully "
+   })
+//   const https = require("https");
+//   const querystring = require("querystring");
+// console.log(price ,brand) 
+// console.log(id)
+// console.log(req.user)
+// const user = await User.findOne({ _id: id });
 
-  const https = require("https");
-  const querystring = require("querystring");
-console.log(price ,brand) 
-console.log(id)
-console.log(req.user)
-const user = await User.findOne({ _id: id });
 
+//   const request = async () => {
+//     const path = "/v1/checkouts";
+//     let entityId;
 
-  const request = async () => {
-    const path = "/v1/checkouts";
-    let entityId;
+//     if (!brand) {
+//       return Promise.reject(new Error("brand is required"));
+//     }
 
-    if (!brand) {
-      return Promise.reject(new Error("brand is required"));
-    }
+//     console.log("Brand: " + brand);
 
-    console.log("Brand: " + brand);
+//     entityId = "8a8294174b7ecb28014b9699220015ca";
+//     //for test
+//     // if (brand == "visa" || brand == "mastercard" || brand == "stcpay") {
+//     //   entityId = "8ac7a4c789cce7da0189cef121f1010e";
+//     // } else if (brand == "mada") {
+//     //   entityId = "8ac7a4c789cce7da0189cef21f1b0112";
+//     // } else if (brand == "applepay") {
+//     //   entityId = "8ac7a4c88ac93f4f018acc6f1377032b";
+//     // } else {
+//     //   return Promise.reject(new Error("brand is not valid"));
+//     // }
+//     // for prod
+//     if (brand.trim() == "visa" || brand.trim()  == "mastercard" || brand.trim() == "stcpay") {
+//       entityId = "8ac9a4c88c152af8018c34bdd8db1eda";
+//     } else if (brand.trim() == "mada") {
+//       entityId = "8ac9a4c88c152af8018c34be7f601ee3";
+//     } else if (brand.trim() == "applepay") {
+//       entityId = "8ac9a4c88c152af8018c34bf34461eec";
+//     } else {
+//       return Promise.reject(new Error("brand is not valid"));
+//     }
 
-    entityId = "8a8294174b7ecb28014b9699220015ca";
-    //for test
-    // if (brand == "visa" || brand == "mastercard" || brand == "stcpay") {
-    //   entityId = "8ac7a4c789cce7da0189cef121f1010e";
-    // } else if (brand == "mada") {
-    //   entityId = "8ac7a4c789cce7da0189cef21f1b0112";
-    // } else if (brand == "applepay") {
-    //   entityId = "8ac7a4c88ac93f4f018acc6f1377032b";
-    // } else {
-    //   return Promise.reject(new Error("brand is not valid"));
-    // }
-    // for prod
-    if (brand.trim() == "visa" || brand.trim()  == "mastercard" || brand.trim() == "stcpay") {
-      entityId = "8ac9a4c88c152af8018c34bdd8db1eda";
-    } else if (brand.trim() == "mada") {
-      entityId = "8ac9a4c88c152af8018c34be7f601ee3";
-    } else if (brand.trim() == "applepay") {
-      entityId = "8ac9a4c88c152af8018c34bf34461eec";
-    } else {
-      return Promise.reject(new Error("brand is not valid"));
-    }
+//     const data = querystring.stringify({
+//       entityId,
+//       amount: price,
+//       currency: "SAR",
+//       paymentType: "DB",
+//       //  Also please remove testMode=EXTERNAL and customParameters[3DS2_enrolled]=true from this step's code, as they are only required for testing
+//       // "customParameters[3DS2_enrolled]": true,
+//       // merchantTransactionId: req.body["merchantTransactionId"],
+//       // "customer.email": req.body["customer.email"],
+//       // "billing.street1": req.body["billing.street1"],
+//       // "billing.city": req.body["billing.city"],
+//       // "billing.state": req.body["billing.state"],
+//       // "billing.country": req.body["billing.country"],
+//       // "billing.postcode": req.body["billing.postcode"],
+//       // "customer.givenName": req.body["customer.givenName"],
+//       // "customer.surname": req.body["customer.surname"],
+//       merchantTransactionId: Math.floor(Math.random() * 900) + 100,
+//       "customer.email": user.email,
+//       "customer.givenName": user.username,
+//       "customer.surname": user.username,
+//       // "billing.street1": "30 March Street",
+//       // "billing.city": "Naghmade",
+//       // "billing.state": "Qena",
+//       // "billing.country": "EG",
+//       // "billing.postcode": "83511",
+//     });
 
-    const data = querystring.stringify({
-      entityId,
-      amount: price,
-      currency: "SAR",
-      paymentType: "DB",
-      //  Also please remove testMode=EXTERNAL and customParameters[3DS2_enrolled]=true from this step's code, as they are only required for testing
-      // "customParameters[3DS2_enrolled]": true,
-      // merchantTransactionId: req.body["merchantTransactionId"],
-      // "customer.email": req.body["customer.email"],
-      // "billing.street1": req.body["billing.street1"],
-      // "billing.city": req.body["billing.city"],
-      // "billing.state": req.body["billing.state"],
-      // "billing.country": req.body["billing.country"],
-      // "billing.postcode": req.body["billing.postcode"],
-      // "customer.givenName": req.body["customer.givenName"],
-      // "customer.surname": req.body["customer.surname"],
-      merchantTransactionId: Math.floor(Math.random() * 900) + 100,
-      "customer.email": user.email,
-      "customer.givenName": user.username,
-      "customer.surname": user.username,
-      // "billing.street1": "30 March Street",
-      // "billing.city": "Naghmade",
-      // "billing.state": "Qena",
-      // "billing.country": "EG",
-      // "billing.postcode": "83511",
-    });
+//     console.log("Data: ");
+//     console.log(data);
 
-    console.log("Data: ");
-    console.log(data);
+//     const options = {
+//       port: 443,
+//       host: "eu-prod.oppwa.com",
+//       // host: "eu-test.oppwa.com",
+//       path: path,
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/x-www-form-urlencoded",
+//         "Content-Length": data.length,
+//         Authorization:
+//           "Bearer OGFjOWE0Yzg4YzE1MmFmODAxOGMzNGJkNDk5NzFlZDJ8cXRqMnlhR0Y0ZVQ5UHFKcA==",
+//         // "Bearer OGFjN2E0Yzc4OWNjZTdkYTAxODljZWYwYTYxMTAxMGF8S3czc3lqRk5Hdw==",
+//       },
+//     };
 
-    const options = {
-      port: 443,
-      host: "eu-prod.oppwa.com",
-      // host: "eu-test.oppwa.com",
-      path: path,
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        "Content-Length": data.length,
-        Authorization:
-          "Bearer OGFjOWE0Yzg4YzE1MmFmODAxOGMzNGJkNDk5NzFlZDJ8cXRqMnlhR0Y0ZVQ5UHFKcA==",
-        // "Bearer OGFjN2E0Yzc4OWNjZTdkYTAxODljZWYwYTYxMTAxMGF8S3czc3lqRk5Hdw==",
-      },
-    };
+//     return new Promise((resolve, reject) => {
+//       const postRequest = https.request(options, function (res) {
+//         const buf = [];
+//         res.on("data", (chunk) => {
+//           buf.push(Buffer.from(chunk));
+//         });
+//         res.on("end", () => {
+//           const jsonString = Buffer.concat(buf).toString("utf8");
+//           try {
+//             resolve(JSON.parse(jsonString));
+//           } catch (error) {
+//             reject(error);
+//           }
+//         });
+//       });
 
-    return new Promise((resolve, reject) => {
-      const postRequest = https.request(options, function (res) {
-        const buf = [];
-        res.on("data", (chunk) => {
-          buf.push(Buffer.from(chunk));
-        });
-        res.on("end", () => {
-          const jsonString = Buffer.concat(buf).toString("utf8");
-          try {
-            resolve(JSON.parse(jsonString));
-          } catch (error) {
-            reject(error);
-          }
-        });
-      });
+//       postRequest.on("error", reject);
+//       postRequest.write(data);
+//       postRequest.end();
+//     });
+//   };
 
-      postRequest.on("error", reject);
-      postRequest.write(data);
-      postRequest.end();
-    });
-  };
-
-  request()
-    .then((response) => res.send(response))
-    .catch(console.error);
+//   request()
+//     .then((response) => res.send(response))
+//     .catch(console.error);
 });
 
 exports.checkPaymentNew = asyncHandler(async (req, res, next) => {
