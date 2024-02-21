@@ -24,11 +24,11 @@ module.exports = mongoose.model(
       },
       type: {
         type: String,
-        enum: ["سنوي", "شهري", "اسبوعي", "يومي"],
+        enum: ["ساعه", "سنوي", "شهري", "اسبوعي", "يومي"],
         required: [true, "Please Add a Subscription Date"],
       },
       numberType: {
-        type: Number,
+        type: Number, 
         default: 0,
         required: [true, "Enter Subscription number for sepcicfic volumn type"],
       },
