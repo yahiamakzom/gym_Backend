@@ -512,12 +512,17 @@ exports.renewClubByWallet = asyncHandler(async (req, res, next) => {
 });
 
 exports.hyperCheckout = asyncHandler(async (req, res, next) => {
-  const { price } = req.body;
-  brand = "visa";
+  const { price ,brand } = req.body;
+  
 
   const { id } = req.user;
   const https = require("https");
   const querystring = require("querystring");
+console.log(price ,brand) 
+console.log(id)
+console.log(req.user)
+const user = await User.findOne({ _id: id });
+
 
   const request = async () => {
     const path = "/v1/checkouts";
@@ -553,7 +558,7 @@ exports.hyperCheckout = asyncHandler(async (req, res, next) => {
 
     const data = querystring.stringify({
       entityId,
-      amount: 1,
+      amount: price,
       currency: "SAR",
       paymentType: "DB",
       //  Also please remove testMode=EXTERNAL and customParameters[3DS2_enrolled]=true from this step's code, as they are only required for testing
@@ -568,9 +573,9 @@ exports.hyperCheckout = asyncHandler(async (req, res, next) => {
       // "customer.givenName": req.body["customer.givenName"],
       // "customer.surname": req.body["customer.surname"],
       merchantTransactionId: Math.floor(Math.random() * 900) + 100,
-      "customer.email": "mostafa@gmail.com",
-      // "customer.givenName": "Mostafa",
-      // "customer.surname": "Mostafa",
+      "customer.email": user.email,
+      "customer.givenName": user.username,
+      "customer.surname": user.username,
       // "billing.street1": "30 March Street",
       // "billing.city": "Naghmade",
       // "billing.state": "Qena",
@@ -709,7 +714,7 @@ exports.checkPaymentNew = asyncHandler(async (req, res, next) => {
 
 exports.checkPayment = asyncHandler(async (req, res, next) => {
   const { paymentId, subId } = req.params;
-  const { userSubId } = req.query;
+  const { userSubId } = req.body;
   const { id } = req.user;
   console.log(req.query);
   console.log(paymentId, subId, id, userSubId);
