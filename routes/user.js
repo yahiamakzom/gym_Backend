@@ -31,6 +31,7 @@ const {
   getClubByActivity,
   isFav,
   userFreezing,
+  userUnfreeze
 } = require("../controllers/user");
 const router = require("express").Router();
 const verifyToken = require("../middlewares/verifyToken");
@@ -61,6 +62,7 @@ router.get("/isfav/:club_id", verifyToken, isFav);
 router.get("/fav", verifyToken, getUserFav);
 router.get("/profile", verifyToken, getprofile);
 router.post("/freeze", verifyToken, userFreezing);
+router.post("/unfreeze", verifyToken, userUnfreeze);
 router.patch(
   "/profile",
   [verifyToken, imgUploader.fields([{ name: "photo", maxCount: 1 }])],

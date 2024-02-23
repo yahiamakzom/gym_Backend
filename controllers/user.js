@@ -968,6 +968,52 @@ exports.userFreezing = asyncHandler(async (req, res, next) => {
   }
 });
 
+exports.userUnfreeze = asyncHandler(async (req, res, next) => {
+  const { userSubId } = req.body;
+
+  try {
+    // Find the user subscription by ID
+    let usersub = await userSub.findById(userSubId).populate("subscription");
+    if (!usersub) {
+      return next(new ApiError("User subscription not found", 404));
+    }
+
+    const subscription = usersub.subscription;
+    const start_date = usersub.start_date;
+    let end_date = new Date(start_date);
+
+    if (subscription.type === "يومي") {
+      end_date.setDate(end_date.getDate() + 1);
+    } else if (subscription.type === "اسبوعي") {
+      end_date.setDate(end_date.getDate() + 7);
+    } else if (subscription.type === "شهري") {
+      end_date.setMonth(end_date.getMonth() + 1);
+    } else if (subscription.type === "سنوي") {
+      end_date.setFullYear(end_date.getFullYear() + 1);
+    } else if (subscription.type === "ساعه") {
+      end_date.setHours(end_date.getHours() + 4);
+    }
+
+    // Reset userSub end date
+    usersub.end_date = end_date;
+
+    // Reset freeze-related fields
+    usersub.isfreezen = false;
+    usersub.freezenDate = Date.now() ;
+
+    // Save changes
+    await usersub.subscription.save();
+    await usersub.save();
+
+    res.status(200).json({
+      message: "User subscription unfrozen successfully",
+      end_date
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 exports.getUserWallet = asyncHandler(async (req, res, next) => {
   const { id } = req.user;
   let total_price = 0;
