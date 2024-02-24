@@ -11,6 +11,7 @@ const Favorite = require("../models/Favorite");
 const ApiError = require("../utils/ApiError");
 const paypal = require("paypal-rest-sdk");
 const axios = require("axios");
+const {getBarandEntityId} = require("../core/hyper_pay_config.js");
 const { calcDistance, calculateDistance } = require("../utils/Map");
 const jwt = require("jsonwebtoken");
 const moment = require("moment");
@@ -537,15 +538,14 @@ exports.hyperCheckout = asyncHandler(async (req, res, next) => {
 
   const https = require("https");
   const querystring = require("querystring");
-console.log(price ,brand) 
-console.log(id)
-console.log(req.user)
-const user = await User.findOne({ _id: id });
+  console.log(price ,brand) 
+  console.log(id)
+  console.log(req.user)
+  const user = await User.findOne({ _id: id });
 
 
   const request = async () => {
     const path = "/v1/checkouts";
-    let entityId;
 
     if (!brand) {
       return Promise.reject(new Error("brand is required"));
@@ -553,27 +553,7 @@ const user = await User.findOne({ _id: id });
 
     console.log("Brand: " + brand);
 
-    entityId = "8a8294174b7ecb28014b9699220015ca";
-    //for test
-    // if (brand == "visa" || brand == "mastercard" || brand == "stcpay") {
-    //   entityId = "8ac7a4c789cce7da0189cef121f1010e";
-    // } else if (brand == "mada") {
-    //   entityId = "8ac7a4c789cce7da0189cef21f1b0112";
-    // } else if (brand == "applepay") {
-    //   entityId = "8ac7a4c88ac93f4f018acc6f1377032b";
-    // } else {
-    //   return Promise.reject(new Error("brand is not valid"));
-    // }
-    // for prod
-    if (brand.trim() == "visa" || brand.trim()  == "mastercard" || brand.trim() == "stcpay") {
-      entityId = "8ac9a4c88c152af8018c34bdd8db1eda";
-    } else if (brand.trim() == "mada") {
-      entityId = "8ac9a4c88c152af8018c34be7f601ee3";
-    } else if (brand.trim() == "applepay") {
-      entityId = "8ac9a4c88c152af8018c34bf34461eec";
-    } else {
-      return Promise.reject(new Error("brand is not valid"));
-    }
+    let entityId = getBarandEntityId(brand);
 
     const data = querystring.stringify({
       entityId,
@@ -653,36 +633,19 @@ exports.checkPaymentNew = asyncHandler(async (req, res, next) => {
   const { id } = req.user;
   const https = require("https");
   const querystring = require("querystring");
-  let entityId;
+  
 
   if (!brand) {
     return Promise.reject(new Error("brand is required"));
   }
-  //for test
-  // if (brand == "visa" || brand == "mastercard" || brand == "stcpay") {
-  //   entityId = "8ac7a4c789cce7da0189cef121f1010e";
-  // } else if (brand == "mada") {
-  //   entityId = "8ac7a4c789cce7da0189cef21f1b0112";
-  // } else if (brand == "applepay") {
-  //   entityId = "8ac7a4c88ac93f4f018acc6f1377032b";
-  // } else {
-  //   return Promise.reject(new Error("brand is not valid"));
-  // }
 
-  if (brand == "visa" || brand == "mastercard" || brand == "stcpay") {
-    entityId = "8ac9a4c88c152af8018c34bdd8db1eda";
-  } else if (brand == "mada") {
-    entityId = "8ac9a4c88c152af8018c34be7f601ee3";
-  } else if (brand == "applepay") {
-    entityId = "8ac7a4c88ac93f4f018acc6f1377032b";
-  } else {
-    return Promise.reject(new Error("brand is not valid"));
-  }
+  let entityId = getBarandEntityId(brand);
+
   const request = async () => {
     var path = `/v1/checkouts/${paymentId}/payment`;
-    // path += "?entityId=8a8294174b7ecb28014b9699220015ca";
 
     path += `?entityId=${entityId}`;
+    
     const options = {
       port: 443,
       host: "eu-prod.oppwa.com",
@@ -690,8 +653,7 @@ exports.checkPaymentNew = asyncHandler(async (req, res, next) => {
       path: path,
       method: "GET",
       headers: {
-        Authorization:
-          "Bearer OGFjOWE0Yzg4YzE1MmFmODAxOGMzNGJkNDk5NzFlZDJ8cXRqMnlhR0Y0ZVQ5UHFKcA==",
+        Authorization: "Bearer OGFjOWE0Yzg4YzE1MmFmODAxOGMzNGJkNDk5NzFlZDJ8cXRqMnlhR0Y0ZVQ5UHFKcA==",
         // "Bearer OGFjN2E0Yzc4OWNjZTdkYTAxODljZWYwYTYxMTAxMGF8S3czc3lqRk5Hdw==",
       },
     };
@@ -1027,7 +989,7 @@ exports.getUserWallet = asyncHandler(async (req, res, next) => {
               logo: "",
             };
             const subscription = await Subscriptions.findById(sub.subscription);
-            total_price += Number(subscription.price);
+            total_price += Number(subscription.price ?? 0);
             return {
               _id: sub._id,
               expired: sub.expired,
