@@ -31,6 +31,6 @@ module.exports = mongoose.model(
     token: String,
     photo: String,
     lat:String,
-    lang:String,
+    long:String,
   })
 );
