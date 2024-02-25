@@ -11,7 +11,7 @@ const Favorite = require("../models/Favorite");
 const ApiError = require("../utils/ApiError");
 const paypal = require("paypal-rest-sdk");
 const axios = require("axios");
-const {getBarandEntityId} = require("../core/hyper_pay_config.js");
+const { getBarandEntityId } = require("../core/hyper_pay_config.js");
 const { calcDistance, calculateDistance } = require("../utils/Map");
 const jwt = require("jsonwebtoken");
 const moment = require("moment");
@@ -275,35 +275,36 @@ exports.getClubAuth = asyncHandler(async (req, res, next) => {
               let start_date, end_date;
 
               if (sub && sub.subscription) {
-                  const { type, numberType } = sub.subscription;
-                  const startDate = moment().startOf("hour"); // Start of the current hour
-              
-                  if (type === "شهري") {
-                      end_date = moment(startDate)
-                          .add(numberType, "months")
-                          .endOf("hour");
-                  } else if (type === "سنوي") {
-                      end_date = moment(startDate)
-                          .add(numberType, "years")
-                          .endOf("hour");
-                  } else if (type === "اسبوعي") {
-                      end_date = moment(startDate)
-                          .add(numberType, "weeks")
-                          .endOf("hour");
-                  } else if (type === "يومي") {
-                      end_date = moment(startDate)
-                          .add(numberType, "days")
-                          .endOf("hour");
-                  } else if (type === "ساعه") { // New condition for hourly subscription
-                      end_date = moment(startDate)
-                          .add(4, "hours") // Adding 4 hours to the start date for a 4-hour subscription
-                          .endOf("hour");
-                  }
-              
-                  if (end_date) {
-                      start_date = startDate.format("DD-MM-YYYY HH:mm:ss"); // Format including hours, minutes, and seconds
-                      end_date = end_date.format("DD-MM-YYYY HH:mm:ss"); // Format including hours, minutes, and seconds
-                  }
+                const { type, numberType } = sub.subscription;
+                const startDate = moment().startOf("hour"); // Start of the current hour
+
+                if (type === "شهري") {
+                  end_date = moment(startDate)
+                    .add(numberType, "months")
+                    .endOf("hour");
+                } else if (type === "سنوي") {
+                  end_date = moment(startDate)
+                    .add(numberType, "years")
+                    .endOf("hour");
+                } else if (type === "اسبوعي") {
+                  end_date = moment(startDate)
+                    .add(numberType, "weeks")
+                    .endOf("hour");
+                } else if (type === "يومي") {
+                  end_date = moment(startDate)
+                    .add(numberType, "days")
+                    .endOf("hour");
+                } else if (type === "ساعه") {
+                  // New condition for hourly subscription
+                  end_date = moment(startDate)
+                    .add(4, "hours") // Adding 4 hours to the start date for a 4-hour subscription
+                    .endOf("hour");
+                }
+
+                if (end_date) {
+                  start_date = startDate.format("DD-MM-YYYY HH:mm:ss"); // Format including hours, minutes, and seconds
+                  end_date = end_date.format("DD-MM-YYYY HH:mm:ss"); // Format including hours, minutes, and seconds
+                }
               }
               // let distance = await calcDistance(
               //   `${club.lat},${club.long}`,
@@ -486,27 +487,27 @@ exports.renewClubByWallet = asyncHandler(async (req, res, next) => {
         else {
           const start_date = new Date(Date.now());
           let end_date = new Date(Date.now());
-        // end_date =
-  //   subscription.type === "يومي"
-  //     ? end_date.setDate(end_date.getDate() + 1)
-  //     : subscription.type === "اسبوعي"
-  //     ? end_date.setDate(end_date.getDate() + 7)
-  //     : subscription.type === "شهري"
-  //     ? end_date.setMonth(end_date.getMonth() + 1)
-  //     : subscription.type === "سنوي" &&
-  //       end_date.setFullYear(end_date.getFullYear() + 1);
+          // end_date =
+          //   subscription.type === "يومي"
+          //     ? end_date.setDate(end_date.getDate() + 1)
+          //     : subscription.type === "اسبوعي"
+          //     ? end_date.setDate(end_date.getDate() + 7)
+          //     : subscription.type === "شهري"
+          //     ? end_date.setMonth(end_date.getMonth() + 1)
+          //     : subscription.type === "سنوي" &&
+          //       end_date.setFullYear(end_date.getFullYear() + 1);
 
-  if (subscription.type === "يومي") {
-    end_date.setDate(end_date.getDate() + 1);
-  } else if (subscription.type === "اسبوعي") {
-    end_date.setDate(end_date.getDate() + 7);
-  } else if (subscription.type === "شهري") {
-    end_date.setMonth(end_date.getMonth() + 1);
-  } else if (subscription.type === "سنوي") {
-    end_date.setFullYear(end_date.getFullYear() + 1);
-  } else if (subscription.type === "ساعه") {
-    end_date.setHours(end_date.getHours() + 4);
-  }
+          if (subscription.type === "يومي") {
+            end_date.setDate(end_date.getDate() + 1);
+          } else if (subscription.type === "اسبوعي") {
+            end_date.setDate(end_date.getDate() + 7);
+          } else if (subscription.type === "شهري") {
+            end_date.setMonth(end_date.getMonth() + 1);
+          } else if (subscription.type === "سنوي") {
+            end_date.setFullYear(end_date.getFullYear() + 1);
+          } else if (subscription.type === "ساعه") {
+            end_date.setHours(end_date.getHours() + 4);
+          }
           await userSub.findById(userSubId).then(async (sub) => {
             if (!sub)
               return next(
@@ -530,19 +531,17 @@ exports.renewClubByWallet = asyncHandler(async (req, res, next) => {
 });
 
 exports.hyperCheckout = asyncHandler(async (req, res, next) => {
-  const { price ,brand } = req.body;
-  
+  const { price, brand } = req.body;
 
-  const { id } = req.user; 
-  console.log(price ,brand ,id)
+  const { id } = req.user;
+  console.log(price, brand, id);
 
   const https = require("https");
   const querystring = require("querystring");
-  console.log(price ,brand) 
-  console.log(id)
-  console.log(req.user)
+  console.log(price, brand);
+  console.log(id);
+  console.log(req.user);
   const user = await User.findOne({ _id: id });
-
 
   const request = async () => {
     const path = "/v1/checkouts";
@@ -557,7 +556,7 @@ exports.hyperCheckout = asyncHandler(async (req, res, next) => {
 
     const data = querystring.stringify({
       entityId,
-      amount: price,
+      amount: Math.round(price),
       currency: "SAR",
       paymentType: "DB",
       //  Also please remove testMode=EXTERNAL and customParameters[3DS2_enrolled]=true from this step's code, as they are only required for testing
@@ -633,7 +632,6 @@ exports.checkPaymentNew = asyncHandler(async (req, res, next) => {
   const { id } = req.user;
   const https = require("https");
   const querystring = require("querystring");
-  
 
   if (!brand) {
     return Promise.reject(new Error("brand is required"));
@@ -645,7 +643,7 @@ exports.checkPaymentNew = asyncHandler(async (req, res, next) => {
     var path = `/v1/checkouts/${paymentId}/payment`;
 
     path += `?entityId=${entityId}`;
-    
+
     const options = {
       port: 443,
       host: "eu-prod.oppwa.com",
@@ -653,7 +651,8 @@ exports.checkPaymentNew = asyncHandler(async (req, res, next) => {
       path: path,
       method: "GET",
       headers: {
-        Authorization: "Bearer OGFjOWE0Yzg4YzE1MmFmODAxOGMzNGJkNDk5NzFlZDJ8cXRqMnlhR0Y0ZVQ5UHFKcA==",
+        Authorization:
+          "Bearer OGFjOWE0Yzg4YzE1MmFmODAxOGMzNGJkNDk5NzFlZDJ8cXRqMnlhR0Y0ZVQ5UHFKcA==",
         // "Bearer OGFjN2E0Yzc4OWNjZTdkYTAxODljZWYwYTYxMTAxMGF8S3czc3lqRk5Hdw==",
       },
     };
@@ -754,27 +753,27 @@ exports.checkPayment = asyncHandler(async (req, res, next) => {
               return next(new ApiError("Can't find subscription", 404));
             const start_date = new Date(Date.now());
             let end_date = new Date(Date.now());
-          // end_date =
-  //   subscription.type === "يومي"
-  //     ? end_date.setDate(end_date.getDate() + 1)
-  //     : subscription.type === "اسبوعي"
-  //     ? end_date.setDate(end_date.getDate() + 7)
-  //     : subscription.type === "شهري"
-  //     ? end_date.setMonth(end_date.getMonth() + 1)
-  //     : subscription.type === "سنوي" &&
-  //       end_date.setFullYear(end_date.getFullYear() + 1);
+            // end_date =
+            //   subscription.type === "يومي"
+            //     ? end_date.setDate(end_date.getDate() + 1)
+            //     : subscription.type === "اسبوعي"
+            //     ? end_date.setDate(end_date.getDate() + 7)
+            //     : subscription.type === "شهري"
+            //     ? end_date.setMonth(end_date.getMonth() + 1)
+            //     : subscription.type === "سنوي" &&
+            //       end_date.setFullYear(end_date.getFullYear() + 1);
 
-  if (subscription.type === "يومي") {
-    end_date.setDate(end_date.getDate() + 1);
-  } else if (subscription.type === "اسبوعي") {
-    end_date.setDate(end_date.getDate() + 7);
-  } else if (subscription.type === "شهري") {
-    end_date.setMonth(end_date.getMonth() + 1);
-  } else if (subscription.type === "سنوي") {
-    end_date.setFullYear(end_date.getFullYear() + 1);
-  } else if (subscription.type === "ساعه") {
-    end_date.setHours(end_date.getHours() + 4);
-  }
+            if (subscription.type === "يومي") {
+              end_date.setDate(end_date.getDate() + 1);
+            } else if (subscription.type === "اسبوعي") {
+              end_date.setDate(end_date.getDate() + 7);
+            } else if (subscription.type === "شهري") {
+              end_date.setMonth(end_date.getMonth() + 1);
+            } else if (subscription.type === "سنوي") {
+              end_date.setFullYear(end_date.getFullYear() + 1);
+            } else if (subscription.type === "ساعه") {
+              end_date.setHours(end_date.getHours() + 4);
+            }
             userSub
               .create({
                 user: userId,
@@ -918,13 +917,11 @@ exports.userFreezing = asyncHandler(async (req, res, next) => {
     await usersub.subscription.save();
     await usersub.save();
 
-    res
-      .status(200)
-      .json({
-        message: "User subscription frozen successfully",
-        newEndDate,
-        freezenDate: usersub.freezenDate,
-      });
+    res.status(200).json({
+      message: "User subscription frozen successfully",
+      newEndDate,
+      freezenDate: usersub.freezenDate,
+    });
   } catch (error) {
     next(error);
   }
@@ -961,7 +958,7 @@ exports.userUnfreeze = asyncHandler(async (req, res, next) => {
 
     // Reset freeze-related fields
     usersub.isfreezen = false;
-    usersub.freezenDate = Date.now() ;
+    usersub.freezenDate = Date.now();
 
     // Save changes
     await usersub.subscription.save();
@@ -969,7 +966,7 @@ exports.userUnfreeze = asyncHandler(async (req, res, next) => {
 
     res.status(200).json({
       message: "User subscription unfrozen successfully",
-      end_date
+      end_date,
     });
   } catch (error) {
     next(error);
@@ -1511,17 +1508,17 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
   //     : subscription.type === "سنوي" &&
   //       end_date.setFullYear(end_date.getFullYear() + 1);
 
-        if (subscription.type === "يومي") {
-          end_date.setDate(end_date.getDate() + 1);
-        } else if (subscription.type === "اسبوعي") {
-          end_date.setDate(end_date.getDate() + 7);
-        } else if (subscription.type === "شهري") {
-          end_date.setMonth(end_date.getMonth() + 1);
-        } else if (subscription.type === "سنوي") {
-          end_date.setFullYear(end_date.getFullYear() + 1);
-        } else if (subscription.type === "ساعه") {
-          end_date.setHours(end_date.getHours() + 4);
-        }
+  if (subscription.type === "يومي") {
+    end_date.setDate(end_date.getDate() + 1);
+  } else if (subscription.type === "اسبوعي") {
+    end_date.setDate(end_date.getDate() + 7);
+  } else if (subscription.type === "شهري") {
+    end_date.setMonth(end_date.getMonth() + 1);
+  } else if (subscription.type === "سنوي") {
+    end_date.setFullYear(end_date.getFullYear() + 1);
+  } else if (subscription.type === "ساعه") {
+    end_date.setHours(end_date.getHours() + 4);
+  }
   userSub
     .create({
       user: id,
