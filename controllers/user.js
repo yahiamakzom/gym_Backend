@@ -324,7 +324,7 @@ exports.getClubAuth = asyncHandler(async (req, res, next) => {
               });
               res.json({
                 club,
-                // isFave: isFave ? true : false,
+                isFave: isFave ? true : false,
                 distance,
                 subscriptions,
                 sub: sub ? true : false,
