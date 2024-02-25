@@ -27,7 +27,7 @@ exports.addSubscreptions = asyncHandler(async (req, res, next) => {
   // Calculate the price with commission percentage
   const commissionPercentage = club.club ? club.club.commission : 0; // Default to 0 if club is not found
   console.log(commissionPercentage);
-  const priceWithCommission = Math.round(
+  const priceWithCommission = Math.ceil(
     price * (1 + commissionPercentage / 100)
   );
 
