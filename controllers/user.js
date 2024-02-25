@@ -324,7 +324,7 @@ exports.getClubAuth = asyncHandler(async (req, res, next) => {
               });
               res.json({
                 club,
-                isFave: isFave ? true : false,
+                // isFave: isFave ? true : false,
                 distance,
                 subscriptions,
                 sub: sub ? true : false,
@@ -350,7 +350,7 @@ exports.getClubAuth = asyncHandler(async (req, res, next) => {
               const user = await User.findById(sub.user);
               res.json({
                 club,
-                isFave: isFave ? true : false,
+                // isFave: isFave ? true : false,
                 subscriptions,
                 sub: sub ? true : false,
                 data: sub
