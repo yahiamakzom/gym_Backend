@@ -15,21 +15,28 @@ cloudinary.config({
 
 exports.addSubscreptions = asyncHandler(async (req, res, next) => {
   const clubId = req.user.id;
-  const { name, price, type, numberType, freezeCountTime, freezeTime } = req.body;
-  
+  const { name, price, type, numberType, freezeCountTime, freezeTime } =
+    req.body;
+
   // Find the club by ID and populate the club field to access its commission
-  const club = await User.findById(clubId).populate('club');
+  const club = await User.findById(clubId).populate("club");
   if (!club) {
     return next(new ApiError("Club not found", 404));
   }
 
   // Calculate the price with commission percentage
   const commissionPercentage = club.club ? club.club.commission : 0; // Default to 0 if club is not found
-  console.log(commissionPercentage)
-  const priceWithCommission = price * (1 + commissionPercentage / 100);
+  console.log(commissionPercentage);
+  const priceWithCommission = Math.round(
+    price * (1 + commissionPercentage / 100)
+  );
 
   // Check if subscription with the same name, type, and numberType exists
-  const exists = await Subscriptions.findOne({ club: club.club, type, numberType });
+  const exists = await Subscriptions.findOne({
+    club: club.club,
+    type,
+    numberType,
+  });
   if (exists) {
     return next(new ApiError("Subscription found with this name", 403));
   }
@@ -44,9 +51,8 @@ exports.addSubscreptions = asyncHandler(async (req, res, next) => {
     freezeTime,
     freezeCountTime,
   });
-console.log(sub)
-  res.status(201).json({  sub });
-
+  console.log(sub);
+  res.status(201).json({ sub });
 });
 
 exports.getSubscriptions = asyncHandler(
