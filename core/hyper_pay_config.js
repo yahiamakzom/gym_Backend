@@ -37,7 +37,7 @@ const getBarandEntityIdProd = (brand) => {
     } else if (brand == "mada") {
      return "8ac9a4c88c152af8018c34be7f601ee3";
     } else if (brand == "applepay") {
-     return "8ac7a4c88ac93f4f018acc6f1377032b";
+     return "8ac9a4c88c152af8018c34bf34461eec";
     } else {
      return Promise.reject(new Error("brand is not valid"));
     }
