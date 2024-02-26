@@ -11,7 +11,7 @@ const Favorite = require("../models/Favorite");
 const ApiError = require("../utils/ApiError");
 const paypal = require("paypal-rest-sdk");
 const axios = require("axios");
-const { getBarandEntityId } = require("../core/hyper_pay_config.js");
+const { getBarandEntityId, getHyperPayHost } = require("../core/hyper_pay_config.js");
 const { calcDistance, calculateDistance } = require("../utils/Map");
 const jwt = require("jsonwebtoken");
 const moment = require("moment");
@@ -586,8 +586,7 @@ exports.hyperCheckout = asyncHandler(async (req, res, next) => {
 
     const options = {
       port: 443,
-      host: "eu-prod.oppwa.com",
-      // host: "eu-test.oppwa.com",
+      host: getHyperPayHost(),
       path: path,
       method: "POST",
       headers: {
@@ -646,8 +645,7 @@ exports.checkPaymentNew = asyncHandler(async (req, res, next) => {
 
     const options = {
       port: 443,
-      host: "eu-prod.oppwa.com",
-      // host: "eu-test.oppwa.com",
+      host: getHyperPayHost(),
       path: path,
       method: "GET",
       headers: {
@@ -708,8 +706,7 @@ exports.checkPayment = asyncHandler(async (req, res, next) => {
 
     const options = {
       port: 443,
-      host: "eu-prod.oppwa.com",
-      // host: "eu-test.oppwa.com",
+      host: getHyperPayHost(),
       path: path,
       method: "GET",
       headers: {

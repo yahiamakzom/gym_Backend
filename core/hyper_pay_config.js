@@ -1,3 +1,13 @@
+const getHyperPayHost = () => {
+    const env = process.env.NODE_ENV;
+    if (env == "development") {
+     return "eu-test.oppwa.com";
+    } else if (env == "production") {
+        return "eu-prod.oppwa.com";
+    } else {
+     return Promise.reject(new Error("env is not valid"));
+    }
+}
 const getBarandEntityId = (brand) => {
     const env = process.env.NODE_ENV;
     if (env == "development") {
@@ -34,5 +44,6 @@ const getBarandEntityIdProd = (brand) => {
 }
 
 module.exports = {
-    getBarandEntityId
+    getBarandEntityId,
+    getHyperPayHost
 }
