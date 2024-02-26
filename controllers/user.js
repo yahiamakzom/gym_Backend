@@ -324,14 +324,14 @@ exports.getClubAuth = asyncHandler(async (req, res, next) => {
               });
               res.json({
                 club,
-                isFave: isFave ? true : false,
+                // isFave: isFave ? true : false,
                 distance,
                 subscriptions,
                 sub: sub ? true : false,
                 data: sub
                   ? {
                       id: sub.id,
-                      username: (await User.findById(sub.user)).username,
+                      username: (await User.findById(id)).username,
                       club_name: club.name,
                       club_location: club.location,
                       // start_date: `${sub.start_date.getDate()}-${sub.start_date.getMonth() + 1}-${sub.start_date.getFullYear()}`,
@@ -347,16 +347,16 @@ exports.getClubAuth = asyncHandler(async (req, res, next) => {
                   : {},
               });
             } else {
-              const user = await User.findById(sub.user);
+              const user = await User.findById(id);
               res.json({
                 club,
-                isFave: isFave ? true : false,
+                // isFave: isFave ? true : false,
                 subscriptions,
                 sub: sub ? true : false,
                 data: sub
                   ? {
                       id: sub.id,
-                      username: (await User.findById(sub.user)).username,
+                      username: (await User.findById(id)).username,
                       club_name: club.name,
                       club_location: club.location,
                       start_date: `${sub.start_date.getDate()}-${
