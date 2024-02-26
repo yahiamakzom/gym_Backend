@@ -8,6 +8,7 @@ const DB = require("./config/DB.config");
 const verifyRoles = require("./middlewares/verifyRoles");
 const validateSub = require("./middlewares/validateSub");
 const Rules = require("./models/Rules");
+const {getRuleType}  =  require('./controllers/rules')
 app.use(express.static(path.join(__dirname, "images")));
 app.use(express.static("public"));
 app.use(express.json());
@@ -24,22 +25,14 @@ app.use(
 app.use("/representative", require("./routes/representative"));
 app.use("/user", require("./routes/user"));
 app.use("/club", verifyRoles("club"), require("./routes/club"));
+app.get("/rule/:type",getRuleType);
+
+app.use(require("./middlewares/globalError"));
+
 app.use("*", (req, res, next) =>
   res.status(404).json({ message: "Page Not Found" })
 );
-app.use(require("./middlewares/globalError"));
-// ss
 
-app.get("/rule", async (req, res) => {
-  try {
-    const rules = await Rules.find();
-
-    res.send(rules);
-  } catch (error) {
-    console.error("Error fetching rules:", error);
-    res.status(500).json({ error: "Failed to fetch rules" });
-  }
-});
 DB.then((con) => {
   app.listen(PORT, () =>
     console.log(
