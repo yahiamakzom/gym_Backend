@@ -25,13 +25,13 @@ app.use(
 app.use("/representative", require("./routes/representative"));
 app.use("/user", require("./routes/user"));
 app.use("/club", verifyRoles("club"), require("./routes/club"));
-// app.get("/rule/:type",getRuleType);
+app.get("/rule/:type",getRuleType);
 
+app.use(require("./middlewares/globalError"));
 
 app.use("*", (req, res, next) =>
   res.status(404).json({ message: "Page Not Found" })
 );
-app.use(require("./middlewares/globalError"));
 
 DB.then((con) => {
   app.listen(PORT, () =>
