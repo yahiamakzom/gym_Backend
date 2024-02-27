@@ -982,10 +982,18 @@ exports.evaluateClub = asyncHandler(async (req, res, next) => {
     return res.status(404).json({ success: false, error: "Club not found" });
   }
 
-  // Update club evaluation
-  club.evaluation.evaluators.push({ user: userId, rating });
+  // Check if the user has already evaluated the club
+  const existingEvaluation = club.evaluation.evaluators.find(evaluator => evaluator.user === userId);
 
-  // Calculate the new average rating
+  if (existingEvaluation) {
+    // Update user's existing rating
+    existingEvaluation.rating = rating;
+  } else {
+    // Add a new evaluation entry for the user
+    club.evaluation.evaluators.push({ user: userId, rating });
+  }
+
+  // Recalculate the total rating and average rating
   let totalRating = 0;
   club.evaluation.evaluators.forEach((evaluator) => {
     totalRating += evaluator.rating;
@@ -999,6 +1007,7 @@ exports.evaluateClub = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({ success: true, data: club.evaluation });
 });
+
 exports.getUserWallet = asyncHandler(async (req, res, next) => {
   const { id } = req.user;
   let total_price = 0;
