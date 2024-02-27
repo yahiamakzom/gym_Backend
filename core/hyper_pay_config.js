@@ -1,3 +1,13 @@
+const getHyperPayHost = () => {
+    const env = process.env.NODE_ENV;
+    if (env == "development") {
+     return "eu-test.oppwa.com";
+    } else if (env == "production") {
+        return "eu-prod.oppwa.com";
+    } else {
+     return Promise.reject(new Error("env is not valid"));
+    }
+}
 const getBarandEntityId = (brand) => {
     const env = process.env.NODE_ENV;
     if (env == "development") {
@@ -27,12 +37,13 @@ const getBarandEntityIdProd = (brand) => {
     } else if (brand == "mada") {
      return "8ac9a4c88c152af8018c34be7f601ee3";
     } else if (brand == "applepay") {
-     return "8ac7a4c88ac93f4f018acc6f1377032b";
+     return "8ac9a4c88c152af8018c34bf34461eec";
     } else {
      return Promise.reject(new Error("brand is not valid"));
     }
 }
 
 module.exports = {
-    getBarandEntityId
+    getBarandEntityId,
+    getHyperPayHost
 }
