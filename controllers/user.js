@@ -983,11 +983,11 @@ exports.evaluateClub = asyncHandler(async (req, res, next) => {
   }
 
   // Check if the user has already evaluated the club
-  const existingEvaluation = club.evaluation.evaluators.find(evaluator => evaluator.user === userId);
+  const existingEvaluationIndex = club.evaluation.evaluators.findIndex(evaluator => evaluator.user === userId);
 
-  if (existingEvaluation) {
+  if (existingEvaluationIndex !== -1) {
     // Update user's existing rating
-    existingEvaluation.rating = rating;
+    club.evaluation.evaluators[existingEvaluationIndex].rating = rating;
   } else {
     // Add a new evaluation entry for the user
     club.evaluation.evaluators.push({ user: userId, rating });
