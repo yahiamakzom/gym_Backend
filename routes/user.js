@@ -31,7 +31,8 @@ const {
   getClubByActivity,
   isFav,
   userFreezing,
-  userUnfreeze
+  userUnfreeze,
+  evaluateClub
 } = require("../controllers/user");
 const router = require("express").Router();
 const verifyToken = require("../middlewares/verifyToken");
@@ -56,6 +57,7 @@ router.post("/clubs_by_activity", getClubByActivity);
 // this wallet depost is deprecated and doesn't use real payments
 router.post("/wallet_deposit", verifyToken, walletDeposit);
 router.get("/wallet", verifyToken, getUserWallet);
+router.post('/evaluation' , verifyToken ,evaluateClub)
 router.get("/booking", verifyToken, userBooking);
 router.put("/fav/:club_id", verifyToken, addOrRemoveFav);
 router.get("/isfav/:club_id", verifyToken, isFav);

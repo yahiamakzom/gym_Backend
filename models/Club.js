@@ -71,7 +71,27 @@ module.exports = mongoose.model(
         type: Number,
         default: null,
       },
+      evaluation: {
+        evaluators: [
+          {
+            user: {
+              type: mongoose.Schema.Types.ObjectId,
+              ref: 'User' // Assuming you have a User model
+            },
+            rating: {
+              type: Number,
+              min: 1,
+              max: 5
+            }
+          }
+        ],
+        averageRating: {
+          type: Number,
+          default: null
+        }
+      }
     },
+
     { timestamps: true }
   )
 );

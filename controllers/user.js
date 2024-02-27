@@ -973,6 +973,35 @@ exports.userUnfreeze = asyncHandler(async (req, res, next) => {
   }
 });
 
+// evaluation for  every club
+exports.evaluateClub = asyncHandler(async (req, res, next) => {
+  const { clubId, rating } = req.body;
+  const userId = req.user.id; // Assuming you have authentication middleware that attaches user id to the request
+
+  // Find the club by ID
+  let club = await Club.findById(clubId);
+
+  if (!club) {
+    return res.status(404).json({ success: false, error: "Club not found" });
+  }
+
+  // Update club evaluation
+  club.evaluation.evaluators.push({ user: userId, rating });
+
+  // Calculate the new average rating
+  let totalRating = 0;
+  club.evaluation.evaluators.forEach((evaluator) => {
+    totalRating += evaluator.rating;
+  });
+  club.evaluation.averageRating = Math.round(
+    totalRating / club.evaluation.evaluators.length
+  );
+
+  // Save the updated club
+  await club.save();
+
+  res.status(200).json({ success: true, data: club.evaluation });
+});
 exports.getUserWallet = asyncHandler(async (req, res, next) => {
   const { id } = req.user;
   let total_price = 0;
@@ -994,6 +1023,8 @@ exports.getUserWallet = asyncHandler(async (req, res, next) => {
               isfreezen: sub.isfreezen,
               freezeCountTime: subscription.freezeCountTime,
               club_id: club._id,
+              lat: club.lat,
+              long: club.long,
               subscriptionId: subscription._id,
               freezeTime: subscription.freezeTime,
               subprice: subscription.price,
