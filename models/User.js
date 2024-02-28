@@ -45,6 +45,14 @@ module.exports = mongoose.model(
       paymentKind: {
         type: String,
       
+      },
+      subscriptionType: {
+        type: String,
+        default: null,
+      },
+      clubName: {
+        type: String,
+        default: null,
       }
     }]
   })

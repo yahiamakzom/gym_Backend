@@ -32,7 +32,8 @@ const {
   isFav,
   userFreezing,
   userUnfreeze,
-  evaluateClub
+  evaluateClub,
+  walletDiscountSubscription
 } = require("../controllers/user");
 const router = require("express").Router();
 const verifyToken = require("../middlewares/verifyToken");
@@ -79,7 +80,7 @@ router.post(
 // old
 router.post("/wallet", depositWallet);
 // not belong to us
-
+router.post('/pay_wallet' ,verifyToken ,walletDiscountSubscription)
 router.post("/check-pay/:paymentId/:subId", verifyToken, checkPayment);
 router.post("/check-pay-new/:paymentId", verifyToken, checkPaymentNew);
 router.post("/wallet_confirm", verifyToken, confirmDeposit);

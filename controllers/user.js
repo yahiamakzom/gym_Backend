@@ -1565,13 +1565,80 @@ exports.walletDeposit = asyncHandler(async (req, res, next) => {
   res.sendStatus(200);
 });
 
+exports.walletDiscountSubscription = asyncHandler(async (req, res, next) => {
+  const { amount } = req.body;
+  const { id } = req.user;
+
+  const userData = await User.findById(id);
+  if (!userData) return next(new ApiError("User Not Found", 404));
+
+  // Check if the wallet has enough balance
+  if (userData.wallet < amount || amount <= 0) {
+    return res
+      .status(400)
+      .json({ message: "Insufficient funds or invalid amount" });
+  }
+
+  userData.wallet -= Number(amount);
+
+  await userData.save();
+  res.status(200).send("Discount successful");
+});
+
+// exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
+//   const { subId, brand, price } = req.body;
+//   const { id } = req.user;
+//   const userData = await User.findById(id);
+//   const subscription = await Subscriptions.findById(subId);
+//   console.log(subId);
+//   if (!subscription) return next(new ApiError("Can't find subscription", 404));
+//   const start_date = new Date(Date.now());
+//   let end_date = new Date(Date.now());
+
+//   if (subscription.type === "يومي") {
+//     end_date.setDate(end_date.getDate() + 1);
+//   } else if (subscription.type === "اسبوعي") {
+//     end_date.setDate(end_date.getDate() + 7);
+//   } else if (subscription.type === "شهري") {
+//     end_date.setMonth(end_date.getMonth() + 1);
+//   } else if (subscription.type === "سنوي") {
+//     end_date.setFullYear(end_date.getFullYear() + 1);
+//   } else if (subscription.type === "ساعه") {
+//     end_date.setHours(end_date.getHours() + 4);
+//   }
+
+//   // track user operations
+
+//   userData.operations.push({
+//     operationKind: "خصم",
+//     operationQuantity: price,
+//     paymentKind: brand,
+//   });
+
+//   await userData.save();
+
+//   userSub
+//     .create({
+//       user: id,
+//       club: subscription.club,
+//       subscription,
+//       start_date,
+//       end_date,
+//       code: userData.code,
+//     })
+//     .then(() => res.status(200).send("Payment successful"));
+// });
+
 exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
   const { subId, brand, price } = req.body;
   const { id } = req.user;
+
   const userData = await User.findById(id);
+  if (!userData) return next(new ApiError("User Not Found", 404));
+
   const subscription = await Subscriptions.findById(subId);
-  console.log(subId);
   if (!subscription) return next(new ApiError("Can't find subscription", 404));
+
   const start_date = new Date(Date.now());
   let end_date = new Date(Date.now());
 
@@ -1587,12 +1654,17 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
     end_date.setHours(end_date.getHours() + 4);
   }
 
-  // track user operations
+  // Retrieve the club associated with the subscription
+  const club = await Club.findById(subscription.club);
+  if (!club) return next(new ApiError("Can't find club", 404));
 
+  // Add deduction operation to the user's operations array
   userData.operations.push({
     operationKind: "خصم",
     operationQuantity: price,
     paymentKind: brand,
+    clubName: club.name,
+    subscriptionType: subscription.type, // Add club name to the operations array
   });
 
   await userData.save();
