@@ -1575,14 +1575,14 @@ exports.walletDiscountSubscription = asyncHandler(async (req, res, next) => {
   // Check if the wallet has enough balance
   if (userData.wallet < amount || amount <= 0) {
     return res
-      .status(400)
+      .status(200)
       .json({ message: "Insufficient funds or invalid amount" });
   }
 
   userData.wallet -= Number(amount);
 
   await userData.save();
-  res.status(200).send("Discount successful");
+  res.status(200).json({message:"Discount successful"});
 });
 
 // exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
