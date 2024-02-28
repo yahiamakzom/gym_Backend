@@ -11,7 +11,10 @@ const Favorite = require("../models/Favorite");
 const ApiError = require("../utils/ApiError");
 const paypal = require("paypal-rest-sdk");
 const axios = require("axios");
-const { getBarandEntityId, getHyperPayHost } = require("../core/hyper_pay_config.js");
+const {
+  getBarandEntityId,
+  getHyperPayHost,
+} = require("../core/hyper_pay_config.js");
 const { calcDistance, calculateDistance } = require("../utils/Map");
 const jwt = require("jsonwebtoken");
 const moment = require("moment");
@@ -983,7 +986,9 @@ exports.evaluateClub = asyncHandler(async (req, res, next) => {
   }
 
   // Check if the user has already evaluated the club
-  const existingEvaluationIndex = club.evaluation.evaluators.findIndex(evaluator => evaluator.user === userId);
+  const existingEvaluationIndex = club.evaluation.evaluators.findIndex(
+    (evaluator) => evaluator.user === userId
+  );
 
   if (existingEvaluationIndex !== -1) {
     // Update user's existing rating
@@ -1044,9 +1049,21 @@ exports.getUserWallet = asyncHandler(async (req, res, next) => {
           })
         );
 
-        res.json({ subs: filterSubs, wallet: user.wallet, total_price });
+        res.json({
+          subs: filterSubs,
+          operations: user.operations,
+          wallet: user.wallet,
+          total_price,
+        });
       } else {
-        res.json({ subs: [], wallet: user.wallet, total_price });
+        res.json({
+          subs: [],
+
+          operations: user.operations,
+
+          wallet: user.wallet,
+          total_price,
+        });
       }
     });
   });
@@ -1526,8 +1543,30 @@ exports.walletDeposit = asyncHandler(async (req, res, next) => {
   res.sendStatus(200);
 });
 
+exports.walletDeposit = asyncHandler(async (req, res, next) => {
+  const { amount, brand } = req.body;
+  const { id } = req.user;
+
+  const userData = await User.findById(id);
+  // check if user not found
+  if (!userData) return next(new ApiError("User Not Found", 404));
+
+  // we add the amount to the user wallet
+  userData.wallet += Number(amount);
+
+  // Add deposit operation to the operations array
+  userData.operations.push({
+    operationKind: "ايداع",
+    operationQuantity: Number(amount),
+    paymentKind: brand,
+  });
+
+  await userData.save();
+  res.sendStatus(200);
+});
+
 exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
-  const { subId } = req.body;
+  const { subId, brand, price } = req.body;
   const { id } = req.user;
   const userData = await User.findById(id);
   const subscription = await Subscriptions.findById(subId);
@@ -1535,15 +1574,6 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
   if (!subscription) return next(new ApiError("Can't find subscription", 404));
   const start_date = new Date(Date.now());
   let end_date = new Date(Date.now());
-  // end_date =
-  //   subscription.type === "يومي"
-  //     ? end_date.setDate(end_date.getDate() + 1)
-  //     : subscription.type === "اسبوعي"
-  //     ? end_date.setDate(end_date.getDate() + 7)
-  //     : subscription.type === "شهري"
-  //     ? end_date.setMonth(end_date.getMonth() + 1)
-  //     : subscription.type === "سنوي" &&
-  //       end_date.setFullYear(end_date.getFullYear() + 1);
 
   if (subscription.type === "يومي") {
     end_date.setDate(end_date.getDate() + 1);
@@ -1556,6 +1586,17 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
   } else if (subscription.type === "ساعه") {
     end_date.setHours(end_date.getHours() + 4);
   }
+
+  // track user operations
+
+  userData.operations.push({
+    operationKind: "خصم",
+    operationQuantity: price,
+    paymentKind: brand,
+  });
+
+  await userData.save();
+
   userSub
     .create({
       user: id,

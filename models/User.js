@@ -32,5 +32,20 @@ module.exports = mongoose.model(
     photo: String,
     lat:String,
     long:String,
+    operations: [{
+      operationKind: {
+        type: String,
+        enum: ['خصم', 'ايداع'],
+    
+      },
+      operationQuantity: {
+        type: Number,
+      
+      },
+      paymentKind: {
+        type: String,
+      
+      }
+    }]
   })
 );
