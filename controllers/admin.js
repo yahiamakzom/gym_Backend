@@ -862,25 +862,28 @@ exports.adminCoupon = asyncHandler(async (req, res) => {
   }
 
   try {
-    // Find clubs that have existing discounts
-    const clubsWithDiscounts = await Club.find({ discounts: { $exists: true, $ne: [] } });
+    // Find clubs that have the discounts field
+    const clubsToUpdate = await Club.find({ discounts: { $exists: true } });
+
+    if (clubsToUpdate.length === 0) {
+      return res.status(404).json({ error: 'No clubs found with discounts to update' });
+    }
 
     // Update existing clubs to add the new discount
-    const updateResults = await Promise.all(clubsWithDiscounts.map(async (club) => {
-      club.discounts.push({ discountCode, discountQuantity });
-      return club.save();
+    const updateResults = await Promise.all(clubsToUpdate.map(async (club) => {
+    
+  
+        club.discounts.push({ discountCode, discountQuantity });
+        return club.save();
+  
+     // Skip clubs with empty discounts array
     }));
 
     // Calculate the number of updated clubs
-    const updatedClubsCount = updateResults.filter(result => result.nModified > 0).length;
-
-    if (updatedClubsCount > 0) {
-      return res.status(200).json({ message: `Discount added to ${updatedClubsCount} clubs successfully.` });
-    } else {
-      return res.status(404).json({ error: 'No clubs found with existing discounts to update' });
-    }
+  res.json({updateResults})
   } catch (error) {
     console.error('Error updating clubs:', error);
     return res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
