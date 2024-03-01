@@ -64,24 +64,76 @@ exports.makeReport = asyncHandler(
       .then(() => res.sendStatus(201))
 );
 
+// exports.getClubs = asyncHandler(async (req, res, next) => {
+//   const { lat, long } = req.body;
+
+//   // Retrieve all clubs
+//   const clubs = await Club.find({});
+
+//   // Retrieve subscription prices for type "يومي" for all clubs
+//   const subscriptionPrices = await Promise.all(
+//     clubs.map(async (club) => {
+//       const dailySubscription = await Subscriptions.findOne({
+//         club: club._id,
+//         type: "يومي", // Filter by subscription type
+//       });
+//       const price = dailySubscription ? dailySubscription.price : null;
+//       return { clubId: club._id, price };
+//     })
+//   );
+
+//   const countries = {};
+//   for (const club of clubs) {
+//     if (countries[club.country]) {
+//       countries[club.country].push(club.city);
+//     } else {
+//       countries[club.country] = [club.city];
+//     }
+//   }
+
+//   if (lat && long) {
+//     const clubsWithDistance = [];
+//     for (const [index, club] of clubs.entries()) {
+//       const distance = await calcDistance(
+//         `${club.lat},${club.long}`,
+//         `${lat},${long}`
+//       );
+//       if (!distance) return next(new ApiError("Invalid distance", 400));
+//       clubsWithDistance.push({
+//         ...club.toObject(),
+//         distance: distance && distance,
+//         subscriptionPrice: subscriptionPrices[index].price,
+//       });
+//     }
+
+//     res.json({ Clubs: clubsWithDistance, countries });
+//   } else {
+//     const clubsWithPrices = clubs.map((club, index) => ({
+//       ...club.toObject(),
+//       subscriptionPrice: subscriptionPrices[index].price,
+//     }));
+//     res.json({ Clubs: clubsWithPrices, countries });
+//   }
+// });
 exports.getClubs = asyncHandler(async (req, res, next) => {
   const { lat, long } = req.body;
 
   // Retrieve all clubs
   const clubs = await Club.find({});
 
-  // Retrieve subscription prices for type "يومي" for all clubs
+  // Retrieve subscription prices for type "اليومي" for all clubs
   const subscriptionPrices = await Promise.all(
     clubs.map(async (club) => {
       const dailySubscription = await Subscriptions.findOne({
         club: club._id,
-        type: "يومي", // Filter by subscription type
+        type: "اليومي", // Filter by subscription type (اليومي)
       });
       const price = dailySubscription ? dailySubscription.price : null;
       return { clubId: club._id, price };
     })
   );
 
+  // Create an object to store countries and their cities
   const countries = {};
   for (const club of clubs) {
     if (countries[club.country]) {
@@ -91,7 +143,9 @@ exports.getClubs = asyncHandler(async (req, res, next) => {
     }
   }
 
+  // Check if lat and long are provided for distance calculation
   if (lat && long) {
+    // Calculate distance for each club
     const clubsWithDistance = [];
     for (const [index, club] of clubs.entries()) {
       const distance = await calcDistance(
@@ -108,6 +162,7 @@ exports.getClubs = asyncHandler(async (req, res, next) => {
 
     res.json({ Clubs: clubsWithDistance, countries });
   } else {
+    // If lat and long are not provided, return clubs with subscription prices
     const clubsWithPrices = clubs.map((club, index) => ({
       ...club.toObject(),
       subscriptionPrice: subscriptionPrices[index].price,
@@ -115,6 +170,7 @@ exports.getClubs = asyncHandler(async (req, res, next) => {
     res.json({ Clubs: clubsWithPrices, countries });
   }
 });
+
 
 // exports.getMinClubs=asyncHandler(async (req, res, next) => {
 //     try {
@@ -1184,14 +1240,49 @@ exports.searchClub = asyncHandler(async (req, res, next) => {
   res.json({ Clubs });
 });
 // find clubs  by Activity
+// exports.getClubByActivity = asyncHandler(async (req, res, next) => {
+//   try {
+//     const filterCondition = req.body.filterCondition;
+//     console.log(filterCondition);
+//     const result = await Club.find({
+//       sports: { $elemMatch: { $eq: filterCondition } },
+//     });
+//     res.status(200).json({ result });
+    
+//   } catch (e) {
+//     res.status(500).json({ message: e.message });
+//   }
+  
+// });
 exports.getClubByActivity = asyncHandler(async (req, res, next) => {
   try {
     const filterCondition = req.body.filterCondition;
     console.log(filterCondition);
-    const result = await Club.find({
+    
+    // Query clubs based on the provided activity
+    const clubs = await Club.find({
       sports: { $elemMatch: { $eq: filterCondition } },
     });
-    res.status(200).json({ result });
+    
+    // Retrieve subscription prices for daily subscriptions for each club
+    const subscriptionPrices = await Promise.all(
+      clubs.map(async (club) => {
+        const dailySubscription = await Subscriptions.findOne({
+          club: club._id,
+          type: "يومي", // Filter by subscription type
+        });
+        const price = dailySubscription ? dailySubscription.price : null;
+        return { clubId: club._id, price };
+      })
+    );
+    
+    // Combine club details with subscription prices in the response
+    const clubsWithPrices = clubs.map((club, index) => ({
+      ...club.toObject(),
+      subscriptionPrice: subscriptionPrices[index].price,
+    }));
+
+    res.status(200).json({ clubs: clubsWithPrices });
   } catch (e) {
     res.status(500).json({ message: e.message });
   }
