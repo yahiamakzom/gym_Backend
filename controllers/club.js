@@ -84,10 +84,23 @@ exports.searchSubscreptions = asyncHandler(async (req, res, next) => {
 
 exports.editClub = asyncHandler(async (req, res, next) => {
   const club_id = req.user.id;
-  const { name, lat, long, description, gender, from, to, allDay,checkedDays,checkedItemsSports } = req.body;
-    const uniqueCheckedDays = checkedDays.split(',');
-const uniqueCheckedItemsSports = checkedItemsSports.split(',') ;
-console.log(uniqueCheckedDays ,uniqueCheckedItemsSports)
+  const {
+    name,
+    lat,
+    long,
+    description,
+    gender,
+    from,
+    to,
+    allDay,
+    checkedDays,
+    checkedItemsSports,
+    discountCode,
+    discountQuantity,
+  } = req.body;
+  const uniqueCheckedDays = checkedDays.split(",");
+  const uniqueCheckedItemsSports = checkedItemsSports.split(",");
+  console.log(uniqueCheckedDays, uniqueCheckedItemsSports);
   let imgs_path =
     req.files &&
     req.files.clubImg &&
@@ -106,12 +119,21 @@ console.log(uniqueCheckedDays ,uniqueCheckedItemsSports)
     place_name = await getLocationName(lat, long);
     if (!place_name) return next(new ApiError("Location Not Found", 404));
   }
+  let newDiscount ={discountCode:null ,discountQuantity:null}
+  if(discountCode && discountQuantity){
+     newDiscount = {
+      discountCode: discountCode,
+      discountQuantity: discountQuantity
+    };
+  }
+
   await User.findById(club_id).then(async (club) => {
     if (!club) return next(new ApiError("Club Not Found", 404));
     if (allDay == "false" || allDay == undefined) {
       await Club.findByIdAndUpdate(
         club.club,
         {
+          $push: { discounts: newDiscount },
           name: name && name,
           country:
             place_name &&
@@ -129,19 +151,21 @@ console.log(uniqueCheckedDays ,uniqueCheckedItemsSports)
           from: from && from,
           to: to && to,
           allDay: false,
-      
-          WorkingDays:uniqueCheckedDays ,
-          sports:uniqueCheckedItemsSports,
+
+          WorkingDays: uniqueCheckedDays,
+          sports: uniqueCheckedItemsSports,
         },
         { new: true }
-      ).then((newclub) =>{
-        console.log(newclub)
-        res.json({ club: newclub })
+      ).then((newclub) => {
+        console.log(newclub);
+        res.json({ club: newclub });
       });
     } else {
       await Club.findByIdAndUpdate(
         club.club,
         {
+          $push: { discounts: newDiscount },
+
           name: name && name,
           country:
             place_name &&
@@ -159,13 +183,13 @@ console.log(uniqueCheckedDays ,uniqueCheckedItemsSports)
           allDay,
           from: null,
           to: null,
-          WorkingDays:uniqueCheckedDays ,
-          sports:uniqueCheckedItemsSports,
+          WorkingDays: uniqueCheckedDays,
+          sports: uniqueCheckedItemsSports,
         },
         { new: true }
-      ).then((newclub) =>{
-        console.log(newclub)
-        res.json({ club: newclub })
+      ).then((newclub) => {
+        console.log(newclub);
+        res.json({ club: newclub });
       });
     }
   });
