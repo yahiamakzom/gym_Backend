@@ -1580,7 +1580,6 @@ exports.walletDiscountSubscription = asyncHandler(async (req, res, next) => {
   }
 
   userData.wallet -= Number(amount);
-
   await userData.save();
   res.status(200).json({message:"Discount successful"});
 });

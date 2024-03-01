@@ -84,7 +84,10 @@ exports.searchSubscreptions = asyncHandler(async (req, res, next) => {
 
 exports.editClub = asyncHandler(async (req, res, next) => {
   const club_id = req.user.id;
-  const { name, lat, long, description, gender, from, to, allDay } = req.body;
+  const { name, lat, long, description, gender, from, to, allDay,checkedDays,checkedItemsSports } = req.body;
+    const uniqueCheckedDays = checkedDays.split(',');
+const uniqueCheckedItemsSports = checkedItemsSports.split(',') ;
+console.log(uniqueCheckedDays ,uniqueCheckedItemsSports)
   let imgs_path =
     req.files &&
     req.files.clubImg &&
@@ -126,9 +129,15 @@ exports.editClub = asyncHandler(async (req, res, next) => {
           from: from && from,
           to: to && to,
           allDay: false,
+      
+          WorkingDays:uniqueCheckedDays ,
+          sports:uniqueCheckedItemsSports,
         },
         { new: true }
-      ).then((newclub) => res.json({ club: newclub }));
+      ).then((newclub) =>{
+        console.log(newclub)
+        res.json({ club: newclub })
+      });
     } else {
       await Club.findByIdAndUpdate(
         club.club,
@@ -150,9 +159,14 @@ exports.editClub = asyncHandler(async (req, res, next) => {
           allDay,
           from: null,
           to: null,
+          WorkingDays:uniqueCheckedDays ,
+          sports:uniqueCheckedItemsSports,
         },
         { new: true }
-      ).then((newclub) => res.json({ club: newclub }));
+      ).then((newclub) =>{
+        console.log(newclub)
+        res.json({ club: newclub })
+      });
     }
   });
 });

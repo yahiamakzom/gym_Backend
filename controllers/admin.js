@@ -82,9 +82,9 @@ exports.addClub = asyncHandler(async (req, res, next) => {
         allDay: false,
         commission,
         sports: [...SportData],
-        Days: [...Days],
-        discountCode,
-        discountQuantity
+        WorkingDays: [...Days],
+
+        discounts: [{ discountCode, discountQuantity }]
       }).then(async (club) => {
         console.log(club)
 
@@ -128,8 +128,8 @@ exports.addClub = asyncHandler(async (req, res, next) => {
         commission,
         sports: [...SportData],
         WorkingDays: [...Days],
-        discountCode,
-        discountQuantity
+        discounts: [{ discountCode, discountQuantity }]
+
       }).then(async (club) => {
         console.log(club)
         let representative = await Representative.findById(repreentative_id);
@@ -152,56 +152,123 @@ exports.addClub = asyncHandler(async (req, res, next) => {
   });
 });
 
+// exports.editClub = asyncHandler(async (req, res, next) => {
+//   const { club_id } = req.params;
+//   const { name, lat, long, description, gender, from, to, days, commission ,checkedDays,checkedItemsSports } =
+//     req.body;
+
+// const uniqueCheckedDays = checkedDays.split(',')
+// const uniqueCheckedItemsSports =checkedItemsSports.split(',') 
+// console.log(uniqueCheckedItemsSports)
+// console.log(uniqueCheckedDays)
+//   let imgs_path =
+//     req.files &&
+//     req.files.clubImg &&
+//     (await Promise.all(
+//       req.files.clubImg.map(async (img) => {
+//         const uploadImg = await cloudinary.uploader.upload(img.path);
+//         return uploadImg.secure_url;
+//       })
+//     ));
+//   let logo =
+//     req.files &&
+//     req.files.logo &&
+//     (await cloudinary.uploader.upload(req.files.logo[0].path)).secure_url;
+//   let place_name;
+//   if (lat && long) {
+//     place_name = await getLocationName(lat, long);
+//     if (!place_name) return next(new ApiError("Location Not Found", 404));
+//   }
+//   await Club.findById(club_id).then(async (club) => {
+//     if (!club) return next(new ApiError("Club Not Found", 404));
+//     await Club.findByIdAndUpdate(
+//       club_id,
+//       {
+//         name: name && name,
+//         country:
+//           place_name &&
+//           `${place_name.split(",")[place_name.split(",").length - 1].trim()}`,
+//         city:
+//           place_name &&
+//           `${place_name.split(",")[place_name.split(",").length - 2].trim()}`,
+//         location: place_name && place_name,
+//         description: description && description,
+//         gender: gender && gender,
+//         images: imgs_path && imgs_path,
+//         logo: logo && logo,
+//         lat: place_name && Number(lat),
+//         long: place_name && Number(long),
+//         from: from && from,
+//         to: to && to,
+//         days: days && days,
+//         commission: commission && commission,
+//       },
+//       { new: true }
+//     ).then((club) => res.json({ club }));
+//   });
+// });
+
 exports.editClub = asyncHandler(async (req, res, next) => {
-  const { club_id } = req.params;
-  const { name, lat, long, description, gender, from, to, days, commission } =
-    req.body;
-  let imgs_path =
-    req.files &&
-    req.files.clubImg &&
-    (await Promise.all(
-      req.files.clubImg.map(async (img) => {
-        const uploadImg = await cloudinary.uploader.upload(img.path);
-        return uploadImg.secure_url;
-      })
-    ));
-  let logo =
-    req.files &&
-    req.files.logo &&
-    (await cloudinary.uploader.upload(req.files.logo[0].path)).secure_url;
-  let place_name;
-  if (lat && long) {
-    place_name = await getLocationName(lat, long);
-    if (!place_name) return next(new ApiError("Location Not Found", 404));
-  }
-  await Club.findById(club_id).then(async (club) => {
+  try {
+    const { club_id } = req.params;
+    const { name, lat, long, description, gender, from, to, days, commission, checkedDays, checkedItemsSports } = req.body;
+
+    // Split the checkedDays and checkedItemsSports strings into arrays
+    const uniqueCheckedDays = checkedDays ? checkedDays.split(',') : [];
+    const uniqueCheckedItemsSports = checkedItemsSports ? checkedItemsSports.split(',') : [];
+    
+    console.log(lat ,long,name)
+
+    let imgs_path =
+      req.files &&
+      req.files.clubImg &&
+      (await Promise.all(
+        req.files.clubImg.map(async (img) => {
+          const uploadImg = await cloudinary.uploader.upload(img.path);
+          return uploadImg.secure_url;
+        })
+      ));
+    let logo =
+      req.files &&
+      req.files.logo &&
+      (await cloudinary.uploader.upload(req.files.logo[0].path)).secure_url;
+    let place_name;
+    if (lat && long) {
+      place_name = await getLocationName(lat, long);
+      if (!place_name) return next(new ApiError("Location Not Found", 404));
+    }
+
+    let club = await Club.findById(club_id);
     if (!club) return next(new ApiError("Club Not Found", 404));
-    await Club.findByIdAndUpdate(
-      club_id,
-      {
-        name: name && name,
-        country:
-          place_name &&
-          `${place_name.split(",")[place_name.split(",").length - 1].trim()}`,
-        city:
-          place_name &&
-          `${place_name.split(",")[place_name.split(",").length - 2].trim()}`,
-        location: place_name && place_name,
-        description: description && description,
-        gender: gender && gender,
-        images: imgs_path && imgs_path,
-        logo: logo && logo,
-        lat: place_name && Number(lat),
-        long: place_name && Number(long),
-        from: from && from,
-        to: to && to,
-        days: days && days,
-        commission: commission && commission,
-      },
-      { new: true }
-    ).then((club) => res.json({ club }));
-  });
+
+    // Update club with new data
+    club.name = name || club.name;
+    club.country = place_name && `${place_name.split(",")[place_name.split(",").length - 1].trim()}`;
+    club.city = place_name && `${place_name.split(",")[place_name.split(",").length - 2].trim()}`;
+    club.location = place_name && place_name;
+    club.description = description || club.description;
+    club.gender = gender || club.gender;
+    club.images = imgs_path || club.images;
+    club.logo = logo || club.logo;
+    club.lat = place_name && Number(lat);
+    club.long = place_name && Number(long);
+    club.from = from || club.from;
+    club.to = to || club.to;
+    club.WorkingDays = uniqueCheckedDays || club.WorkingDays; // Update WorkingDays field
+    club.commission = commission || club.commission;
+    club.sports = uniqueCheckedItemsSports || club.sports;
+
+    // Save the updated club
+    club = await club.save();
+    res.json({ club });
+    console.log(club)
+    
+  } catch (error) {
+    console.error(error); // Log the error for debugging
+    next(error);
+  }
 });
+
 
 exports.deleteClub = asyncHandler(async (req, res, next) => {
   await Club.findById(req.params.club_id).then(async (club) => {
