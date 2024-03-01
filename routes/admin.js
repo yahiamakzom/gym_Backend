@@ -16,11 +16,12 @@ const {
   deleteOpinion,
   addRepresentative,
   GetRepresentatives,
-  DeleteRepersentative ,
-  GetRepresentative ,
+  DeleteRepersentative,
+  GetRepresentative,
   AddActivity,
   GetActivities,
-  deleteActivity
+  deleteActivity,
+  adminCoupon,
 } = require("../controllers/admin");
 const {
   addClubValidator,
@@ -105,11 +106,12 @@ router.get("/clubs/report", clubReports);
 
 router.post("/rule/question", deleteQuestion);
 
-router.post("/add_representative",addRepresentative);
-router.get("/get_representatives" ,GetRepresentatives)
-router.get("/get_representative/:id" ,GetRepresentative)
-router.delete('/delete_representative/:id',DeleteRepersentative) 
-// add sport activity 
-router.post("/add-activity",AddActivity)
-router.delete("/delete-activity/:id",deleteActivity)
+router.post("/add_representative", addRepresentative);
+router.get("/get_representatives", GetRepresentatives);
+router.get("/get_representative/:id", GetRepresentative);
+router.delete("/delete_representative/:id", DeleteRepersentative);
+// add sport activity
+router.post("/add-activity", AddActivity);
+router.delete("/delete-activity/:id", deleteActivity);
+router.post("/add-coupon", adminCoupon);
 module.exports = router;
