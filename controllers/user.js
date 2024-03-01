@@ -64,6 +64,59 @@ exports.makeReport = asyncHandler(
       .then(() => res.sendStatus(201))
 );
 
+// exports.getClubs = asyncHandler(async (req, res, next) => {
+//   const { lat, long } = req.body;
+
+//   // Retrieve all clubs
+//   const clubs = await Club.find({});
+
+//   // Retrieve subscription prices for type "يومي" for all clubs
+//   const subscriptionPrices = await Promise.all(
+//     clubs.map(async (club) => {
+//       const dailySubscription = await Subscriptions.findOne({
+//         club: club._id,
+//         type: "يومي", // Filter by subscription type
+//       });
+//       const price = dailySubscription ? dailySubscription.price : null;
+//       return { clubId: club._id, price };
+//     })
+//   );
+
+//   const countries = {};
+//   for (const club of clubs) {
+//     if (countries[club.country]) {
+//       countries[club.country].push(club.city);
+//     } else {
+//       countries[club.country] = [club.city];
+//     }
+//   }
+
+//   if (lat && long) {
+//     const clubsWithDistance = [];
+//     for (const [index, club] of clubs.entries()) {
+//       const distance = await calcDistance(
+//         `${club.lat},${club.long}`,
+//         `${lat},${long}`
+//       );
+//       if (!distance) return next(new ApiError("Invalid distance", 400));
+//       clubsWithDistance.push({
+//         ...club.toObject(),
+//         distance: distance && distance,
+//         subscriptionPrice: subscriptionPrices[index].price,
+//       });
+//     }
+
+//     res.json({ Clubs: clubsWithDistance, countries });
+//   } else {
+//     const clubsWithPrices = clubs.map((club, index) => ({
+//       ...club.toObject(),
+//       subscriptionPrice: subscriptionPrices[index].price,
+//     }));
+//     res.json({ Clubs: clubsWithPrices, countries });
+//   }
+// });
+
+
 exports.getClubs = asyncHandler(async (req, res, next) => {
   const { lat, long } = req.body;
 
@@ -81,6 +134,10 @@ exports.getClubs = asyncHandler(async (req, res, next) => {
       return { clubId: club._id, price };
     })
   );
+
+  // Retrieve favorited clubs for the user
+  const userId = req.user.id; // Assuming you have user information in the request
+  const favoritedClubs = await Favorite.find({ user: userId }).distinct('club_id');
 
   const countries = {};
   for (const club of clubs) {
@@ -103,6 +160,7 @@ exports.getClubs = asyncHandler(async (req, res, next) => {
         ...club.toObject(),
         distance: distance && distance,
         subscriptionPrice: subscriptionPrices[index].price,
+        isFav: favoritedClubs.includes(club._id.toString()) // Check if club is favorited
       });
     }
 
@@ -111,6 +169,7 @@ exports.getClubs = asyncHandler(async (req, res, next) => {
     const clubsWithPrices = clubs.map((club, index) => ({
       ...club.toObject(),
       subscriptionPrice: subscriptionPrices[index].price,
+      isFav: favoritedClubs.includes(club._id.toString()) // Check if club is favorited
     }));
     res.json({ Clubs: clubsWithPrices, countries });
   }
@@ -1255,6 +1314,41 @@ exports.searchClub = asyncHandler(async (req, res, next) => {
 //   }
   
 // });
+// exports.getClubByActivity = asyncHandler(async (req, res, next) => {
+//   try {
+//     const filterCondition = req.body.filterCondition;
+//     console.log(filterCondition);
+    
+//     // Query clubs based on the provided activity
+//     const clubs = await Club.find({
+//       sports: { $elemMatch: { $eq: filterCondition } },
+//     });
+    
+//     // Retrieve subscription prices for daily subscriptions for each club
+//     const subscriptionPrices = await Promise.all(
+//       clubs.map(async (club) => {
+//         const dailySubscription = await Subscriptions.findOne({
+//           club: club._id,
+//           type: "يومي", // Filter by subscription type
+//         });
+//         const price = dailySubscription ? dailySubscription.price : null;
+//         return { clubId: club._id, price };
+//       })
+//     );
+    
+//     // Combine club details with subscription prices in the response
+//     const clubsWithPrices = clubs.map((club, index) => ({
+//       ...club.toObject(),
+//       subscriptionPrice: subscriptionPrices[index].price,
+//     }));
+
+//     res.status(200).json({ result: clubsWithPrices });
+//   } catch (e) {
+//     res.status(500).json({ message: e.message });
+//   }
+// });
+
+
 exports.getClubByActivity = asyncHandler(async (req, res, next) => {
   try {
     const filterCondition = req.body.filterCondition;
@@ -1276,18 +1370,24 @@ exports.getClubByActivity = asyncHandler(async (req, res, next) => {
         return { clubId: club._id, price };
       })
     );
-    
-    // Combine club details with subscription prices in the response
-    const clubsWithPrices = clubs.map((club, index) => ({
+
+    // Retrieve favorited clubs for the user
+    const userId = req.user.id; // Assuming you have user information in the request
+    const favoritedClubs = await Favorite.find({ user: userId }).distinct('club_id');
+
+    // Combine club details with subscription prices and isFav in the response
+    const clubsWithPricesAndFav = clubs.map((club, index) => ({
       ...club.toObject(),
       subscriptionPrice: subscriptionPrices[index].price,
+      isFav: favoritedClubs.includes(club._id.toString()) // Check if club is favorited
     }));
 
-    res.status(200).json({ result: clubsWithPrices });
+    res.status(200).json({ result: clubsWithPricesAndFav });
   } catch (e) {
     res.status(500).json({ message: e.message });
   }
 });
+
 exports.filterClubs = asyncHandler(async (req, res, next) => {
   const { filter } = req.query;
   const { lat, long } = req.query;
@@ -1477,7 +1577,7 @@ exports.addOrRemoveFav = asyncHandler(async (req, res, next) => {
   await Favorite.findOne({ club_id, user: id }).then(async (fav) => {
     console.log(await Favorite.find({}));
     if (fav)
-      await Favorite.findByIdAndDelete(fav.id).then(() => res.status(200).json({message:"club is  fav and removed"}));
+      await Favorite.findByIdAndDelete(fav.id).then(() => res.sendStatus(200));
     else {
       let price = 0;
       const club = await Club.findById(club_id);
@@ -1493,7 +1593,7 @@ exports.addOrRemoveFav = asyncHandler(async (req, res, next) => {
         club_logo: club.logo,
         club_name: club.name,
         price,
-      }).then(() => res.status(200).json({message:"club is not fav and created"}));
+      }).then(() => res.sendStatus(200));
     }
   });
 });
