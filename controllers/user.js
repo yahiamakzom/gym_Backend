@@ -1438,7 +1438,7 @@ exports.getUserFav = asyncHandler(async (req, res, next) => {
   await Favorite.find({ user: req.user.id })
     .populate({
       path: "club_id",
-      select: "-__v", // Select all fields except __v
+      select: "-__v", 
     })
     .populate({
       path: "user",
@@ -1455,6 +1455,7 @@ exports.getUserFav = asyncHandler(async (req, res, next) => {
           });
           const subPrice = dailySubscription ? dailySubscription.price : 0;
           console.log(subPrice);
+
           // Modify club data if needed
           // Example: clubData.someField = newValue;
 
@@ -1476,7 +1477,7 @@ exports.addOrRemoveFav = asyncHandler(async (req, res, next) => {
   await Favorite.findOne({ club_id, user: id }).then(async (fav) => {
     console.log(await Favorite.find({}));
     if (fav)
-      await Favorite.findByIdAndDelete(fav.id).then(() => res.sendStatus(200));
+      await Favorite.findByIdAndDelete(fav.id).then(() => res.status(200).json({message:"club is  fav and removed"}));
     else {
       let price = 0;
       const club = await Club.findById(club_id);
@@ -1492,7 +1493,7 @@ exports.addOrRemoveFav = asyncHandler(async (req, res, next) => {
         club_logo: club.logo,
         club_name: club.name,
         price,
-      }).then(() => res.sendStatus(200));
+      }).then(() => res.status(200).json({message:"club is not fav and created"}));
     }
   });
 });
