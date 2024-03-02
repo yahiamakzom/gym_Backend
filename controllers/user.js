@@ -1771,3 +1771,39 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
     })
     .then(() => res.status(200).send("Payment successful"));
 });
+
+
+// filter clubs by type
+exports.filterClubsBySubscriptionType = asyncHandler(async (req, res, next) => {
+  try {
+    const { subscriptionType } = req.body;
+
+    // Ensure the subscription type is provided
+    if (!subscriptionType) {
+      return next(new ApiError('Subscription type is required', 400));
+    }
+
+    // Retrieve all clubs with subscriptions of the specified type
+    const clubs = await Club.find({});
+    const clubsWithSubscription = [];
+
+    for (const club of clubs) {
+      const subscription = await Subscriptions.findOne({
+        club: club._id,
+        type: subscriptionType,
+      });
+
+      if (subscription) {
+        clubsWithSubscription.push({
+          ...club.toObject(),
+          subscriptionPrice: subscription.price,
+        });
+      }
+    }
+
+    res.json({ Clubs: clubsWithSubscription });
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});

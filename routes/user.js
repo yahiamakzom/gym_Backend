@@ -33,7 +33,8 @@ const {
   userFreezing,
   userUnfreeze,
   evaluateClub,
-  walletDiscountSubscription
+  walletDiscountSubscription,
+  filterClubsBySubscriptionType
 } = require("../controllers/user");
 const router = require("express").Router();
 const verifyToken = require("../middlewares/verifyToken");
@@ -91,4 +92,5 @@ router.post("/confirm_payment/:subId", verifyToken, confirmPayment);
 router.post("/pay-visa", verifyToken, hyperCheckout);
 
 router.get("/activities", GetActivities);
+router.post('/filter_by_subscriptionType',filterClubsBySubscriptionType)
 module.exports = router;
