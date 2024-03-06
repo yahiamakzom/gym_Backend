@@ -171,7 +171,6 @@ exports.getClubs = asyncHandler(async (req, res, next) => {
 //   }
 // });
 
-
 // exports.getMinClubs=asyncHandler(async (req, res, next) => {
 //     try {
 //         const minSubscriptions = await Subscriptions.aggregate([
@@ -964,7 +963,9 @@ exports.userFreezing = asyncHandler(async (req, res, next) => {
 
     // Update userSub end date
     usersub.end_date = newEndDate;
-    const freezeEndDate = new Date(Date.now() + 5 * 60 * 1000);
+    const freezeEndDate = new Date(
+      Date.now() + freezeDuration * 24 * 60 * 60 * 1000
+    );
 
     usersub.isfreezen = freezeEndDate >= new Date();
     usersub.freezenDate = freezeEndDate;
@@ -1249,22 +1250,22 @@ exports.searchClub = asyncHandler(async (req, res, next) => {
 //       sports: { $elemMatch: { $eq: filterCondition } },
 //     });
 //     res.status(200).json({ result });
-    
+
 //   } catch (e) {
 //     res.status(500).json({ message: e.message });
 //   }
-  
+
 // });
 exports.getClubByActivity = asyncHandler(async (req, res, next) => {
   try {
     const filterCondition = req.body.filterCondition;
     console.log(filterCondition);
-    
+
     // Query clubs based on the provided activity
     const clubs = await Club.find({
       sports: { $elemMatch: { $eq: filterCondition } },
     });
-    
+
     // Retrieve subscription prices for daily subscriptions for each club
     const subscriptionPrices = await Promise.all(
       clubs.map(async (club) => {
@@ -1276,7 +1277,7 @@ exports.getClubByActivity = asyncHandler(async (req, res, next) => {
         return { clubId: club._id, price };
       })
     );
-    
+
     // Combine club details with subscription prices in the response
     const clubsWithPrices = clubs.map((club, index) => ({
       ...club.toObject(),
@@ -1673,7 +1674,7 @@ exports.walletDiscountSubscription = asyncHandler(async (req, res, next) => {
 
   userData.wallet -= Number(amount);
   await userData.save();
-  res.status(200).json({message:"Discount successful"});
+  res.status(200).json({ message: "Discount successful" });
 });
 
 // exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
@@ -1772,7 +1773,6 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
     .then(() => res.status(200).send("Payment successful"));
 });
 
-
 // filter clubs by type
 exports.filterClubsBySubscriptionType = asyncHandler(async (req, res, next) => {
   try {
@@ -1780,7 +1780,7 @@ exports.filterClubsBySubscriptionType = asyncHandler(async (req, res, next) => {
 
     // Ensure the subscription type is provided
     if (!subscriptionType) {
-      return next(new ApiError('Subscription type is required', 400));
+      return next(new ApiError("Subscription type is required", 400));
     }
 
     // Retrieve all clubs with subscriptions of the specified type
