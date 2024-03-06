@@ -1098,6 +1098,7 @@ exports.getUserWallet = asyncHandler(async (req, res, next) => {
               freezeTime: subscription.freezeTime,
               subprice: subscription.price,
               type: subscription.type,
+              numberType: subscription.numberType,
               club_name: club.name,
               club_logo: club.logo,
               start_date: sub.start_date,
