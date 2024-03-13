@@ -63,6 +63,7 @@ exports.Login = asyncHandler(async (req, res, next) => {
     const token = sign({ id: user.id, role: user.role }, process.env.TOKEN);
     delete user._doc.password;
     user.token = token;
+    console.log(token);
     res.json({ user, token });
   } catch (error) {
     console.error(error);
