@@ -16,6 +16,7 @@ exports.Register = asyncHandler(async (req, res, next) => {
     lat,
     long,
   } = req.body;
+  
   if (!lat || !long) {
   
     lat = "24.7136";
