@@ -16,6 +16,11 @@ exports.Register = asyncHandler(async (req, res, next) => {
     lat,
     long,
   } = req.body;
+  if (!lat || !long) {
+  
+    lat = "24.7136";
+    long = "46.6753";
+}
   await User.findOne({ email }).then(async (user) => {
     const code = Math.floor(Math.random() * 1000000);
     if (user) return next(new ApiError("Email Or Phone Already Exists", 409));
