@@ -68,7 +68,7 @@ router.get("/fav", verifyToken, getUserFav);
 router.get("/profile", verifyToken, getprofile);
 router.post("/freeze", verifyToken, userFreezing);
 router.post("/unfreeze", verifyToken, userUnfreeze);
-router.get("/delet-user", verifyToken, deleteUser);
+router.delete("/delet-user", verifyToken, deleteUser);
 router.patch(
   "/profile",
   [verifyToken, imgUploader.fields([{ name: "photo", maxCount: 1 }])],
