@@ -1837,3 +1837,25 @@ exports.deleteUser = asyncHandler(async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 });
+
+exports.updateUserLocation = asyncHandler(async (req, res) => {
+  const userId = req.user.id;
+
+  const { lat, long } = req.body;
+
+  try {
+    const user = await User.findById(userId);
+
+    user.lat = lat;
+    user.long = long;
+
+    await user.save();
+
+    res
+      .status(200)
+      .json({ message: "User location updated successfully", user });
+  } catch (error) {
+    console.error("Error updating user location:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
