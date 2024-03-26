@@ -34,7 +34,9 @@ const {
   userUnfreeze,
   evaluateClub,
   walletDiscountSubscription,
-  filterClubsBySubscriptionType
+  filterClubsBySubscriptionType,
+  deleteUser,
+  updateUserLocation,
 } = require("../controllers/user");
 const router = require("express").Router();
 const verifyToken = require("../middlewares/verifyToken");
@@ -54,12 +56,13 @@ router.get("/clubs/filter", filterClubs);
 router.get("/rules", getRules);
 router.post("/user_reports", makeReport);
 router.post("/renew_club_wallet/:subId", verifyToken, renewClubByWallet);
+router.post("/update-location", verifyToken, updateUserLocation);
 // get club by its catogery
 router.post("/clubs_by_activity", getClubByActivity);
 // this wallet depost is deprecated and doesn't use real payments
 router.post("/wallet_deposit", verifyToken, walletDeposit);
 router.get("/wallet", verifyToken, getUserWallet);
-router.post('/evaluation' , verifyToken ,evaluateClub)
+router.post("/evaluation", verifyToken, evaluateClub);
 router.get("/booking", verifyToken, userBooking);
 router.put("/fav/:club_id", verifyToken, addOrRemoveFav);
 router.get("/isfav/:club_id", verifyToken, isFav);
@@ -67,6 +70,7 @@ router.get("/fav", verifyToken, getUserFav);
 router.get("/profile", verifyToken, getprofile);
 router.post("/freeze", verifyToken, userFreezing);
 router.post("/unfreeze", verifyToken, userUnfreeze);
+router.delete("/delet-user", verifyToken, deleteUser);
 router.patch(
   "/profile",
   [verifyToken, imgUploader.fields([{ name: "photo", maxCount: 1 }])],
@@ -81,7 +85,7 @@ router.post(
 // old
 router.post("/wallet", depositWallet);
 // not belong to us
-router.post('/pay_wallet' ,verifyToken ,walletDiscountSubscription)
+router.post("/pay_wallet", verifyToken, walletDiscountSubscription);
 router.post("/check-pay/:paymentId/:subId", verifyToken, checkPayment);
 router.post("/check-pay-new/:paymentId", verifyToken, checkPaymentNew);
 router.post("/wallet_confirm", verifyToken, confirmDeposit);
@@ -92,5 +96,5 @@ router.post("/confirm_payment/:subId", verifyToken, confirmPayment);
 router.post("/pay-visa", verifyToken, hyperCheckout);
 
 router.get("/activities", GetActivities);
-router.post('/filter_by_subscriptionType',filterClubsBySubscriptionType)
+router.post("/filter_by_subscriptionType", filterClubsBySubscriptionType);
 module.exports = router;

@@ -1808,3 +1808,54 @@ exports.filterClubsBySubscriptionType = asyncHandler(async (req, res, next) => {
     next(error);
   }
 });
+
+// DELETE route to delete user along with their subscriptions and favorites
+exports.deleteUser = asyncHandler(async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    // Delete user's subscriptions
+    await userSub.deleteMany({ user: userId });
+
+    await Favorite.deleteMany({ user: userId });
+
+    const user = await User.findByIdAndDelete(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    console.log(
+      `User with ID ${userId} and associated data were deleted successfully.`
+    );
+
+    return res
+      .status(200)
+      .json({ message: "User and associated data deleted successfully" });
+  } catch (error) {
+    console.error(`Error deleting user and associated data: ${error.message}`);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+exports.updateUserLocation = asyncHandler(async (req, res) => {
+  const userId = req.user.id;
+
+  const { lat, long } = req.body;
+
+  try {
+    const user = await User.findById(userId);
+
+    user.lat = lat;
+    user.long = long;
+
+    await user.save();
+
+    res
+      .status(200)
+      .json({ message: "User location updated successfully", user });
+  } catch (error) {
+    console.error("Error updating user location:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});

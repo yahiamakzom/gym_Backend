@@ -30,8 +30,14 @@ module.exports = mongoose.model(
     wallet: Number,
     token: String,
     photo: String,
-    lat:String,
-    long:String,
+    lat: {
+      type: String,
+      default: "24.7136", // Default latitude value
+  },
+  long: {
+      type: String,
+      default: "46.6753", // Default longitude value
+  },
     operations: [{
       operationKind: {
         type: String,

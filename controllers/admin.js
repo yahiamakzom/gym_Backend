@@ -22,6 +22,136 @@ cloudinary.config({
   api_secret: process.env.CLOUD_API_SECRET,
 });
 
+// exports.addClub = asyncHandler(async (req, res, next) => {
+//   const {
+//     name,
+//     email,
+//     password,
+//     lat,
+//     long,
+//     description,
+//     gender,
+//     from,
+//     to,
+//     allDay,
+//     commission,
+//     repreentative_id,
+//     sports,
+//     days,
+//     discountCode,
+//     discountQuantity
+//   } = req.body;
+
+//   let SportData = sports.split(",");
+//   let Days = days.split(",");
+//   if (!req.files.clubImg)
+//     return next(new ApiError("Please Add Club Imgs", 409));
+//   if (!req.files.logo) return next(new ApiError("Please Add Club logo", 409));
+//   const place_name = await getLocationName(lat, long);
+//   if (!place_name) return next(new ApiError("Location Not Found", 404));
+//   console.log(place_name);
+//   const imgs_path = await Promise.all(
+//     req.files.clubImg.map(async (img) => {
+//       const uploadImg = await cloudinary.uploader.upload(img.path);
+//       return uploadImg.secure_url;
+//     })
+//   );
+//   const logo = (await cloudinary.uploader.upload(req.files.logo[0].path))
+//     .secure_url;
+//   await User.findOne({ email }).then(async (user) => {
+//     if (user) return next(new ApiError("User With This Email is Exists", 409));
+//     console.log(allDay);
+//     if (allDay == "false" || allDay == undefined) {
+//       await Club.create({
+//         name: name.trim(),
+//         country: `${place_name
+//           .split(",")
+//           [place_name.split(",").length - 1].trim()}`,
+//         city: `${place_name
+//           .split(",")
+//           [place_name.split(",").length - 2].trim()}`,
+//         location: place_name,
+//         description,
+//         gender,
+//         images: imgs_path,
+//         lat: Number(lat),
+//         long: Number(long),
+//         logo,
+//         from,
+//         to,
+//         allDay: false,
+//         commission,
+//         sports: [...SportData],
+//         WorkingDays: [...Days],
+
+//         discounts: [{ discountCode, discountQuantity }]
+//       }).then(async (club) => {
+//         console.log(club)
+
+//         let representative = await Representative.findById(repreentative_id);
+//         if (representative) {
+//           representative.clups.push(club.id);
+//           representative.save();
+//           console.log(representative);
+//         }
+
+        
+//         await User.create({
+//           email,
+//           password: await bcrypt.hash(password, 10),
+//           role: "club",
+//           club: club.id,
+//           home_location: place_name,
+//           username: name,
+//         });
+//         res.status(201).json({ club });
+//       });
+//     } else {
+//       await Club.create({
+//         name: name.trim(),
+//         country: `${place_name
+//           .split(",")
+//           [place_name.split(",").length - 1].trim()}`,
+//         city: `${place_name
+//           .split(",")
+//           [place_name.split(",").length - 2].trim()}`,
+//         location: place_name,
+//         description,
+//         gender,
+//         images: imgs_path,
+//         lat: Number(lat),
+//         long: Number(long),
+//         logo,
+//         allDay,
+//         from: null,
+//         to: null,
+//         commission,
+//         sports: [...SportData],
+//         WorkingDays: [...Days],
+//         discounts: [{ discountCode, discountQuantity }]
+
+//       }).then(async (club) => {
+//         console.log(club)
+//         let representative = await Representative.findById(repreentative_id);
+//         if (representative) {
+//           representative.clups.push(club.id);
+//           representative.save();
+//           console.log(representative);
+//         }
+//         await User.create({
+//           email,
+//           password: await bcrypt.hash(password, 10),
+//           role: "club",
+//           club: club.id,
+//           home_location: place_name,
+//           username: name,
+//         });
+//         res.status(201).json({ club });
+//       });
+//     }
+//   });
+// });
+
 exports.addClub = asyncHandler(async (req, res, next) => {
   const {
     name,
@@ -64,13 +194,13 @@ exports.addClub = asyncHandler(async (req, res, next) => {
     console.log(allDay);
     if (allDay == "false" || allDay == undefined) {
       await Club.create({
-        name: name.trim(),
+        name: name,
         country: `${place_name
           .split(",")
-          [place_name.split(",").length - 1].trim()}`,
+          [place_name.split(",").length - 1]}`,
         city: `${place_name
           .split(",")
-          [place_name.split(",").length - 2].trim()}`,
+          [place_name.split(",").length - 2]}`,
         location: place_name,
         description,
         gender,
@@ -110,13 +240,13 @@ exports.addClub = asyncHandler(async (req, res, next) => {
       });
     } else {
       await Club.create({
-        name: name.trim(),
+        name: name,
         country: `${place_name
           .split(",")
-          [place_name.split(",").length - 1].trim()}`,
+          [place_name.split(",").length - 1]}`,
         city: `${place_name
           .split(",")
-          [place_name.split(",").length - 2].trim()}`,
+          [place_name.split(",").length - 2]}`,
         location: place_name,
         description,
         gender,
@@ -154,6 +284,7 @@ exports.addClub = asyncHandler(async (req, res, next) => {
     }
   });
 });
+
 
 // exports.editClub = asyncHandler(async (req, res, next) => {
 //   const { club_id } = req.params;
