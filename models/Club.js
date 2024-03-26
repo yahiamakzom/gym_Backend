@@ -14,6 +14,9 @@ module.exports = mongoose.model(
         required: [true, "Please Enter Gender"],
         enum: ["male", "female", "both"],
       },
+      mapUrl: {
+        type: String,
+      },
       // days: {
       //     type: String,
       //     required:[true,"please add Days"]
@@ -63,35 +66,37 @@ module.exports = mongoose.model(
         required: [true, "Please Enter Commmission Of Club"],
       },
 
-      discounts: [{
-        discountCode: {
+      discounts: [
+        {
+          discountCode: {
             type: String,
-            default: null
-        },
-        discountQuantity: {
+            default: null,
+          },
+          discountQuantity: {
             type: Number,
-            default: null
-        }
-    }],
+            default: null,
+          },
+        },
+      ],
       evaluation: {
         evaluators: [
           {
             user: {
               type: mongoose.Schema.Types.ObjectId,
-              ref: 'User' // Assuming you have a User model
+              ref: "User", // Assuming you have a User model
             },
             rating: {
               type: Number,
               min: 1,
-              max: 5
-            }
-          }
+              max: 5,
+            },
+          },
         ],
         averageRating: {
           type: Number,
-          default: null
-        }
-      }
+          default: null,
+        },
+      },
     },
 
     { timestamps: true }
