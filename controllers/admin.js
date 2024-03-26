@@ -377,8 +377,8 @@ exports.editClub = asyncHandler(async (req, res, next) => {
 
     // Update club with new data
     club.name = name || club.name;
-    club.country = place_name && `${place_name.split(",")[place_name.split(",").length - 1].trim()}`;
-    club.city = place_name && `${place_name.split(",")[place_name.split(",").length - 2].trim()}`;
+    club.country = place_name && `${place_name.split(",")[place_name.split(",").length - 1]}`;
+    club.city = place_name && `${place_name.split(",")[place_name.split(",").length - 2]}`;
     club.location = place_name && place_name;
     club.description = description || club.description;
     club.gender = gender || club.gender;
