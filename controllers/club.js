@@ -97,6 +97,7 @@ exports.editClub = asyncHandler(async (req, res, next) => {
     checkedItemsSports,
     discountCode,
     discountQuantity,
+    mapUrl
   } = req.body;
   const uniqueCheckedDays = checkedDays.split(",");
   const uniqueCheckedItemsSports = checkedItemsSports.split(",");
@@ -151,6 +152,7 @@ exports.editClub = asyncHandler(async (req, res, next) => {
           from: from && from,
           to: to && to,
           allDay: false,
+          mapUrl:mapUrl &&mapUrl ,
 
           WorkingDays: uniqueCheckedDays,
           sports: uniqueCheckedItemsSports,
@@ -182,6 +184,7 @@ exports.editClub = asyncHandler(async (req, res, next) => {
           long: place_name && Number(long),
           allDay,
           from: null,
+          mapUrl:mapUrl &&mapUrl ,
           to: null,
           WorkingDays: uniqueCheckedDays,
           sports: uniqueCheckedItemsSports,

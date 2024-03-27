@@ -345,7 +345,7 @@ exports.addClub = asyncHandler(async (req, res, next) => {
 exports.editClub = asyncHandler(async (req, res, next) => {
   try {
     const { club_id } = req.params;
-    const { name, lat, long, description, gender, from, to, days, commission, checkedDays, checkedItemsSports } = req.body;
+    const { name, lat, long, description, gender, mapUrl, from, to, days, commission, checkedDays, checkedItemsSports } = req.body;
 
     // Split the checkedDays and checkedItemsSports strings into arrays
     const uniqueCheckedDays = checkedDays ? checkedDays.split(',') : [];
@@ -388,6 +388,7 @@ exports.editClub = asyncHandler(async (req, res, next) => {
     club.long = place_name && Number(long);
     club.from = from || club.from;
     club.to = to || club.to;
+    club.mapUrl = mapUrl || club.mapUrl;
     club.WorkingDays = uniqueCheckedDays || club.WorkingDays; // Update WorkingDays field
     club.commission = commission || club.commission;
     club.sports = uniqueCheckedItemsSports || club.sports;
