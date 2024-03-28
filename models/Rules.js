@@ -38,7 +38,7 @@ module.exports = mongoose.model(
     IBAN: String,
     whatsapp: String,
     instagram: String,
-    facebook: String,
+    twitter: String,
     questions: Array,
     phone1: String,
     phone2: String,
