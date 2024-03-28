@@ -613,9 +613,9 @@ exports.addRule = asyncHandler(async (req, res, next) => {
           res.json({ instagram })
         );
     });
-  } else if (type === "facebook") {
+  } else if (type === "twitter") {
     const { facebook } = req.body;
-    if (!facebook) return next(new ApiError("Facebook Required", 400));
+    if (!facebook) return next(new ApiError("twitter Required", 400));
     await Rules.findOne({ type }).then(async (rule) => {
       if (rule)
         await Rules.findOneAndUpdate({ type }, { facebook }).then((facebook) =>
