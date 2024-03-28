@@ -614,7 +614,7 @@ exports.addRule = asyncHandler(async (req, res, next) => {
         );
     });
   } else if (type === "twitter") {
-    const { facebook } = req.body;
+    const { twitter } = req.body;
     if (!facebook) return next(new ApiError("twitter Required", 400));
     await Rules.findOne({ type }).then(async (rule) => {
       if (rule)
