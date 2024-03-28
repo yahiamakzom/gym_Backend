@@ -738,14 +738,14 @@ exports.clubReports = asyncHandler(async (req, res, next) => {
               club_name: club.name,
               club_city: club.city,
               club_players: all_players,
-              day: day * players_day,
-              month: month * players_month,
-              year: year * players_year,
-              week: week * players_week,
-              appgymsDay: appgymsDay * players_day,
-              appGymsMonth: appGymsMonth * players_month,
-              appGymsYear: appGymsYear * players_year,
-              appGymsWeek: appGymsWeek * players_week,
+              day: (day * players_day).toFixed(2),
+              month: (month * players_month).toFixed(2),
+              year: (year * players_year).toFixed(2),
+              week: (week * players_week).toFixed(2),
+              appgymsDay: (appgymsDay * players_day).toFixed(2),
+              appGymsMonth: (appGymsMonth * players_month).toFixed(2),
+              appGymsYear: (appGymsYear * players_year).toFixed(2),
+              appGymsWeek: (appGymsWeek * players_week).toFixed(2),
             };
           }
         );
