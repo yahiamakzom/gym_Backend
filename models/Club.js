@@ -16,6 +16,7 @@ module.exports = mongoose.model(
       },
       mapUrl: {
         type: String,
+        default:"https://www.google.com/maps/@24.7207538,46.4222781,9.96z?entry=ttu"
       },
       // days: {
       //     type: String,
