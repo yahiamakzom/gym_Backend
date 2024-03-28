@@ -615,15 +615,15 @@ exports.addRule = asyncHandler(async (req, res, next) => {
     });
   } else if (type === "twitter") {
     const { twitter } = req.body;
-    if (!facebook) return next(new ApiError("twitter Required", 400));
+    if (!twitter) return next(new ApiError("twitter Required", 400));
     await Rules.findOne({ type }).then(async (rule) => {
       if (rule)
-        await Rules.findOneAndUpdate({ type }, { facebook }).then((facebook) =>
-          res.json({ facebook })
+        await Rules.findOneAndUpdate({ type }, { twitter }).then((twitter) =>
+          res.json({ twitter })
         );
       else
-        await Rules.create({ facebook, type }).then((facebook) =>
-          res.json({ facebook })
+        await Rules.create({ twitter, type }).then((twitter) =>
+          res.json({ twitter })
         );
     });
   } else if (type === "questions") {
