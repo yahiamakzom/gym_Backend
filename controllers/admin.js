@@ -95,7 +95,6 @@ cloudinary.config({
 //           console.log(representative);
 //         }
 
-        
 //         await User.create({
 //           email,
 //           password: await bcrypt.hash(password, 10),
@@ -169,8 +168,8 @@ exports.addClub = asyncHandler(async (req, res, next) => {
     sports,
     days,
     discountCode,
-    discountQuantity ,
-    mapUrl
+    discountQuantity,
+    mapUrl,
   } = req.body;
 
   let SportData = sports.split(",");
@@ -195,12 +194,8 @@ exports.addClub = asyncHandler(async (req, res, next) => {
     if (allDay == "false" || allDay == undefined) {
       await Club.create({
         name: name,
-        country: `${place_name
-          .split(",")
-          [place_name.split(",").length - 1]}`,
-        city: `${place_name
-          .split(",")
-          [place_name.split(",").length - 2]}`,
+        country: `${place_name.split(",")[place_name.split(",").length - 1]}`,
+        city: `${place_name.split(",")[place_name.split(",").length - 2]}`,
         location: place_name,
         description,
         gender,
@@ -214,11 +209,11 @@ exports.addClub = asyncHandler(async (req, res, next) => {
         commission,
         sports: [...SportData],
         WorkingDays: [...Days],
-        mapUrl ,
+        mapUrl,
 
-        discounts: [{ discountCode, discountQuantity }]
+        discounts: [{ discountCode, discountQuantity }],
       }).then(async (club) => {
-        console.log(club)
+        console.log(club);
 
         let representative = await Representative.findById(repreentative_id);
         if (representative) {
@@ -227,7 +222,6 @@ exports.addClub = asyncHandler(async (req, res, next) => {
           console.log(representative);
         }
 
-        
         await User.create({
           email,
           password: await bcrypt.hash(password, 10),
@@ -241,12 +235,8 @@ exports.addClub = asyncHandler(async (req, res, next) => {
     } else {
       await Club.create({
         name: name,
-        country: `${place_name
-          .split(",")
-          [place_name.split(",").length - 1]}`,
-        city: `${place_name
-          .split(",")
-          [place_name.split(",").length - 2]}`,
+        country: `${place_name.split(",")[place_name.split(",").length - 1]}`,
+        city: `${place_name.split(",")[place_name.split(",").length - 2]}`,
         location: place_name,
         description,
         gender,
@@ -257,14 +247,13 @@ exports.addClub = asyncHandler(async (req, res, next) => {
         allDay,
         from: null,
         to: null,
-        mapUrl ,
+        mapUrl,
         commission,
         sports: [...SportData],
         WorkingDays: [...Days],
-        discounts: [{ discountCode, discountQuantity }]
-
+        discounts: [{ discountCode, discountQuantity }],
       }).then(async (club) => {
-        console.log(club)
+        console.log(club);
         let representative = await Representative.findById(repreentative_id);
         if (representative) {
           representative.clups.push(club.id);
@@ -285,14 +274,13 @@ exports.addClub = asyncHandler(async (req, res, next) => {
   });
 });
 
-
 // exports.editClub = asyncHandler(async (req, res, next) => {
 //   const { club_id } = req.params;
 //   const { name, lat, long, description, gender, from, to, days, commission ,checkedDays,checkedItemsSports } =
 //     req.body;
 
 // const uniqueCheckedDays = checkedDays.split(',')
-// const uniqueCheckedItemsSports =checkedItemsSports.split(',') 
+// const uniqueCheckedItemsSports =checkedItemsSports.split(',')
 // console.log(uniqueCheckedItemsSports)
 // console.log(uniqueCheckedDays)
 //   let imgs_path =
@@ -345,13 +333,28 @@ exports.addClub = asyncHandler(async (req, res, next) => {
 exports.editClub = asyncHandler(async (req, res, next) => {
   try {
     const { club_id } = req.params;
-    const { name, lat, long, description, gender, mapUrl, from, to, days, commission, checkedDays, checkedItemsSports } = req.body;
+    const {
+      name,
+      lat,
+      long,
+      description,
+      gender,
+      mapUrl,
+      from,
+      to,
+      days,
+      commission,
+      checkedDays,
+      checkedItemsSports,
+    } = req.body;
 
     // Split the checkedDays and checkedItemsSports strings into arrays
-    const uniqueCheckedDays = checkedDays ? checkedDays.split(',') : [];
-    const uniqueCheckedItemsSports = checkedItemsSports ? checkedItemsSports.split(',') : [];
-    
-    console.log(lat ,long,name)
+    const uniqueCheckedDays = checkedDays ? checkedDays.split(",") : [];
+    const uniqueCheckedItemsSports = checkedItemsSports
+      ? checkedItemsSports.split(",")
+      : [];
+
+    console.log(lat, long, name);
 
     let imgs_path =
       req.files &&
@@ -377,8 +380,12 @@ exports.editClub = asyncHandler(async (req, res, next) => {
 
     // Update club with new data
     club.name = name || club.name;
-    club.country = place_name && `${place_name.split(",")[place_name.split(",").length - 1]}`;
-    club.city = place_name && `${place_name.split(",")[place_name.split(",").length - 2]}`;
+    club.country =
+      place_name &&
+      `${place_name.split(",")[place_name.split(",").length - 1]}`;
+    club.city =
+      place_name &&
+      `${place_name.split(",")[place_name.split(",").length - 2]}`;
     club.location = place_name && place_name;
     club.description = description || club.description;
     club.gender = gender || club.gender;
@@ -396,14 +403,12 @@ exports.editClub = asyncHandler(async (req, res, next) => {
     // Save the updated club
     club = await club.save();
     res.json({ club });
-    console.log(club)
-    
+    console.log(club);
   } catch (error) {
     console.error(error); // Log the error for debugging
     next(error);
   }
 });
-
 
 exports.deleteClub = asyncHandler(async (req, res, next) => {
   await Club.findById(req.params.club_id).then(async (club) => {
@@ -671,24 +676,61 @@ exports.clubReports = asyncHandler(async (req, res, next) => {
             let all_players = (
               await userSub.find({ club: club.id, expired: false })
             ).length;
-            let players_day, players_month, players_year;
-            players_day = players_month = players_year = 0;
-            let day, month, year;
-            day = month = year = 0;
+            let players_day, players_month, players_week, players_year;
+            players_day = players_month = players_year = players_week = 0;
+            let day,
+              month,
+              week,
+              year,
+              appgymsDay,
+              appGymsWeek,
+              appGymsMonth,
+              appGymsYear;
+
+            day =
+              month =
+              year =
+              week =
+              appGymsMonth =
+              appGymsDay =
+              appGymsYear =
+              appGymsWeek =
+              appgymsDay =
+                0;
             await Promise.all(
               subs.map(async (sub) => {
                 if (sub.type === "يومي") {
                   players_day = (await userSub.find({ subscription: sub.id }))
                     .length;
-                  day += Number(sub.price);
+                  const price = Number(sub.price);
+                  const commission = Number(club.commission);
+                  const commission_price = (price * commission) / 100;
+                  appgymsDay += Number(commission_price);
+                  day = price - commission_price;
                 } else if (sub.type === "شهري") {
                   players_month = (await userSub.find({ subscription: sub.id }))
                     .length;
-                  month += Number(sub.price);
+                  const price = Number(sub.price);
+                  const commission = Number(club.commission);
+                  const commission_price = (price * commission) / 100;
+                  appGymsMonth += Number(commission_price);
+                  month = price - commission_price;
+                } else if (sub.type === "اسبوعي") {
+                  players_week = (await userSub.find({ subscription: sub.id }))
+                    .length;
+                  const price = Number(sub.price);
+                  const commission = Number(club.commission);
+                  const commission_price = (price * commission) / 100;
+                  appGymsWeek += Number(commission_price);
+                  week = price - commission_price;
                 } else {
                   players_year = (await userSub.find({ subscription: sub.id }))
                     .length;
-                  year += Number(sub.price);
+                  const price = Number(sub.price);
+                  const commission = Number(club.commission);
+                  const commission_price = (price * commission) / 100;
+                  appGymsYear += Number(commission_price);
+                  year = price - commission_price;
                 }
               })
             );
@@ -699,6 +741,11 @@ exports.clubReports = asyncHandler(async (req, res, next) => {
               day: day * players_day,
               month: month * players_month,
               year: year * players_year,
+              week: week * players_week,
+              appgymsDay: appgymsDay * players_day,
+              appGymsMonth: appGymsMonth * players_month,
+              appGymsYear: appGymsYear * players_year,
+              appGymsWeek: appGymsWeek * players_week,
             };
           }
         );
@@ -986,14 +1033,14 @@ exports.deleteActivity = asyncHandler(async (req, res, next) => {
   }
 });
 
-
-
 exports.adminCoupon = asyncHandler(async (req, res) => {
   const { discountCode, discountQuantity } = req.body;
 
   // Validate discount code and quantity
   if (!discountCode || !discountQuantity) {
-    return res.status(400).json({ error: 'Discount code and quantity are required' });
+    return res
+      .status(400)
+      .json({ error: "Discount code and quantity are required" });
   }
 
   try {
@@ -1001,24 +1048,25 @@ exports.adminCoupon = asyncHandler(async (req, res) => {
     const clubsToUpdate = await Club.find({ discounts: { $exists: true } });
 
     if (clubsToUpdate.length === 0) {
-      return res.status(404).json({ error: 'No clubs found with discounts to update' });
+      return res
+        .status(404)
+        .json({ error: "No clubs found with discounts to update" });
     }
 
     // Update existing clubs to add the new discount
-    const updateResults = await Promise.all(clubsToUpdate.map(async (club) => {
-    
-  
+    const updateResults = await Promise.all(
+      clubsToUpdate.map(async (club) => {
         club.discounts.push({ discountCode, discountQuantity });
         return club.save();
-  
-     // Skip clubs with empty discounts array
-    }));
+
+        // Skip clubs with empty discounts array
+      })
+    );
 
     // Calculate the number of updated clubs
-  res.json({updateResults})
+    res.json({ updateResults });
   } catch (error) {
-    console.error('Error updating clubs:', error);
-    return res.status(500).json({ error: 'Internal Server Error' });
+    console.error("Error updating clubs:", error);
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 });
-
