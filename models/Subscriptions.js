@@ -24,14 +24,34 @@ module.exports = mongoose.model(
       },
       type: {
         type: String,
-        enum: ["ساعه", "سنوي", "شهري", "اسبوعي", "يومي"],
+        enum: [
+          "ساعه",
+          "سنوي",
+          "شهري",
+          "اسبوعي",
+          "يومي",
+          "60Minutes",
+          "30Minutes",
+          "90Minutes",
+        ],
         required: [true, "Please Add a Subscription Date"],
       },
       numberType: {
-        type: Number, 
+        type: Number,
         default: 0,
         required: [true, "Enter Subscription number for sepcicfic volumn type"],
       },
+      gymsCount: {
+        type: Number,
+        default: 0,
+      }, 
+
+      startData: Date,
+      endData: Date,
+      isGymsCountEnd:{ 
+        type :Boolean ,
+        default: false,
+      } ,
     },
     { timestamps: true }
   )

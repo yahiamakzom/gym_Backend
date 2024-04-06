@@ -1078,7 +1078,7 @@ exports.userUnfreeze = asyncHandler(async (req, res, next) => {
   }
 });
 
-// evaluation for  every club
+
 
 exports.evaluateClub = asyncHandler(async (req, res, next) => {
   const { clubId, rating } = req.body;

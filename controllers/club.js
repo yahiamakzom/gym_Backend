@@ -6,7 +6,7 @@ const User = require("../models/User");
 const userSub = require("../models/userSub");
 const { getLocationName } = require("../utils/Map");
 const cloudinary = require("cloudinary").v2;
-
+const moment = require("moment");
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.CLOUD_API_KEY,
@@ -15,18 +15,26 @@ cloudinary.config({
 
 exports.addSubscreptions = asyncHandler(async (req, res, next) => {
   const clubId = req.user.id;
-  const { name, price, type, numberType, freezeCountTime, freezeTime } =
-    req.body;
+  const {
+    name,
+    price,
+    type,
+    numberType,
+    freezeCountTime,
+    freezeTime,
+    gymsCount,
+  } = req.body;
 
   // Find the club by ID and populate the club field to access its commission
   const club = await User.findById(clubId).populate("club");
+
   if (!club) {
     return next(new ApiError("Club not found", 404));
   }
 
   // Calculate the price with commission percentage
   const commissionPercentage = club.club ? club.club.commission : 0; // Default to 0 if club is not found
-  console.log(commissionPercentage);
+
   const priceWithCommission = Math.ceil(
     price * (1 + commissionPercentage / 100)
   );
@@ -41,7 +49,68 @@ exports.addSubscreptions = asyncHandler(async (req, res, next) => {
     return next(new ApiError("Subscription found with this name", 403));
   }
 
-  // Create the subscription
+  if (club.club.sports.length === 1 && club.club.sports[0] === "بادل") {
+    let clubOpen = club.club.from;
+    let clubStop = club.club.to;
+    let clubOpenTime = moment(clubOpen, "hh:mm A");
+    let clubStopTime = moment(clubStop, "hh:mm A");
+    let duration = moment.duration(clubStopTime.diff(clubOpenTime));
+    let totalMinutes = duration.asMinutes();
+
+    // Convert total minutes to hours (rounding down to the nearest integer)
+    let totalHours = Math.floor(totalMinutes / 60);
+
+    console.log("Duration in hours:", totalHours);
+    console.log(type);
+
+    let subscriptionType = type;
+    let subscriptionDuration;
+
+    if (subscriptionType === "30Minutes") {
+      subscriptionDuration = 0.5; // 30 minutes
+    } else if (subscriptionType === "60Minutes") {
+      subscriptionDuration = 1; // 60 minutes
+    } else if (subscriptionType === "90Minutes") {
+      subscriptionDuration = 1.5; // 90 minutes
+    } 
+
+    
+    let numberOfSubscriptions = Math.floor(totalHours / subscriptionDuration);
+    let subs = []; 
+    console.log(numberOfSubscriptions)
+    try {
+      for (let i = 0; i < numberOfSubscriptions; i++) {
+        let startData = moment(clubOpenTime)
+          .add(i * subscriptionDuration, "hours")
+          .toDate(); // Convert to Date object
+
+        let endData = moment(clubOpenTime)
+          .add((i + 1) * subscriptionDuration, "hours")
+          .toDate();
+
+        const sub = await Subscriptions.create({
+          club: club.club,
+          name,
+          price: priceWithCommission,
+          type,
+          startData,
+          endData,
+          gymsCount
+        });
+        subs.push(sub);
+        console.log(sub);
+      }
+    } catch (error) {
+      console.error(error);
+      return next(new ApiError("Internal Server Error", 500));
+    } finally {
+      res.status(201).json({ sub: subs }); 
+      return 
+    } 
+    
+  }
+
+  // // Create the subscription
   const sub = await Subscriptions.create({
     club: club.club,
     name,
@@ -51,6 +120,7 @@ exports.addSubscreptions = asyncHandler(async (req, res, next) => {
     freezeTime,
     freezeCountTime,
   });
+
   console.log(sub);
   res.status(201).json({ sub });
 });
@@ -97,7 +167,7 @@ exports.editClub = asyncHandler(async (req, res, next) => {
     checkedItemsSports,
     discountCode,
     discountQuantity,
-    mapUrl
+    mapUrl,
   } = req.body;
   const uniqueCheckedDays = checkedDays.split(",");
   const uniqueCheckedItemsSports = checkedItemsSports.split(",");
@@ -120,11 +190,11 @@ exports.editClub = asyncHandler(async (req, res, next) => {
     place_name = await getLocationName(lat, long);
     if (!place_name) return next(new ApiError("Location Not Found", 404));
   }
-  let newDiscount ={discountCode:null ,discountQuantity:null}
-  if(discountCode && discountQuantity){
-     newDiscount = {
+  let newDiscount = { discountCode: null, discountQuantity: null };
+  if (discountCode && discountQuantity) {
+    newDiscount = {
       discountCode: discountCode,
-      discountQuantity: discountQuantity
+      discountQuantity: discountQuantity,
     };
   }
 
@@ -152,7 +222,7 @@ exports.editClub = asyncHandler(async (req, res, next) => {
           from: from && from,
           to: to && to,
           allDay: false,
-          mapUrl:mapUrl &&mapUrl ,
+          mapUrl: mapUrl && mapUrl,
 
           WorkingDays: uniqueCheckedDays,
           sports: uniqueCheckedItemsSports,
@@ -184,7 +254,7 @@ exports.editClub = asyncHandler(async (req, res, next) => {
           long: place_name && Number(long),
           allDay,
           from: null,
-          mapUrl:mapUrl &&mapUrl ,
+          mapUrl: mapUrl && mapUrl,
           to: null,
           WorkingDays: uniqueCheckedDays,
           sports: uniqueCheckedItemsSports,
