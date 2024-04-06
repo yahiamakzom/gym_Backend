@@ -52,6 +52,7 @@ exports.addSubscreptions = asyncHandler(async (req, res, next) => {
   if (club.club.sports.length === 1 && club.club.sports[0] === "بادل") {
     let clubOpen = club.club.from;
     let clubStop = club.club.to;
+    const isAllDay = club.club.allDay;
     let clubOpenTime = moment(clubOpen, "hh:mm A");
     let clubStopTime = moment(clubStop, "hh:mm A");
     let duration = moment.duration(clubStopTime.diff(clubOpenTime));
@@ -59,7 +60,12 @@ exports.addSubscreptions = asyncHandler(async (req, res, next) => {
 
     // Convert total minutes to hours (rounding down to the nearest integer)
     let totalHours = Math.floor(totalMinutes / 60);
+    if (isAllDay) {
+      totalHours = 24;
 
+      clubOpenTime = moment().set({ hour: 7, minute: 0, second: 0 }); // Set clubOpenTime to 7:00 AM today
+      clubStopTime = moment(clubOpenTime).add(1, "day");
+    }
     console.log("Duration in hours:", totalHours);
     console.log(type);
 
@@ -72,21 +78,21 @@ exports.addSubscreptions = asyncHandler(async (req, res, next) => {
       subscriptionDuration = 1; // 60 minutes
     } else if (subscriptionType === "90Minutes") {
       subscriptionDuration = 1.5; // 90 minutes
-    } 
+    }
 
-    
     let numberOfSubscriptions = Math.floor(totalHours / subscriptionDuration);
-    let subs = []; 
-    console.log(numberOfSubscriptions)
+    let subs = [];
+
+    console.log(numberOfSubscriptions);
+    console.log(isAllDay);
+
     try {
       for (let i = 0; i < numberOfSubscriptions; i++) {
-        let startData = moment(clubOpenTime)
-          .add(i * subscriptionDuration, "hours")
-          .toDate(); // Convert to Date object
+        let startData = moment(clubOpenTime).toDate(); // Convert to Date object
+        startData.setHours(startData.getHours() + i * subscriptionDuration);
 
-        let endData = moment(clubOpenTime)
-          .add((i + 1) * subscriptionDuration, "hours")
-          .toDate();
+        let endData = moment(clubOpenTime).toDate(); // Convert to Date object
+        endData.setHours(endData.getHours() + (i + 1) * subscriptionDuration);
 
         const sub = await Subscriptions.create({
           club: club.club,
@@ -95,7 +101,7 @@ exports.addSubscreptions = asyncHandler(async (req, res, next) => {
           type,
           startData,
           endData,
-          gymsCount
+          gymsCount,
         });
         subs.push(sub);
         console.log(sub);
@@ -104,10 +110,9 @@ exports.addSubscreptions = asyncHandler(async (req, res, next) => {
       console.error(error);
       return next(new ApiError("Internal Server Error", 500));
     } finally {
-      res.status(201).json({ sub: subs }); 
-      return 
-    } 
-    
+      res.status(201).json({ sub: subs });
+      return;
+    }
   }
 
   // // Create the subscription
