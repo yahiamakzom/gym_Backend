@@ -833,10 +833,8 @@ exports.checkPayment = asyncHandler(async (req, res, next) => {
             const club = await Club.findById(subscription.club);
             if (!club) return next(new ApiError("Can't find club", 404));
             if (club.sports.length == 1 && !club.sports[0] == "بادل") {
-              let end_dateSub = moment(subscription.startData).endOf("hour");
-              let start_dateSub = moment(subscription.startData).startOf(
-                "hour"
-              );
+              let end_dateSub = moment(subscription.startData);
+              let start_dateSub = moment(subscription.startData);
               subscription.gymsCount--;
               await subscription.save();
               await userSub
