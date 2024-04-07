@@ -331,11 +331,10 @@ exports.getClubAuth = asyncHandler(async (req, res, next) => {
           .then(async (sub) => {
             if (lat && long) {
               // let start_date, end_date;
-
+console.log(sub);
               if (sub && sub.subscription) {
                 // const { type, numberType } = sub.subscription;
                 // const startDate = moment().startOf("hour"); // Start of the current hour
-
                 // if (type === "شهري") {
                 //   end_date = moment(startDate)
                 //     .add(numberType, "months")
@@ -358,7 +357,6 @@ exports.getClubAuth = asyncHandler(async (req, res, next) => {
                 //     .add(4, "hours") // Adding 4 hours to the start date for a 4-hour subscription
                 //     .endOf("hour");
                 // }
-
                 // if (end_date) {
                 //   start_date = startDate.format("DD-MM-YYYY HH:mm:ss"); // Format including hours, minutes, and seconds
                 //   end_date = end_date.format("DD-MM-YYYY HH:mm:ss"); // Format including hours, minutes, and seconds
@@ -394,7 +392,7 @@ exports.getClubAuth = asyncHandler(async (req, res, next) => {
                       club_location: club.location,
                       // start_date: `${sub.start_date.getDate()}-${sub.start_date.getMonth() + 1}-${sub.start_date.getFullYear()}`,
                       // end_date: `${sub.end_date.getDate()}-${sub.end_date.getMonth() + 1}-${sub.end_date.getFullYear()}`,
-                      start_date:sub.start_date,
+                      start_date: sub.start_date,
                       end_date: sub.end_date,
                       subscription_id: sub.subscription.id,
                       subscription_name: sub.subscription.name,
@@ -417,12 +415,7 @@ exports.getClubAuth = asyncHandler(async (req, res, next) => {
                       username: (await User.findById(id)).username,
                       club_name: club.name,
                       club_location: club.location,
-                      start_date: `${sub.start_date.getDate()}-${
-                        sub.start_date.getMonth() + 1
-                      }-${sub.start_date.getFullYear()}`,
-                      end_date: `${sub.end_date.getDate()}-${
-                        sub.end_date.getMonth() + 1
-                      }-${sub.end_date.getFullYear()}`,
+
                       subscription_id: sub.subscription.id,
 
                       subscription_name: sub.subscription.name,
@@ -837,35 +830,28 @@ exports.checkPayment = asyncHandler(async (req, res, next) => {
               // New condition for hourly subscription
               end_date = moment(start_date).add(4, "hours");
             }
-            // end_date =
-            //   subscription.type === "يومي"
-            //     ? end_date.setDate(end_date.getDate() + 1)
-            //     : subscription.type === "اسبوعي"
-            //     ? end_date.setDate(end_date.getDate() + 7)
-            //     : subscription.type === "شهري"
-            //     ? end_date.setMonth(end_date.getMonth() + 1)
-            //     : subscription.type === "سنوي" &&
-            //       end_date.setFullYear(end_date.getFullYear() + 1);
-
-            // if (subscription.type === "يومي") {
-            //   end_date.setDate(end_date.getDate() + 1);
-            // } else if (subscription.type === "اسبوعي") {
-            //   end_date.setDate(end_date.getDate() + 7);
-            // } else if (subscription.type === "شهري") {
-            //   end_date.setMonth(end_date.getMonth() + 1);
-            // } else if (subscription.type === "سنوي") {
-            //   end_date.setFullYear(end_date.getFullYear() + 1);
-            // } else if (subscription.type === "ساعه") {
-            //   end_date.setHours(end_date.getHours() + 4);
-            // }
-            // / Adding 4 hours to the start date for a 4-hour subscription
             const club = await Club.findById(subscription.club);
             if (!club) return next(new ApiError("Can't find club", 404));
             if (club.sports.length == 1 && !club.sports[0] == "بادل") {
-              (end_date = subscription.endData),
-                (start_date = subscription.startData);
+              let end_date = moment(subscription.endData).endOf("hour");
+            let  start_date = moment(subscription.startData).startOf("hour");
               subscription.gymsCount--;
-            await  subscription.save();
+              await subscription.save();
+              userSub
+              .create({
+                user: userId,
+                club: subscription.club,
+                subscription: subscription._id,
+                start_date,
+                end_date,
+                code: userData.code,
+              })
+              .then(() =>
+                res.status(200).json({
+                  status: "success",
+                })
+              ); 
+              return
             }
             userSub
               .create({
@@ -1760,7 +1746,6 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
 
   // Retrieve the club associated with the subscription
 
-
   // Add deduction operation to the user's operations array
   userData.operations.push({
     operationKind: "خصم",
@@ -1773,8 +1758,8 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
   await userData.save();
   if (!club) return next(new ApiError("Can't find club", 404));
   if (club.sports.length == 1 && !club.sports[0] == "بادل") {
-    end_date = subscription.endData
-     start_date = subscription.startData
+    end_date = moment(subscription.endData).endOf("hour");
+    start_date = moment(subscription.startData).startOf("hour");
     subscription.gymsCount--;
     await subscription.save();
   }
