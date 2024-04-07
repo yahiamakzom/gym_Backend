@@ -543,29 +543,8 @@ exports.renewClubByWallet = asyncHandler(async (req, res, next) => {
         if (user.wallet < subscription.price * 3.75)
           return next(new ApiError("Your Balance in Wallet Not Enough", 400));
         else {
-          const start_date = new Date(Date.now());
+          const start_date = moment().startOf("hour");
           let end_date;
-          // end_date =
-          //   subscription.type === "يومي"
-          //     ? end_date.setDate(end_date.getDate() + 1)
-          //     : subscription.type === "اسبوعي"
-          //     ? end_date.setDate(end_date.getDate() + 7)
-          //     : subscription.type === "شهري"
-          //     ? end_date.setMonth(end_date.getMonth() + 1)
-          //     : subscription.type === "سنوي" &&
-          //       end_date.setFullYear(end_date.getFullYear() + 1);
-
-          // if (subscription.type === "يومي") {
-          //   end_date.setDate(end_date.getDate() + 1);
-          // } else if (subscription.type === "اسبوعي") {
-          //   end_date.setDate(end_date.getDate() + 7);
-          // } else if (subscription.type === "شهري") {
-          //   end_date.setMonth(end_date.getMonth() + 1);
-          // } else if (subscription.type === "سنوي") {
-          //   end_date.setFullYear(end_date.getFullYear() + 1);
-          // } else if (subscription.type === "ساعه") {
-          //   end_date.setHours(end_date.getHours() + 4);
-          // }
           const numberType = subscription.numberType;
           const type = subscription.type;
           if (type === "شهري") {
@@ -595,6 +574,13 @@ exports.renewClubByWallet = asyncHandler(async (req, res, next) => {
                   404
                 )
               );
+            const club = await Club.findById(subscription.club);
+            if (club.sports.length == 1 && !club.sports[0] == "بادل") {
+              (end_date = subscription.endData),
+                (start_date = subscription.startData);
+              subscription.gymsCount--;
+              await subscription.save();
+            }
             await userSub
               .findByIdAndUpdate(
                 userSubId,
@@ -878,14 +864,14 @@ exports.checkPayment = asyncHandler(async (req, res, next) => {
             if (club.sports.length == 1 && !club.sports[0] == "بادل") {
               (end_date = subscription.endData),
                 (start_date = subscription.startData);
-                subscription.gymsCount--;
-                subscription.save();
+              subscription.gymsCount--;
+              subscription.save();
             }
             userSub
               .create({
                 user: userId,
                 club: subscription.club,
-                subscription,
+                subscription: subscription._id,
                 start_date,
                 end_date,
                 code: userData.code,
@@ -1779,7 +1765,6 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
     (end_date = subscription.endData), (start_date = subscription.startData);
     subscription.gymsCount--;
     await subscription.save();
-  
   }
   // Add deduction operation to the user's operations array
   userData.operations.push({
@@ -1792,11 +1777,11 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
 
   await userData.save();
 
-  userSub
+  await userSub
     .create({
       user: id,
       club: subscription.club,
-      subscription,
+      subscription: subscription._id,
       start_date,
       end_date,
       code: userData.code,
