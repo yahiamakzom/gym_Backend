@@ -1734,6 +1734,7 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
 
   let end_date;
   const numberType = subscription.numberType;
+  const type = subscription.type
   if (type === "شهري") {
     end_date = moment(start_date).add(numberType, "months").endOf("hour");
   } else if (type === "سنوي") {
@@ -1747,9 +1748,6 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
     end_date = moment(start_date).add(4, "hours");
   }
 
-  // Retrieve the club associated with the subscription
-
-  // Add deduction operation to the user's operations array
   userData.operations.push({
     operationKind: "خصم",
     operationQuantity: price,
