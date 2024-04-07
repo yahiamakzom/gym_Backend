@@ -862,7 +862,7 @@ exports.checkPayment = asyncHandler(async (req, res, next) => {
                 club: subscription.club,
                 subscription: subscription._id,
                 start_date,
-                end_date,
+                end_date:Date.now(),
                 code: userData.code,
               })
               .then(() =>
