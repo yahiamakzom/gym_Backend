@@ -833,7 +833,10 @@ exports.checkPayment = asyncHandler(async (req, res, next) => {
             }
             const club = await Club.findById(subscription.club);
             if (!club) return next(new ApiError("Can't find club", 404));
-            if (club.sports.length == 1 && club.sports[0].trim() == "بادل") {
+
+
+
+            // if (club.sports.length == 1 && club.sports[0].trim() === "بادل") {
               let end_dateSub = moment(subscription.endData);
               let start_dateSub = moment(subscription.startData);
               subscription.gymsCount--;
@@ -856,21 +859,21 @@ exports.checkPayment = asyncHandler(async (req, res, next) => {
                 );
               return;
             }
-            userSub
-              .create({
-                user: userId,
-                club: subscription.club,
-                subscription: subscription._id,
-                start_date,
-                end_date:Date.now(),
-                code: userData.code,
-              })
-              .then(() =>
-                res.status(200).json({
-                  status: "success",
-                })
-              );
-          }
+            // userSub
+            //   .create({
+            //     user: userId,
+            //     club: subscription.club,
+            //     subscription: subscription._id,
+            //     start_date,
+            //     end_date,
+            //     code: userData.code,
+            //   })
+            //   .then(() =>
+            //     res.status(200).json({
+            //       status: "success",
+            //     })
+            //   );
+          // }
         );
       } else {
         res.status(422).json({
