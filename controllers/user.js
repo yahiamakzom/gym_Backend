@@ -331,7 +331,7 @@ exports.getClubAuth = asyncHandler(async (req, res, next) => {
           .then(async (sub) => {
             if (lat && long) {
               // let start_date, end_date;
-console.log(sub);
+              console.log(sub);
               if (sub && sub.subscription) {
                 // const { type, numberType } = sub.subscription;
                 // const startDate = moment().startOf("hour"); // Start of the current hour
@@ -833,27 +833,29 @@ exports.checkPayment = asyncHandler(async (req, res, next) => {
             const club = await Club.findById(subscription.club);
             if (!club) return next(new ApiError("Can't find club", 404));
             if (club.sports.length == 1 && !club.sports[0] == "بادل") {
-              let end_date = moment(subscription.startData).endOf("hour");
-            let  start_date = moment(subscription.startData).startOf("hour");
+              let end_dateSub = moment(subscription.startData).endOf("hour");
+              let start_dateSub = moment(subscription.startData).startOf(
+                "hour"
+              );
               subscription.gymsCount--;
               await subscription.save();
               await userSub
-              .create({
-                user: userId,
-                club: subscription.club,
-                subscription: subscription._id,
-                end_date:end_date,
-                start_date,
-              
-                code: userData.code,
-              })
-              .then((s) =>
-                res.status(200).json({
-                  status: "success", 
-                  data:s
+                .create({
+                  user: userId,
+                  club: subscription.club,
+                  subscription: subscription._id,
+                  end_date: end_dateSub,
+                  start_date: start_dateSub,
+
+                  code: userData.code,
                 })
-              ); 
-              return
+                .then((s) =>
+                  res.status(200).json({
+                    status: "success",
+                    data: s,
+                  })
+                );
+              return;
             }
             userSub
               .create({
