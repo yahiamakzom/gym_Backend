@@ -49,7 +49,10 @@ exports.addSubscreptions = asyncHandler(async (req, res, next) => {
     return next(new ApiError("Subscription found with this name", 403));
   }
 
-  if (club.club.sports.length === 1 && club.club.sports[0] === "بادل") {
+  if (
+    (club.club.sports.length === 1 && club.club.sports[0] === "بادل") ||
+  ( club.club.sports.length === 1 && club.club.sports[0] === "الأنشطة الأخرى")
+  ) {
     let clubOpen = club.club.from;
     let clubStop = club.club.to;
     const isAllDay = club.club.allDay;
