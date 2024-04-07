@@ -330,7 +330,7 @@ exports.getClubAuth = asyncHandler(async (req, res, next) => {
           })
           .then(async (sub) => {
             if (lat && long) {
-              let start_date, end_date;
+              // let start_date, end_date;
 
               if (sub && sub.subscription) {
                 // const { type, numberType } = sub.subscription;
@@ -394,8 +394,8 @@ exports.getClubAuth = asyncHandler(async (req, res, next) => {
                       club_location: club.location,
                       // start_date: `${sub.start_date.getDate()}-${sub.start_date.getMonth() + 1}-${sub.start_date.getFullYear()}`,
                       // end_date: `${sub.end_date.getDate()}-${sub.end_date.getMonth() + 1}-${sub.end_date.getFullYear()}`,
-                      start_date:sub.start_date.getDate(),
-                      end_date: sub.end_date.getDate(),
+                      start_date:sub.start_date,
+                      end_date: sub.end_date,
                       subscription_id: sub.subscription.id,
                       subscription_name: sub.subscription.name,
                       subscription_price: sub.subscription.price,
