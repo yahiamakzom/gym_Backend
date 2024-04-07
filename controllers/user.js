@@ -1760,12 +1760,7 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
 
   // Retrieve the club associated with the subscription
 
-  if (!club) return next(new ApiError("Can't find club", 404));
-  if (club.sports.length == 1 && !club.sports[0] == "بادل") {
-    (end_date = subscription.endData), (start_date = subscription.startData);
-    subscription.gymsCount--;
-    await subscription.save();
-  }
+
   // Add deduction operation to the user's operations array
   userData.operations.push({
     operationKind: "خصم",
@@ -1776,7 +1771,13 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
   });
 
   await userData.save();
-
+  if (!club) return next(new ApiError("Can't find club", 404));
+  if (club.sports.length == 1 && !club.sports[0] == "بادل") {
+    end_date = subscription.endData
+     start_date = subscription.startData
+    subscription.gymsCount--;
+    await subscription.save();
+  }
   await userSub
     .create({
       user: id,
