@@ -48,10 +48,7 @@ module.exports = mongoose.model(
 
       startData: Date,
       endData: Date,
-      isGymsCountEnd:{ 
-        type :Boolean ,
-        default: false,
-      } ,
+  
     },
     { timestamps: true }
   )

@@ -1672,18 +1672,18 @@ exports.getOpinnion = asyncHandler(async (req, res, next) => {
   return res.json(opinion);
 });
 
-exports.walletDeposit = asyncHandler(async (req, res, next) => {
-  const { amount } = req.body;
-  const { id } = req.user;
-  const userData = await User.findById(id);
-  // check if user not found
-  if (!userData) return next(new ApiError("User Not Found", 404));
+// exports.walletDeposit = asyncHandler(async (req, res, next) => {
+//   const { amount } = req.body;
+//   const { id } = req.user;
+//   const userData = await User.findById(id);
+//   // check if user not found
+//   if (!userData) return next(new ApiError("User Not Found", 404));
 
-  // we add the amount to the user wallet
-  userData.wallet += Number(amount);
-  await userData.save();
-  res.sendStatus(200);
-});
+//   // we add the amount to the user wallet
+//   userData.wallet += Number(amount);
+//   await userData.save();
+//   res.sendStatus(200);
+// });
 
 exports.walletDeposit = asyncHandler(async (req, res, next) => {
   const { amount, brand } = req.body;
@@ -1726,49 +1726,7 @@ exports.walletDiscountSubscription = asyncHandler(async (req, res, next) => {
   res.status(200).json({ message: "Discount successful" });
 });
 
-// exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
-//   const { subId, brand, price } = req.body;
-//   const { id } = req.user;
-//   const userData = await User.findById(id);
-//   const subscription = await Subscriptions.findById(subId);
-//   console.log(subId);
-//   if (!subscription) return next(new ApiError("Can't find subscription", 404));
-//   const start_date = new Date(Date.now());
-//   let end_date = new Date(Date.now());
 
-//   if (subscription.type === "يومي") {
-//     end_date.setDate(end_date.getDate() + 1);
-//   } else if (subscription.type === "اسبوعي") {
-//     end_date.setDate(end_date.getDate() + 7);
-//   } else if (subscription.type === "شهري") {
-//     end_date.setMonth(end_date.getMonth() + 1);
-//   } else if (subscription.type === "سنوي") {
-//     end_date.setFullYear(end_date.getFullYear() + 1);
-//   } else if (subscription.type === "ساعه") {
-//     end_date.setHours(end_date.getHours() + 4);
-//   }
-
-//   // track user operations
-
-//   userData.operations.push({
-//     operationKind: "خصم",
-//     operationQuantity: price,
-//     paymentKind: brand,
-//   });
-
-//   await userData.save();
-
-//   userSub
-//     .create({
-//       user: id,
-//       club: subscription.club,
-//       subscription,
-//       start_date,
-//       end_date,
-//       code: userData.code,
-//     })
-//     .then(() => res.status(200).send("Payment successful"));
-// });
 
 exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
   const { subId, brand, price } = req.body;
@@ -1778,9 +1736,10 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
   if (!userData) return next(new ApiError("User Not Found", 404));
 
   const subscription = await Subscriptions.findById(subId);
+  const club = await Club.findById(subscription.club);
   if (!subscription) return next(new ApiError("Can't find subscription", 404));
 
-  const start_date = usersub.start_date;
+  const start_date = moment().startOf("hour")
 
     let end_date;
     const numberType = subscription.numberType;
@@ -1800,9 +1759,12 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
     } 
 
   // Retrieve the club associated with the subscription
-  const club = await Club.findById(subscription.club);
-  if (!club) return next(new ApiError("Can't find club", 404));
 
+  if (!club) return next(new ApiError("Can't find club", 404));
+ if(club.sports.length ==1 && !club.sports[0] =='بادل'){
+   end_date =subscription.endData ,
+   start_date =subscription.startData
+ }
   // Add deduction operation to the user's operations array
   userData.operations.push({
     operationKind: "خصم",
