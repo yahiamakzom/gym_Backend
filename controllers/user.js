@@ -1778,7 +1778,8 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
   if (club.sports.length == 1 && !club.sports[0] == "بادل") {
     (end_date = subscription.endData), (start_date = subscription.startData);
     subscription.gymsCount--;
-    subscription.save();
+    await subscription.save();
+  
   }
   // Add deduction operation to the user's operations array
   userData.operations.push({
