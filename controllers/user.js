@@ -1730,7 +1730,7 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
   const club = await Club.findById(subscription.club);
   if (!subscription) return next(new ApiError("Can't find subscription", 404));
 
-  const start_date = moment().startOf("hour");
+  let start_date = moment().startOf("hour");
 
   let end_date;
   const numberType = subscription.numberType;
