@@ -326,12 +326,13 @@ exports.getClubAuth = asyncHandler(async (req, res, next) => {
           .findOne({ club: club_id, user: id, expired: false })
           .populate({
             path: "subscription",
-            select: "name price type numberType",
+            select: "name price type numberType freezeCountTime freezeTime gymsCount endData startData",
           })
           .then(async (sub) => {
             if (lat && long) {
               // let start_date, end_date;
               console.log(sub);
+              console.log(sub.subscription)
               if (sub && sub.subscription) {
                 // const { type, numberType } = sub.subscription;
                 // const startDate = moment().startOf("hour"); // Start of the current hour
@@ -861,7 +862,7 @@ exports.checkPayment = asyncHandler(async (req, res, next) => {
                 club: subscription.club,
                 subscription: subscription._id,
                 start_date,
-                end_date,
+                end_date:Data.now(),
                 code: userData.code,
               })
               .then(() =>
