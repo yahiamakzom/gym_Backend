@@ -878,6 +878,8 @@ exports.checkPayment = asyncHandler(async (req, res, next) => {
             if (club.sports.length == 1 && !club.sports[0] == "بادل") {
               (end_date = subscription.endData),
                 (start_date = subscription.startData);
+                subscription.gymsCount--;
+                subscription.save();
             }
             userSub
               .create({
@@ -1775,6 +1777,8 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
   if (!club) return next(new ApiError("Can't find club", 404));
   if (club.sports.length == 1 && !club.sports[0] == "بادل") {
     (end_date = subscription.endData), (start_date = subscription.startData);
+    subscription.gymsCount--;
+    subscription.save();
   }
   // Add deduction operation to the user's operations array
   userData.operations.push({
