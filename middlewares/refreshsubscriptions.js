@@ -79,9 +79,9 @@ module.exports = expressAsyncHandler(async (req, res, next) => {
           }
         }
         console.log("asdcasd");
-        console.log(tomorrowMorning);
+    
         console.log("sdsd");
-        console.log(moment().isAfter(tomorrowMorning));
+  
         console.log(moment());
       }
     }
