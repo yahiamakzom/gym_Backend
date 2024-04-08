@@ -104,7 +104,7 @@ exports.addSubscreptions = asyncHandler(async (req, res, next) => {
           type,
           startData,
           endData,
-          gymsCount,
+          gymsCount: gymsCount,
           gymsCountFixed: gymsCount,
         });
         subs.push(sub);
