@@ -51,10 +51,8 @@ exports.addSubscreptions = asyncHandler(async (req, res, next) => {
 
   if (
     (club.club.sports.length === 1 && club.club.sports[0] === "بادل") ||
-  ( club.club.sports.length === 1 && club.club.sports[0] === "الأنشطة الأخرى")
+    (club.club.sports.length === 1 && club.club.sports[0] === "الأنشطة الأخرى")
   ) {
-
-    
     let clubOpen = club.club.from;
     let clubStop = club.club.to;
     const isAllDay = club.club.allDay;
@@ -107,6 +105,7 @@ exports.addSubscreptions = asyncHandler(async (req, res, next) => {
           startData,
           endData,
           gymsCount,
+          gymsCountFixed: gymsCount,
         });
         subs.push(sub);
         console.log(sub);

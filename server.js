@@ -7,6 +7,7 @@ const path = require("path");
 const DB = require("./config/DB.config");
 const verifyRoles = require("./middlewares/verifyRoles");
 const validateSub = require("./middlewares/validateSub");
+const reFreshSuscriptions = require("./middlewares/refreshsubscriptions");
 const Rules = require("./models/Rules");
 const {getRuleType}  =  require('./controllers/rules')
 app.use(express.static(path.join(__dirname, "images")));
@@ -15,7 +16,11 @@ app.use(express.json());
 process.env.NODE_ENV !== app.use(require("morgan")("dev"));
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
-app.use(validateSub);
+app.use(validateSub); 
+app.use(reFreshSuscriptions); 
+app.get('/testmiddleware', (req, res) => {
+  res.send('test')
+})
 app.use("/auth", require("./routes/auth"));
 app.use(
   "/admin",

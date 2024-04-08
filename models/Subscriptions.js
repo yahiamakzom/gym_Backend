@@ -45,7 +45,10 @@ module.exports = mongoose.model(
         type: Number,
         default: 0,
       }, 
-
+      gymsCountFixed: {
+        type: Number,
+        default: 0,
+      }, 
       startData: Date,
       endData: Date,
   

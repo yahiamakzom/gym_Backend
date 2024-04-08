@@ -415,6 +415,7 @@ exports.deleteClub = asyncHandler(async (req, res, next) => {
     if (!club) return next(new ApiError("Club Not Found", 404));
     await Club.findByIdAndDelete(club.id).then(async () => {
       await Subscriptions.deleteMany({ club: req.params.club_id });
+      await userSub.deleteMany({ club: req.params.club_id });
       await User.findOneAndDelete({ club: req.params.club_id }).then(() =>
         res.sendStatus(200)
       );
