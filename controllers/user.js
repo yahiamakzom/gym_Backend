@@ -1763,7 +1763,7 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
   } else if (type === "يومي") {
     end_date = moment(start_date).add(numberType, "days").endOf("hour");
   } else if (type === "ساعه") {
-    // New condition for hourly subscription
+  
     end_date = moment(start_date).add(4, "hours");
   }
 

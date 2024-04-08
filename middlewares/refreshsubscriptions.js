@@ -43,15 +43,18 @@ module.exports = expressAsyncHandler(async (req, res, next) => {
             }
 
             console.log("sdcsdvs");
-        
-            // Now you can compare the formatted dates
+           console.log(formattedCurrentDate)
+           console.log(formattedEndDate)
+           console.log(subscription)
+            
           }
         } else {
           console.log(moment().isAfter(moment(club.to, "HH:mm")));
           console.log("not end");
         }
       } else {
-        const tomorrowMorning = moment().startOf("day").hour(7);
+        const tomorrowMorning = moment().startOf("day").hour(7).add(1, 'days');
+
 
         if (moment().isAfter(tomorrowMorning)) {
           for (const subscription of clubSubscriptions) {
@@ -73,11 +76,14 @@ module.exports = expressAsyncHandler(async (req, res, next) => {
               await subscription.save();
               console.log(subscription);
             }
-            console.log(moment());
-            console.log(subscription.endData);
-            console.log(subscription);
+            
           }
-        }
+        } 
+        console.log('asdcasd');
+        console.log(tomorrowMorning);
+        console.log('sdsd')
+        console.log(moment().isAfter(tomorrowMorning));
+        console.log(moment());
       }
     }
 
