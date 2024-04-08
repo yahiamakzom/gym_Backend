@@ -848,11 +848,16 @@ exports.checkPayment = asyncHandler(async (req, res, next) => {
                 const allClubSubscriptions = await Subscriptions.find({
                   club: club._id,
                 });
-          
+
                 for (const sub of allClubSubscriptions) {
-                  if (moment(sub.endData).isBefore(subscription.endData)) {
+                  // Check if sub.endData is before subscription.endData OR sub.StartData is the same as subscription.startData
+                  if (
+                    (moment(sub.endData).isBefore(subscription.endData) ||
+                      moment(sub.endData).isSame(subscription.endData)) &&
+                    (moment(sub.startData).isSame(subscription.startData) ||
+                      moment(sub.startData).isAfter(subscription.startData))
+                  ) {
                     sub.gymsCount = 0;
-          
                     await sub.save();
                   }
                 }
@@ -1763,7 +1768,6 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
   } else if (type === "يومي") {
     end_date = moment(start_date).add(numberType, "days").endOf("hour");
   } else if (type === "ساعه") {
-  
     end_date = moment(start_date).add(4, "hours");
   }
 
@@ -1790,9 +1794,14 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
       });
 
       for (const sub of allClubSubscriptions) {
-        if (moment(sub.endData).isBefore(subscription.endData)) {
+        // Check if sub.endData is before subscription.endData OR sub.StartData is the same as subscription.startData
+        if (
+          (moment(sub.endData).isBefore(subscription.endData) ||
+            moment(sub.endData).isSame(subscription.endData)) &&
+          (moment(sub.startData).isSame(subscription.startData) ||
+            moment(sub.startData).isAfter(subscription.startData))
+        ) {
           sub.gymsCount = 0;
-
           await sub.save();
         }
       }

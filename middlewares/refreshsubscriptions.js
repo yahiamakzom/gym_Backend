@@ -23,9 +23,9 @@ module.exports = expressAsyncHandler(async (req, res, next) => {
       if (club.to && club.from && moment(club.to, "HH:mm", true).isValid()) {
         if (moment().isAfter(moment(club.to, "HH:mm"))) {
           for (const subscription of clubSubscriptions) {
-            const formattedEndDate = moment.utc(subscription.endData).format(
-              "YYYY-MM-DD HH:mm:ss"
-            );
+            const formattedEndDate = moment
+              .utc(subscription.endData)
+              .format("YYYY-MM-DD HH:mm:ss");
             const formattedCurrentDate = moment().format("YYYY-MM-DD HH:mm:ss");
             const isAfterEndDate = moment(formattedCurrentDate).isAfter(
               moment(formattedEndDate)
@@ -43,24 +43,23 @@ module.exports = expressAsyncHandler(async (req, res, next) => {
             }
 
             console.log("sdcsdvs");
-           console.log(formattedCurrentDate)
-           console.log(formattedEndDate)
-           console.log(subscription)
-            
+            console.log(formattedCurrentDate);
+            console.log(formattedEndDate);
+            console.log(subscription);
           }
         } else {
           console.log(moment().isAfter(moment(club.to, "HH:mm")));
           console.log("not end");
         }
       } else {
-        const tomorrowMorning = moment().startOf("day").hour(7).add(1, 'days');
+        const startOfDay = now.startOf("day");
+        const now = moment();
 
-
-        if (moment().isAfter(tomorrowMorning)) {
+        if (now.isSame(startOfDay)) {
           for (const subscription of clubSubscriptions) {
-            const formattedEndDate = moment.utc(subscription.endData).format(
-              "YYYY-MM-DD HH:mm:ss"
-            );
+            const formattedEndDate = moment
+              .utc(subscription.endData)
+              .format("YYYY-MM-DD HH:mm:ss");
             const formattedCurrentDate = moment().format("YYYY-MM-DD HH:mm:ss");
             const isAfterEndDate = moment(formattedCurrentDate).isAfter(
               moment(formattedEndDate)
@@ -76,12 +75,11 @@ module.exports = expressAsyncHandler(async (req, res, next) => {
               await subscription.save();
               console.log(subscription);
             }
-            
           }
-        } 
-        console.log('asdcasd');
+        }
+        console.log("asdcasd");
         console.log(tomorrowMorning);
-        console.log('sdsd')
+        console.log("sdsd");
         console.log(moment().isAfter(tomorrowMorning));
         console.log(moment());
       }
