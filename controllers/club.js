@@ -92,10 +92,14 @@ exports.addSubscreptions = asyncHandler(async (req, res, next) => {
     try {
       for (let i = 0; i < numberOfSubscriptions; i++) {
         let startData = moment(clubOpenTime).toDate(); // Convert to Date object
-        startData.setHours(startData.getHours() + i * subscriptionDuration);
+        startData.setTime(
+          startData.getTime() + i * subscriptionDuration * 60 * 60 * 1000
+        );
 
         let endData = moment(clubOpenTime).toDate(); // Convert to Date object
-        endData.setHours(endData.getHours() + (i + 1) * subscriptionDuration);
+        endData.setTime(
+          endData.getTime() + (i + 1) * subscriptionDuration * 60 * 60 * 1000
+        );
 
         const sub = await Subscriptions.create({
           club: club.club,
