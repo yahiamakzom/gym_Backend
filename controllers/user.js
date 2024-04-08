@@ -1794,7 +1794,6 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
       });
 
       for (const sub of allClubSubscriptions) {
-        // Check if sub.endData is before subscription.endData OR sub.StartData is the same as subscription.startData
         if (
           (moment(sub.endData).isBefore(subscription.endData) ||
             moment(sub.endData).isSame(subscription.endData)) &&
