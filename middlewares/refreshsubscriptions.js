@@ -52,8 +52,9 @@ module.exports = expressAsyncHandler(async (req, res, next) => {
           console.log("not end");
         }
       } else {
-        const startOfDay = now.startOf("day");
         const now = moment();
+        const startOfDay = now.startOf("day");
+      
 
         if (now.isSame(startOfDay)) {
           for (const subscription of clubSubscriptions) {
