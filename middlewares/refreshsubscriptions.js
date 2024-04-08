@@ -1,22 +1,88 @@
 const expressAsyncHandler = require("express-async-handler");
-const Subscription = require("../models/Subscriptions"); // Import the Subscription model
+const Subscription = require("../models/Subscriptions");
 const Club = require("../models/Club");
+const moment = require("moment");
+
 module.exports = expressAsyncHandler(async (req, res, next) => {
-  const subscriptionTypes = ["90Minutes", "30Minutes", "60Minutes"];
+  try {
+    const subscriptionTypes = ["90Minutes", "30Minutes", "60Minutes"];
+    const subscriptions = await Subscription.find({
+      type: { $in: subscriptionTypes },
+    });
+    const clubIds = [
+      ...new Set(subscriptions.map((subscription) => subscription.club)),
+    ];
+    const clubs = await Club.find({
+      _id: { $in: clubIds },
+    });
 
-  const subscriptions = await Subscription.find({
-    type: { $in: subscriptionTypes },
-  });
+    for (const club of clubs) {
+      const clubSubscriptions = subscriptions.filter(
+        (subscription) => subscription.club.toString() === club._id.toString()
+      );
+      if (club.to && club.from && moment(club.to, "HH:mm", true).isValid()) {
+        if (moment().isAfter(moment(club.to, "HH:mm"))) {
+          for (const subscription of clubSubscriptions) {
+            const formattedEndDate = moment.utc(subscription.endData).format(
+              "YYYY-MM-DD HH:mm:ss"
+            );
+            const formattedCurrentDate = moment().format("YYYY-MM-DD HH:mm:ss");
+            const isAfterEndDate = moment(formattedCurrentDate).isAfter(
+              moment(formattedEndDate)
+            );
+            if (isAfterEndDate) {
+              // Perform desired operations
+              subscription.endData = moment(subscription.endData).add(1, "day");
+              subscription.startData = moment(subscription.startData).add(
+                1,
+                "day"
+              );
+              subscription.gymsCount = subscription.gymsCountFixed;
+              await subscription.save();
+              console.log(subscription);
+            }
 
-  const clubIds = subscriptions.map((subscription) => subscription.club);
+            console.log("sdcsdvs");
+        
+            // Now you can compare the formatted dates
+          }
+        } else {
+          console.log(moment().isAfter(moment(club.to, "HH:mm")));
+          console.log("not end");
+        }
+      } else {
+        const tomorrowMorning = moment().startOf("day").hour(7);
 
-  const clubs = await Club.find({ _id: { $in: clubIds } });
+        if (moment().isAfter(tomorrowMorning)) {
+          for (const subscription of clubSubscriptions) {
+            const formattedEndDate = moment.utc(subscription.endData).format(
+              "YYYY-MM-DD HH:mm:ss"
+            );
+            const formattedCurrentDate = moment().format("YYYY-MM-DD HH:mm:ss");
+            const isAfterEndDate = moment(formattedCurrentDate).isAfter(
+              moment(formattedEndDate)
+            );
+            if (isAfterEndDate) {
+              // Perform desired operations
+              subscription.endData = moment(subscription.endData).add(1, "day");
+              subscription.startData = moment(subscription.startData).add(
+                1,
+                "day"
+              );
+              subscription.gymsCount = subscription.gymsCountFixed;
+              await subscription.save();
+              console.log(subscription);
+            }
+            console.log(moment());
+            console.log(subscription.endData);
+            console.log(subscription);
+          }
+        }
+      }
+    }
 
-  console.log(
-    "Clubs with subscriptions of types '90Minutes', '30Minutes', or '60Minutes':"
-  );
-  console.log(clubs);
-  console.log(subscriptions);
-
-  next();
+    next();
+  } catch (error) {
+    next(error);
+  }
 });

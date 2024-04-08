@@ -326,13 +326,14 @@ exports.getClubAuth = asyncHandler(async (req, res, next) => {
           .findOne({ club: club_id, user: id, expired: false })
           .populate({
             path: "subscription",
-            select: "name price type numberType freezeCountTime freezeTime gymsCount endData startData",
+            select:
+              "name price type numberType freezeCountTime freezeTime gymsCount endData startData",
           })
           .then(async (sub) => {
             if (lat && long) {
               // let start_date, end_date;
               console.log(sub);
-              console.log(sub.subscription)
+              console.log(sub.subscription);
               if (sub && sub.subscription) {
                 // const { type, numberType } = sub.subscription;
                 // const startDate = moment().startOf("hour"); // Start of the current hour
@@ -833,11 +834,29 @@ exports.checkPayment = asyncHandler(async (req, res, next) => {
             }
             const club = await Club.findById(subscription.club);
             if (!club) return next(new ApiError("Can't find club", 404));
-            if (type === '90Minutes' || type === '30Minutes' || type === '60Minutes') {
+            if (
+              type === "90Minutes" ||
+              type === "30Minutes" ||
+              type === "60Minutes"
+            ) {
               let end_dateSub = moment(subscription.endData);
               let start_dateSub = moment(subscription.startData);
               subscription.gymsCount--;
               await subscription.save();
+              if (subscription.gymsCount <= 0) {
+                // Find all subscriptions that contain the same club ID
+                const allClubSubscriptions = await Subscriptions.find({
+                  club: club._id,
+                });
+          
+                for (const sub of allClubSubscriptions) {
+                  if (moment(sub.endData).isBefore(subscription.endData)) {
+                    sub.gymsCount = 0;
+          
+                    await sub.save();
+                  }
+                }
+              }
               await userSub
                 .create({
                   user: userId,
@@ -1734,7 +1753,7 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
 
   let end_date;
   const numberType = subscription.numberType;
-  const type = subscription.type
+  const type = subscription.type;
   if (type === "شهري") {
     end_date = moment(start_date).add(numberType, "months").endOf("hour");
   } else if (type === "سنوي") {
@@ -1758,12 +1777,26 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
 
   await userData.save();
   if (!club) return next(new ApiError("Can't find club", 404));
-  if (type === '90Minutes' || type === '30Minutes' || type === '60Minutes') {
-    end_date = moment(subscription.endData)
-    start_date = moment(subscription.startData)
+  if (type === "90Minutes" || type === "30Minutes" || type === "60Minutes") {
+    end_date = moment(subscription.endData);
+    start_date = moment(subscription.startData);
+
     subscription.gymsCount--;
-    await subscription.save(); 
-    
+    await subscription.save();
+    if (subscription.gymsCount <= 0) {
+      // Find all subscriptions that contain the same club ID
+      const allClubSubscriptions = await Subscriptions.find({
+        club: club._id,
+      });
+
+      for (const sub of allClubSubscriptions) {
+        if (moment(sub.endData).isBefore(subscription.endData)) {
+          sub.gymsCount = 0;
+
+          await sub.save();
+        }
+      }
+    }
   }
   await userSub
     .create({
