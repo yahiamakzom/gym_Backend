@@ -66,7 +66,7 @@ exports.addSubscreptions = asyncHandler(async (req, res, next) => {
     if (isAllDay) {
       totalHours = 24;
 
-      clubOpenTime = moment().set({ hour: 7, minute: 0, second: 0 }); // Set clubOpenTime to 7:00 AM today
+      clubOpenTime = moment().set({ hour: 12, minute: 0, second: 0 }); // Set clubOpenTime to 7:00 AM today
       clubStopTime = moment(clubOpenTime).add(1, "day");
     }
     console.log("Duration in hours:", totalHours);
