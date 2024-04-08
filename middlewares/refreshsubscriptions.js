@@ -66,7 +66,7 @@ module.exports = expressAsyncHandler(async (req, res, next) => {
               moment(formattedEndDate)
             );
             if (isAfterEndDate) {
-              // Perform desired operations
+            
               subscription.endData = moment(subscription.endData).add(1, "day");
               subscription.startData = moment(subscription.startData).add(
                 1,
