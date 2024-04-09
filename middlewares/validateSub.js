@@ -19,16 +19,21 @@
 // });
 const expressAsyncHandler = require("express-async-handler");
 const userSub = require("../models/userSub");
-const moment = require("moment"); 
+const moment = require("moment");
 
 module.exports = expressAsyncHandler(async (req, res, next) => {
   await userSub.find({ expired: false }).then(async (subs) => {
     if (subs.length) {
       subs.forEach(async (sub) => {
-        const end_date = moment(sub.end_date).endOf("minute");
-        const freezenDate = sub.freezenDate ? moment(sub.freezenDate) : moment();
-        const now = moment();
-
+        const end_date = moment.utc(sub.end_date).endOf("minute");
+        const freezenDate = sub.freezenDate
+          ? moment(sub.freezenDate).utc()
+          : moment().utc;
+        const now = moment().utc();
+        console.log(sub.expired);
+        // console.log(end_date);
+        // console.log(now);
+        // console.log(end_date.isBefore(now));
         if (end_date && end_date.isBefore(now)) {
           await userSub.findByIdAndUpdate(sub.id, { expired: true });
         }
