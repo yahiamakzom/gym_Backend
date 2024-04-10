@@ -18,9 +18,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.use(validateSub); 
 app.use(reFreshSuscriptions); 
-app.get('/testmiddleware', (req, res) => {
-  res.send('test')
-})
 app.use("/auth", require("./routes/auth"));
 app.use(
   "/admin",

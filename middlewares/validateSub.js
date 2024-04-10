@@ -29,11 +29,7 @@ module.exports = expressAsyncHandler(async (req, res, next) => {
         const freezenDate = sub.freezenDate
           ? moment(sub.freezenDate).utc()
           : moment().utc;
-        const now = moment().utc();
-        console.log(sub.expired);
-        // console.log(end_date);
-        // console.log(now);
-        // console.log(end_date.isBefore(now));
+
         if (end_date && end_date.isBefore(now)) {
           await userSub.findByIdAndUpdate(sub.id, { expired: true });
         }
