@@ -24,7 +24,8 @@ const moment = require("moment");
 module.exports = expressAsyncHandler(async (req, res, next) => {
   await userSub.find({ expired: false }).then(async (subs) => {
     if (subs.length) {
-      subs.forEach(async (sub) => {
+      subs.forEach(async (sub) => { 
+        const now = moment.utc();
         const end_date = moment.utc(sub.end_date).endOf("minute");
         const freezenDate = sub.freezenDate
           ? moment(sub.freezenDate).utc()
