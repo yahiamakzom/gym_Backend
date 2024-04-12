@@ -49,6 +49,8 @@ module.exports = expressAsyncHandler(async (req, res, next) => {
       } else {
         console.log(moment().isAfter(moment(club.to, "HH:mm")));
         console.log("not end");
+        console.log(moment(club.to, "HH:mm"));
+        console.log(moment())
       }
     } else {
       const now = moment();
