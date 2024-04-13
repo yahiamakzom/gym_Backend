@@ -52,7 +52,7 @@ module.exports = expressAsyncHandler(async (req, res, next) => {
         console.log(moment(club.to, "HH:mm"));
         console.log(club.to)
   
-        console.log(moment())
+        console.log(moment.utc())
       }
     } else {
       const now = moment();
