@@ -41,15 +41,17 @@ module.exports = expressAsyncHandler(async (req, res, next) => {
             console.log(subscription);
           }
 
-          console.log("sdcsdvs");
+        
           console.log(formattedCurrentDate);
           console.log(formattedEndDate);
           console.log(subscription);
         }
       } else {
         console.log(moment().isAfter(moment(club.to, "HH:mm")));
-        console.log("not end");
+      
         console.log(moment(club.to, "HH:mm"));
+        console.log(club.to)
+  
         console.log(moment())
       }
     } else {
@@ -78,11 +80,8 @@ module.exports = expressAsyncHandler(async (req, res, next) => {
           }
         }
       }
-      console.log("asdcasd");
-
-      console.log("sdsd");
-
-      console.log(moment());
+    
+      
     }
   }
 
