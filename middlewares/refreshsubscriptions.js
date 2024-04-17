@@ -4,7 +4,7 @@ const Club = require("../models/Club");
 const moment = require("moment");
 
 module.exports = expressAsyncHandler(async (req, res, next) => {
-  const subscriptionTypes = ["90Minutes", "30Minutes", "60Minutes"];
+  const subscriptionTypes = ["90Minutes", "30Minutes", "60Minutes" ,"120Minutes"];
   const subscriptions = await Subscription.find({
     type: { $in: subscriptionTypes },
   });

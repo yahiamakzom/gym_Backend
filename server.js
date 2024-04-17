@@ -9,15 +9,19 @@ const verifyRoles = require("./middlewares/verifyRoles");
 const validateSub = require("./middlewares/validateSub");
 const reFreshSuscriptions = require("./middlewares/refreshsubscriptions");
 const Rules = require("./models/Rules");
-const {getRuleType}  =  require('./controllers/rules')
+const { getRuleType } = require("./controllers/rules");
+const { refreshSubscriptions } = require("./helper/refreshSubscriptions");
+
 app.use(express.static(path.join(__dirname, "images")));
 app.use(express.static("public"));
 app.use(express.json());
 process.env.NODE_ENV !== app.use(require("morgan")("dev"));
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
-app.use(validateSub); 
-app.use(reFreshSuscriptions); 
+app.use(validateSub);
+// app.use(reFreshSuscriptions);
+
+// Call the function to schedule subscription refreshing
 app.use("/auth", require("./routes/auth"));
 app.use(
   "/admin",
@@ -27,7 +31,7 @@ app.use(
 app.use("/representative", require("./routes/representative"));
 app.use("/user", require("./routes/user"));
 app.use("/club", verifyRoles("club"), require("./routes/club"));
-app.get("/rule/:type",getRuleType);
+app.get("/rule/:type", getRuleType);
 
 app.use(require("./middlewares/globalError"));
 
@@ -36,11 +40,13 @@ app.use("*", (req, res, next) =>
 );
 
 DB.then((con) => {
-  app.listen(PORT, () =>
+  app.listen(PORT, () => {
+    refreshSubscriptions();
+
     console.log(
       "Listening On   " + PORT + " DB Connect To" + con.connection.host
-    )
-  );
+    );
+  });
 }).catch((err) => {
   throw new Error(
     "Error Happend While Connecting TO DataBase\n" + err.message,

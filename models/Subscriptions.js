@@ -33,6 +33,7 @@ module.exports = mongoose.model(
           "60Minutes",
           "30Minutes",
           "90Minutes",
+          "120Minutes",
         ],
         required: [true, "Please Add a Subscription Date"],
       },
@@ -44,14 +45,13 @@ module.exports = mongoose.model(
       gymsCount: {
         type: Number,
         default: 0,
-      }, 
+      },
       gymsCountFixed: {
         type: Number,
         default: 0,
-      }, 
+      },
       startData: Date,
       endData: Date,
-  
     },
     { timestamps: true }
   )
