@@ -81,6 +81,8 @@ exports.addSubscreptions = asyncHandler(async (req, res, next) => {
       subscriptionDuration = 1; // 60 minutes
     } else if (subscriptionType === "90Minutes") {
       subscriptionDuration = 1.5; // 90 minutes
+    }else{ 
+      subscriptionDuration = 2;
     }
 
     let numberOfSubscriptions = Math.floor(totalHours / subscriptionDuration);
