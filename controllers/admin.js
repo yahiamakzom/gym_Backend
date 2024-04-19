@@ -1076,15 +1076,17 @@ exports.ClubsBankAccount = asyncHandler(async (req, res) => {
   const clubs = await Club.find({});
 
   const clubsWithBankAccount = clubs.map((club) => {
-    return {
-      _id: club._id,
-      name: club.name,
-      bankAccount: club.bankAccount,
-    };
+    if (club.bankAccount) {
+      return {
+        _id: club._id,
+        name: club.name,
+        bankAccount: club.bankAccount,
+      };
+    }
   });
 
   res.status(200).json({
     data: clubsWithBankAccount,
-    succss: true,
+    success: true,
   });
 });
