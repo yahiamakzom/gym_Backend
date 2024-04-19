@@ -1075,21 +1075,29 @@ exports.adminCoupon = asyncHandler(async (req, res) => {
 exports.ClubsBankAccount = asyncHandler(async (req, res) => {
   const clubs = await Club.find({});
 
-  const clubsWithBankAccount = clubs.filter((club) => {
+  const clubsWithBankAccount  =[]
+  
+  clubs.forEach((club) => {
     if (
       club.bankAccount.bankAccountName &&
       club.bankAccount.bankAccountNumber &&
       club.bankAccount.bankName &&
       club.bankAccount.phone &&
       club.bankAccount.name
-    ) {
-      return {
-        _id: club._id,
-        name: club.name,
-        bankAccount: club.bankAccount,
-      };
+    ) { 
+      const obj ={ 
+        name: club.bankAccount.name,
+        phone: club.bankAccount.phone,
+        bankName: club.bankAccount.bankName,
+        bankAccountName: club.bankAccount.bankAccountName,
+        bankAccountNumber: club.bankAccount.bankAccountNumber ,
+        clubName:club.name
+      }
+      clubsWithBankAccount.push(obj)
     }
-  });
+  }); 
+
+  console.log(clubsWithBankAccount)
 
   res.status(200).json({
     data: clubsWithBankAccount,
