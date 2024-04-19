@@ -1071,3 +1071,20 @@ exports.adminCoupon = asyncHandler(async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+exports.ClubsBankAccount = asyncHandler(async (req, res) => {
+  const clubs = await Club.find({});
+
+  const clubsWithBankAccount = clubs.map((club) => {
+    return {
+      _id: club._id,
+      name: club.name,
+      bankAccount: club.bankAccount,
+    };
+  });
+
+  res.status(200).json({
+    data: clubsWithBankAccount,
+    succss: true,
+  });
+});

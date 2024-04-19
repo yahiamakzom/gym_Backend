@@ -51,8 +51,6 @@ function scheduleTask(time, subscriptions) {
       console.log(`Task scheduled at: 17:30`);
       console.log(`Task scheduled at: 17:30`);
 
-      
-
       for (const subscription of subscriptions) {
         subscription.endData = moment(subscription.endData).add(1, "day");
         subscription.startData = moment(subscription.startData).add(1, "day");
@@ -67,7 +65,6 @@ function scheduleTask(time, subscriptions) {
   );
 
   job.start();
-
 }
 
 // You can call the refreshSubscriptions function to trigger the scheduling of tasks

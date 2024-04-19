@@ -5,6 +5,7 @@ const ApiError = require("../utils/ApiError");
 const User = require("../models/User");
 const userSub = require("../models/userSub");
 const { getLocationName } = require("../utils/Map");
+const Bank = require("../models/BankData");
 const cloudinary = require("cloudinary").v2;
 const moment = require("moment");
 cloudinary.config({
@@ -12,6 +13,7 @@ cloudinary.config({
   api_key: process.env.CLOUD_API_KEY,
   api_secret: process.env.CLOUD_API_SECRET,
 });
+
 
 exports.addSubscreptions = asyncHandler(async (req, res, next) => {
   const clubId = req.user.id;
@@ -81,7 +83,7 @@ exports.addSubscreptions = asyncHandler(async (req, res, next) => {
       subscriptionDuration = 1; // 60 minutes
     } else if (subscriptionType === "90Minutes") {
       subscriptionDuration = 1.5; // 90 minutes
-    }else{ 
+    } else {
       subscriptionDuration = 2;
     }
 
@@ -324,4 +326,120 @@ exports.deleteSubscription = asyncHandler(async (req, res, next) => {
   });
 });
 
+
+
+exports.BankData = asyncHandler(async (req, res, next) => { 
+
+  try {
+    // Find the user by their ID
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      console.log("User not found.");
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    // If the user has a club associated with them
+    if (user.club) {
+      // Find the club using the club ID associated with the user
+      const club = await Club.findById(user.club);
+
+      if (!club) {
+        console.log("Club not found.");
+        return res
+          .status(404)
+          .json({ success: false, message: "Club not found" });
+      }
+
+      // Extract bank account data from req.body
+      const { name, phone, bankName ,bankAccountNumber , bankAccountName } = req.body;
+
+      if (
+        !name ||
+        !phone ||
+        !bankName ||
+        !bankAccountNumber ||
+        !bankAccountName) {
+        return res
+          .status(400)
+          .json({
+            success: false,
+            message: "Please provide all bank account details",
+          });
+      }
+
+      // Check if the club already has bank account information
+      club.bankAccount = {
+        name,
+        phone,
+        bankName,
+        bankAccountName,
+        bankAccountNumber,
+      };
+
+      // Save the club instance with the updated or inserted bank account data
+      await club.save();
+
+      res.status(200).json({ success: true, data: club });
+    } else {
+      console.log("User is not associated with any club.");
+      return res
+        .status(404)
+        .json({
+          success: false,
+          message: "User is not associated with any club",
+        });
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+});
+ 
+
+exports.getClubBankAccount = async (req, res, next) => {
+  try {
+    // Find the user by their ID
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      console.log("User not found.");
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    // If the user has a club associated with them
+    if (user.club) {
+      // Find the club using the club ID associated with the user
+      const club = await Club.findById(user.club);
+
+      if (!club) {
+        console.log("Club not found.");
+        return res
+          .status(404)
+          .json({ success: false, message: "Club not found" });
+      }
+
+      // Extract bank account details from the club object
+      const bankAccount = club.bankAccount;
+
+      // Return the bank account details in the response
+      return res.status(200).json({ success: true, data: bankAccount || {}  });
+    } else {
+      console.log("User is not associated with any club.");
+      return res
+        .status(404)
+        .json({
+          success: false,
+          message: "User is not associated with any club",
+        });
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
 exports.clubReports;

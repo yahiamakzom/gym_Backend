@@ -1,9 +1,26 @@
 const mongoose = require("mongoose");
-
+const Bank = require("./BankData");
 module.exports = mongoose.model(
   "Club",
   new mongoose.Schema(
     {
+      bankAccount: {
+        name: {
+          type: String,
+        },
+        phone: {
+          type: String,
+        },
+        bankName: {
+          type: String,
+        },
+        bankAccountName: {
+          type: String,
+        },
+        bankAccountNumber: {
+          type: String,
+        },
+      },
       name: {
         type: String,
         required: [true, "Please Enter Club Name"],
@@ -16,12 +33,10 @@ module.exports = mongoose.model(
       },
       mapUrl: {
         type: String,
-        default:"https://www.google.com/maps/@24.7207538,46.4222781,9.96z?entry=ttu"
+        default:
+          "https://www.google.com/maps/@24.7207538,46.4222781,9.96z?entry=ttu",
       },
-      // days: {
-      //     type: String,
-      //     required:[true,"please add Days"]
-      // },
+    
       from: {
         type: String,
       },
@@ -97,7 +112,9 @@ module.exports = mongoose.model(
           type: Number,
           default: null,
         },
-      },
+      }, 
+
+      
     },
 
     { timestamps: true }

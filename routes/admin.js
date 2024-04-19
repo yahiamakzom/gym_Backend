@@ -22,6 +22,7 @@ const {
   GetActivities,
   deleteActivity,
   adminCoupon,
+  ClubsBankAccount
 } = require("../controllers/admin");
 const {
   addClubValidator,
@@ -113,5 +114,6 @@ router.delete("/delete_representative/:id", DeleteRepersentative);
 // add sport activity
 router.post("/add-activity", AddActivity);
 router.delete("/delete-activity/:id", deleteActivity);
-router.post("/add-coupon", adminCoupon);
+router.post("/add-coupon", adminCoupon); 
+router.get("/club_bank_account" ,ClubsBankAccount)
 module.exports = router;
