@@ -1075,8 +1075,14 @@ exports.adminCoupon = asyncHandler(async (req, res) => {
 exports.ClubsBankAccount = asyncHandler(async (req, res) => {
   const clubs = await Club.find({});
 
-  const clubsWithBankAccount = clubs.map((club) => {
-    if (club.bankAccount) {
+  const clubsWithBankAccount = clubs.filter((club) => {
+    if (
+      club.bankAccount.bankAccountName &&
+      club.bankAccount.bankAccountNumber &&
+      club.bankAccount.bankName &&
+      club.bankAccount.phone &&
+      club.bankAccount.name
+    ) {
       return {
         _id: club._id,
         name: club.name,
