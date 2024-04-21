@@ -1744,11 +1744,61 @@ exports.walletDiscountSubscription = asyncHandler(async (req, res, next) => {
 });
 
 exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
-  const { subId, brand, price } = req.body;
+  const { subId, brand, price, yogaSubscriptionDate, isYoga } = req.body;
   const { id } = req.user;
 
   const userData = await User.findById(id);
   if (!userData) return next(new ApiError("User Not Found", 404));
+
+  if (isYoga === true) {
+    const club = await Club.findById(userData.club_id);
+    if (!club) return next(new ApiError("Club Not Found", 404));
+    const subs = await Subscriptions.find({ club: club._id });
+
+    if (!subs) return next(new ApiError("Subscription Not Found", 404));
+    let price = 20;
+
+    for (let i = 0; i < subs.length; i++) {
+      if (subs[i].type == "يومي") {
+        price = subs[i].price;
+      }
+    }
+
+    const yogaSubscriptionDateParsed = JSON.parse(yogaSubscriptionDate);
+    for (let i = 0; i < yogaSubscriptionDateParsed.length; i++) {
+      const date = moment(yogaSubscriptionDateParsed[i]);
+      const newDate = date.add(1, "day");
+      await Subscriptions.create({
+        club: club._id,
+        name: "يومي",
+        freezeTime: 0,
+        freezeCountTime: 0,
+        price: price,
+        type: "يومي",
+        numberType: 1,
+      }).then((sub) => {
+        userData.operations.push({
+          operationKind: "خصم",
+          operationQuantity: price,
+          paymentKind: brand,
+          clubName: club.name,
+          subscriptionType: subscription.type, // Add club name to the operations array
+        });
+        userSub
+          .create({
+            user: id,
+            club: sub.club,
+            subscription: sub._id,
+            start_date: date,
+            end_date: newDate,
+            code: userData.code,
+          })
+          .then(() => console.log("complete"));
+      });
+    }
+    res.status(200).send("Payment successful");
+    return;
+  }
 
   const subscription = await Subscriptions.findById(subId);
   const club = await Club.findById(subscription.club);

@@ -14,7 +14,6 @@ cloudinary.config({
   api_secret: process.env.CLOUD_API_SECRET,
 });
 
-
 exports.addSubscreptions = asyncHandler(async (req, res, next) => {
   const clubId = req.user.id;
   const {
@@ -184,8 +183,13 @@ exports.editClub = asyncHandler(async (req, res, next) => {
     checkedItemsSports,
     discountCode,
     discountQuantity,
+    yogaCardData,
     mapUrl,
   } = req.body;
+  const parsedYogaCardData = JSON.parse(yogaCardData);
+
+  // Now you can access the parsedYogaCardData as an object
+  console.log(parsedYogaCardData);
   const uniqueCheckedDays = checkedDays.split(",");
   const uniqueCheckedItemsSports = checkedItemsSports.split(",");
   console.log(uniqueCheckedDays, uniqueCheckedItemsSports);
@@ -240,7 +244,7 @@ exports.editClub = asyncHandler(async (req, res, next) => {
           to: to && to,
           allDay: false,
           mapUrl: mapUrl && mapUrl,
-
+          yogaSessions: [...parsedYogaCardData],
           WorkingDays: uniqueCheckedDays,
           sports: uniqueCheckedItemsSports,
         },
@@ -273,6 +277,8 @@ exports.editClub = asyncHandler(async (req, res, next) => {
           from: null,
           mapUrl: mapUrl && mapUrl,
           to: null,
+          yogaSessions: [...parsedYogaCardData],
+
           WorkingDays: uniqueCheckedDays,
           sports: uniqueCheckedItemsSports,
         },
@@ -326,10 +332,7 @@ exports.deleteSubscription = asyncHandler(async (req, res, next) => {
   });
 });
 
-
-
-exports.BankData = asyncHandler(async (req, res, next) => { 
-
+exports.BankData = asyncHandler(async (req, res, next) => {
   try {
     // Find the user by their ID
     const user = await User.findById(req.user.id);
@@ -354,20 +357,20 @@ exports.BankData = asyncHandler(async (req, res, next) => {
       }
 
       // Extract bank account data from req.body
-      const { name, phone, bankName ,bankAccountNumber , bankAccountName } = req.body;
+      const { name, phone, bankName, bankAccountNumber, bankAccountName } =
+        req.body;
 
       if (
         !name ||
         !phone ||
         !bankName ||
         !bankAccountNumber ||
-        !bankAccountName) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-            message: "Please provide all bank account details",
-          });
+        !bankAccountName
+      ) {
+        return res.status(400).json({
+          success: false,
+          message: "Please provide all bank account details",
+        });
       }
 
       // Check if the club already has bank account information
@@ -385,19 +388,16 @@ exports.BankData = asyncHandler(async (req, res, next) => {
       res.status(200).json({ success: true, data: club });
     } else {
       console.log("User is not associated with any club.");
-      return res
-        .status(404)
-        .json({
-          success: false,
-          message: "User is not associated with any club",
-        });
+      return res.status(404).json({
+        success: false,
+        message: "User is not associated with any club",
+      });
     }
   } catch (error) {
     console.error("Error:", error);
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 });
- 
 
 exports.getClubBankAccount = async (req, res, next) => {
   try {
@@ -427,15 +427,13 @@ exports.getClubBankAccount = async (req, res, next) => {
       const bankAccount = club.bankAccount;
 
       // Return the bank account details in the response
-      return res.status(200).json({ success: true, data: bankAccount || {}  });
+      return res.status(200).json({ success: true, data: bankAccount || {} });
     } else {
       console.log("User is not associated with any club.");
-      return res
-        .status(404)
-        .json({
-          success: false,
-          message: "User is not associated with any club",
-        });
+      return res.status(404).json({
+        success: false,
+        message: "User is not associated with any club",
+      });
     }
   } catch (error) {
     console.error("Error:", error);
