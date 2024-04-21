@@ -1751,11 +1751,12 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
   if (!userData) return next(new ApiError("User Not Found", 404));
 
   if (isYoga === true) {
-    const club = await Club.findById(userData.club);
+    const club = await Club.findOne({id:userData.club}); 
+    console.log(club)
     if (!club) return next(new ApiError("Club Not Found", 404));
   
     const subs = await Subscriptions.find({ club: club._id });
-    if (subs.length === 0) return next(new ApiError("Subscription Not Found", 404));
+    // if (subs.length === 0) return next(new ApiError("Subscription Not Found", 404));
   
     let price = 20;
     for (let i = 0; i < subs.length; i++) {
@@ -1765,7 +1766,7 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
       }
     }
   
-    const yogaSubscriptionDateParsed = JSON.parse(yogaSubscriptionDate);
+    const yogaSubscriptionDateParsed = yogaSubscriptionDate
     const userOperations = [];
     const userSubscriptions = [];
   
