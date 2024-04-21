@@ -1750,7 +1750,7 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
   const userData = await User.findById(id);
   if (!userData) return next(new ApiError("User Not Found", 404));
 
-  if (isYoga === "true") {
+  if (isYoga === true) {
     const club = await Club.findOne({id:userData.club}); 
     console.log(club)
     if (!club) return next(new ApiError("Club Not Found", 404));
