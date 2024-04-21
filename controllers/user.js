@@ -1788,7 +1788,7 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
         userSub
           .create({
             user: id,
-            club: clubز._id,
+            club: club._id,
             subscription: sub._id,
             start_date: date,
             end_date: newDate,
