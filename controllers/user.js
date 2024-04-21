@@ -1759,7 +1759,7 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
     let price = 20;
 
     for (let i = 0; i < subs.length; i++) {
-      if (subs[i].type == "يومي") {
+      if (subs[i].type == "يومي" && subs[i].numberType == 1) {
         price = subs[i].price;
       }
     }
@@ -1782,12 +1782,13 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
           operationQuantity: price,
           paymentKind: brand,
           clubName: club.name,
-          subscriptionType: subscription.type, // Add club name to the operations array
-        });
+          subscriptionType: sub.type, // Add club name to the operations array
+        }); 
+        userData.save();
         userSub
           .create({
             user: id,
-            club: sub.club,
+            club: clubز._id,
             subscription: sub._id,
             start_date: date,
             end_date: newDate,
