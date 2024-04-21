@@ -1766,7 +1766,7 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
       }
     }
   
-    const yogaSubscriptionDateParsed = yogaSubscriptionDate
+    const yogaSubscriptionDateParsed = JSON.parse(yogaSubscriptionDate);
     const userOperations = [];
     const userSubscriptions = [];
   
