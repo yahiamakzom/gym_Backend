@@ -91,6 +91,9 @@ module.exports = mongoose.model(
           to: {
             type: String,
           },
+          price: {
+            type: String,
+          },
         },
       ],
       logo: String,

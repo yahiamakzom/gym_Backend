@@ -1751,24 +1751,29 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
   if (!userData) return next(new ApiError("User Not Found", 404));
 
   if (isYoga === true) {
-    const club = await Club.findById(userData.club_id);
+    const club = await Club.findById(userData.club);
     if (!club) return next(new ApiError("Club Not Found", 404));
+  
     const subs = await Subscriptions.find({ club: club._id });
-
-    if (!subs) return next(new ApiError("Subscription Not Found", 404));
+    if (subs.length === 0) return next(new ApiError("Subscription Not Found", 404));
+  
     let price = 20;
-
     for (let i = 0; i < subs.length; i++) {
       if (subs[i].type == "يومي" && subs[i].numberType == 1) {
         price = subs[i].price;
+        break; // No need to continue looping if price is found
       }
     }
-
+  
     const yogaSubscriptionDateParsed = JSON.parse(yogaSubscriptionDate);
+    const userOperations = [];
+    const userSubscriptions = [];
+  
     for (let i = 0; i < yogaSubscriptionDateParsed.length; i++) {
       const date = moment(yogaSubscriptionDateParsed[i]);
       const newDate = date.add(1, "day");
-      await Subscriptions.create({
+  
+      const subscription = await Subscriptions.create({
         club: club._id,
         name: "يومي",
         freezeTime: 0,
@@ -1776,29 +1781,32 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
         price: price,
         type: "يومي",
         numberType: 1,
-      }).then((sub) => {
-        userData.operations.push({
-          operationKind: "خصم",
-          operationQuantity: price,
-          paymentKind: brand,
-          clubName: club.name,
-          subscriptionType: sub.type, // Add club name to the operations array
-        }); 
-        userData.save();
-        userSub
-          .create({
-            user: id,
-            club: club._id,
-            subscription: sub._id,
-            start_date: date,
-            end_date: newDate,
-            code: userData.code,
-          })
-          .then(() => console.log("complete"));
+      });
+  
+      userOperations.push({
+        operationKind: "خصم",
+        operationQuantity: price,
+        paymentKind: brand,
+        clubName: club.name,
+        subscriptionType: subscription.type,
+      });
+  
+      userSubscriptions.push({
+        user: id,
+        club: club._id,
+        subscription: subscription._id,
+        start_date: date,
+        end_date: newDate,
+        code: userData.code,
       });
     }
+  
+    userData.operations.push(...userOperations);
+    await userData.save();
+  
+    await userSub.create(userSubscriptions);
+  
     res.status(200).send("Payment successful");
-    return;
   }
 
   const subscription = await Subscriptions.findById(subId);
