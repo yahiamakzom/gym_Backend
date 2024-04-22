@@ -91,10 +91,7 @@ router.post("/check-pay-new/:paymentId", verifyToken, checkPaymentNew);
 router.post("/wallet_confirm", verifyToken, confirmDeposit);
 router.post("/make_sub/:subId", verifyToken, userMakeSub);
 router.post("/confirm_payment/:subId", verifyToken, confirmPayment);
-
-// this will be responsilbe for gettign the
 router.post("/pay-visa", verifyToken, hyperCheckout);
-
 router.get("/activities", GetActivities);
 router.post("/filter_by_subscriptionType", filterClubsBySubscriptionType);
 module.exports = router;

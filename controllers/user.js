@@ -300,6 +300,30 @@ exports.getMinClubs = asyncHandler(async (req, res, next) => {
 exports.getClub = asyncHandler(async (req, res, next) => {
   const { lat, long } = req.body;
   await Club.findById(req.params.club_id).then(async (club) => {
+    if (club.sports.length == 1 && club.sports[0].trim() === "يوغا") {
+      let filteredSubs = [];
+      arr = [];
+      
+      await Subscriptions.find({ club: req.params.club_id }).then(
+        async (subscriptions) => {
+          filteredSubs = subscriptions.filter(
+            (sub) => sub.name !== "subPersonal"
+          );
+          if (lat && long) {
+            let distance = await calcDistance(
+              `${club.lat},${club.long}`,
+              `${lat},${long}`
+            );
+            if (!distance) return next(new ApiError("Invalid distance", 400));
+
+            res.json({ club, distance, subscriptions: filteredSubs });
+          } else res.json({ club, subscriptions: filteredSubs });
+        }
+      );
+      console.log("ues");
+      console.log(arr);
+      return;
+    }
     await Subscriptions.find({ club: req.params.club_id }).then(
       async (subscriptions) => {
         if (lat && long) {
@@ -1743,13 +1767,9 @@ exports.walletDiscountSubscription = asyncHandler(async (req, res, next) => {
   res.status(200).json({ message: "Discount successful" });
 });
 
-exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => { 
-const yogaData =  JSON.stringify(req.body) 
-const yogaDataParsed = JSON.parse(yogaData)
-
-
-
- 
+exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
+  const yogaData = JSON.stringify(req.body);
+  const yogaDataParsed = JSON.parse(yogaData);
 
   const { subId, brand, price, yogaSubscriptionDate, isYoga, clubId } =
     yogaDataParsed;
@@ -1759,11 +1779,11 @@ const yogaDataParsed = JSON.parse(yogaData)
   if (!userData) return next(new ApiError("User Not Found", 404));
 
   if (isYoga === true) {
-    const club = await Club.findById({_id:clubId });
+    const club = await Club.findById({ _id: clubId });
     console.log(club);
     if (!club) return next(new ApiError("Club Not Found", 404));
 
-    const yogaSubscriptionDateParsed =yogaSubscriptionDate;
+    const yogaSubscriptionDateParsed = yogaSubscriptionDate;
     const userOperations = [];
     const userSubscriptions = [];
 
@@ -1773,7 +1793,7 @@ const yogaDataParsed = JSON.parse(yogaData)
 
       const subscription = await Subscriptions.create({
         club: club._id,
-        name: "يومي",
+        name: "subPersonal",
         freezeTime: 0,
         freezeCountTime: 0,
         price: yogaSubscriptionDateParsed[i].price,
