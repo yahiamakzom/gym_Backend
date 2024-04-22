@@ -1744,46 +1744,36 @@ exports.walletDiscountSubscription = asyncHandler(async (req, res, next) => {
 });
 
 exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
-  const { subId, brand, price, yogaSubscriptionDate, isYoga } = req.body;
+  const { subId, brand, price, yogaSubscriptionDate, isYoga, clubId } =
+    req.body;
   const { id } = req.user;
 
   const userData = await User.findById(id);
   if (!userData) return next(new ApiError("User Not Found", 404));
 
   if (isYoga === true) {
-    const club = await Club.findOne({id:userData.club}); 
-    console.log(club)
+    const club = await Club.findOne({ id: clubId });
+    console.log(club);
     if (!club) return next(new ApiError("Club Not Found", 404));
-  
-    const subs = await Subscriptions.find({ club: club._id });
-    // if (subs.length === 0) return next(new ApiError("Subscription Not Found", 404));
-  
-    let price = 20;
-    for (let i = 0; i < subs.length; i++) {
-      if (subs[i].type == "يومي" && subs[i].numberType == 1) {
-        price = subs[i].price;
-        break; // No need to continue looping if price is found
-      }
-    }
-  
+
     const yogaSubscriptionDateParsed = JSON.parse(yogaSubscriptionDate);
     const userOperations = [];
     const userSubscriptions = [];
-  
+
     for (let i = 0; i < yogaSubscriptionDateParsed.length; i++) {
-      const date = moment(yogaSubscriptionDateParsed[i]);
+      const date = moment(yogaSubscriptionDateParsed[i].date);
       const newDate = date.add(1, "day");
-  
+
       const subscription = await Subscriptions.create({
         club: club._id,
         name: "يومي",
         freezeTime: 0,
         freezeCountTime: 0,
-        price: price,
+        price: yogaSubscriptionDateParsed[i].price,
         type: "يومي",
         numberType: 1,
       });
-  
+
       userOperations.push({
         operationKind: "خصم",
         operationQuantity: price,
@@ -1791,7 +1781,7 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
         clubName: club.name,
         subscriptionType: subscription.type,
       });
-  
+
       userSubscriptions.push({
         user: id,
         club: club._id,
@@ -1801,12 +1791,12 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
         code: userData.code,
       });
     }
-  
+
     userData.operations.push(...userOperations);
     await userData.save();
-  
+
     await userSub.create(userSubscriptions);
-  
+
     res.status(200).send("Payment successful");
   }
 
