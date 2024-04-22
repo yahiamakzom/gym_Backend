@@ -1743,9 +1743,16 @@ exports.walletDiscountSubscription = asyncHandler(async (req, res, next) => {
   res.status(200).json({ message: "Discount successful" });
 });
 
-exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
+exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => { 
+const yogaData =  JSON.stringify(req.body) 
+const yogaDataParsed = JSON.parse(yogaData)
+
+
+
+ 
+
   const { subId, brand, price, yogaSubscriptionDate, isYoga, clubId } =
-    req.body;
+    yogaDataParsed;
   const { id } = req.user;
 
   const userData = await User.findById(id);
@@ -1756,7 +1763,7 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
     console.log(club);
     if (!club) return next(new ApiError("Club Not Found", 404));
 
-    const yogaSubscriptionDateParsed = yogaSubscriptionDate;
+    const yogaSubscriptionDateParsed =yogaSubscriptionDate;
     const userOperations = [];
     const userSubscriptions = [];
 
