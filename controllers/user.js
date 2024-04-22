@@ -1752,11 +1752,11 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
   if (!userData) return next(new ApiError("User Not Found", 404));
 
   if (isYoga === true) {
-    const club = await Club.findOne({ id: clubId });
+    const club = await Club.findById({_id:clubId });
     console.log(club);
     if (!club) return next(new ApiError("Club Not Found", 404));
 
-    const yogaSubscriptionDateParsed = JSON.parse(yogaSubscriptionDate);
+    const yogaSubscriptionDateParsed = yogaSubscriptionDate;
     const userOperations = [];
     const userSubscriptions = [];
 
