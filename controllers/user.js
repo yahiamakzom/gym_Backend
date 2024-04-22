@@ -1768,7 +1768,7 @@ exports.walletDiscountSubscription = asyncHandler(async (req, res, next) => {
 });
 
 exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => { 
-  console.log(req.body)
+  // console.log(req.body)
   console.log(req)
   // const yogaData = JSON.stringify(req.body);
   // const yogaDataParsed = JSON.parse(yogaData);
