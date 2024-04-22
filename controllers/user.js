@@ -1767,132 +1767,134 @@ exports.walletDiscountSubscription = asyncHandler(async (req, res, next) => {
   res.status(200).json({ message: "Discount successful" });
 });
 
-exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
-  const yogaData = JSON.stringify(req.body);
-  const yogaDataParsed = JSON.parse(yogaData);
+exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => { 
+  console.log(req.body)
+  console.log(req)
+  // const yogaData = JSON.stringify(req.body);
+  // const yogaDataParsed = JSON.parse(yogaData);
 
-  const { subId, brand, price, yogaSubscriptionDate, isYoga, clubId } =
-    yogaDataParsed;
-  const { id } = req.user;
+  // const { subId, brand, price, yogaSubscriptionDate, isYoga, clubId } =
+  //   yogaDataParsed;
+  // const { id } = req.user;
 
-  const userData = await User.findById(id);
-  if (!userData) return next(new ApiError("User Not Found", 404));
+  // const userData = await User.findById(id);
+  // if (!userData) return next(new ApiError("User Not Found", 404));
 
-  if (isYoga === true) {
-    const club = await Club.findById({ _id: clubId });
-    console.log(club);
-    if (!club) return next(new ApiError("Club Not Found", 404));
+  // if (isYoga === true) {
+  //   const club = await Club.findById({ _id: clubId });
+  //   console.log(club);
+  //   if (!club) return next(new ApiError("Club Not Found", 404));
 
-    const yogaSubscriptionDateParsed = yogaSubscriptionDate;
-    const userOperations = [];
-    const userSubscriptions = [];
+  //   const yogaSubscriptionDateParsed = yogaSubscriptionDate;
+  //   const userOperations = [];
+  //   const userSubscriptions = [];
 
-    for (let i = 0; i < yogaSubscriptionDateParsed.length; i++) {
-      const date = moment(yogaSubscriptionDateParsed[i].date);
-      const newDate = date.add(1, "day");
+  //   for (let i = 0; i < yogaSubscriptionDateParsed.length; i++) {
+  //     const date = moment(yogaSubscriptionDateParsed[i].date);
+  //     const newDate = date.add(1, "day");
 
-      const subscription = await Subscriptions.create({
-        club: club._id,
-        name: "subPersonal",
-        freezeTime: 0,
-        freezeCountTime: 0,
-        price: yogaSubscriptionDateParsed[i].price,
-        type: "يومي",
-        numberType: 1,
-      });
+  //     const subscription = await Subscriptions.create({
+  //       club: club._id,
+  //       name: "subPersonal",
+  //       freezeTime: 0,
+  //       freezeCountTime: 0,
+  //       price: yogaSubscriptionDateParsed[i].price,
+  //       type: "يومي",
+  //       numberType: 1,
+  //     });
 
-      userOperations.push({
-        operationKind: "خصم",
-        operationQuantity: price,
-        paymentKind: brand,
-        clubName: club.name,
-        subscriptionType: subscription.type,
-      });
+  //     userOperations.push({
+  //       operationKind: "خصم",
+  //       operationQuantity: price,
+  //       paymentKind: brand,
+  //       clubName: club.name,
+  //       subscriptionType: subscription.type,
+  //     });
 
-      userSubscriptions.push({
-        user: id,
-        club: club._id,
-        subscription: subscription._id,
-        start_date: date,
-        end_date: newDate,
-        code: userData.code,
-      });
-    }
+  //     userSubscriptions.push({
+  //       user: id,
+  //       club: club._id,
+  //       subscription: subscription._id,
+  //       start_date: date,
+  //       end_date: newDate,
+  //       code: userData.code,
+  //     });
+  //   }
 
-    userData.operations.push(...userOperations);
-    await userData.save();
+  //   userData.operations.push(...userOperations);
+  //   await userData.save();
 
-    await userSub.create(userSubscriptions);
+  //   await userSub.create(userSubscriptions);
 
-    res.status(200).send("Payment successful");
-  }
+  //   res.status(200).send("Payment successful");
+  // }
 
-  const subscription = await Subscriptions.findById(subId);
-  const club = await Club.findById(subscription.club);
-  if (!subscription) return next(new ApiError("Can't find subscription", 404));
+  // const subscription = await Subscriptions.findById(subId);
+  // const club = await Club.findById(subscription.club);
+  // if (!subscription) return next(new ApiError("Can't find subscription", 404));
 
-  let start_date = moment().startOf("hour");
+  // let start_date = moment().startOf("hour");
 
-  let end_date;
-  const numberType = subscription.numberType;
-  const type = subscription.type;
-  if (type === "شهري") {
-    end_date = moment(start_date).add(numberType, "months").endOf("hour");
-  } else if (type === "سنوي") {
-    end_date = moment(start_date).add(numberType, "years").endOf("hour");
-  } else if (type === "اسبوعي") {
-    end_date = moment(start_date).add(numberType, "weeks").endOf("hour");
-  } else if (type === "يومي") {
-    end_date = moment(start_date).add(numberType, "days").endOf("hour");
-  } else if (type === "ساعه") {
-    end_date = moment(start_date).add(4, "hours");
-  }
+  // let end_date;
+  // const numberType = subscription.numberType;
+  // const type = subscription.type;
+  // if (type === "شهري") {
+  //   end_date = moment(start_date).add(numberType, "months").endOf("hour");
+  // } else if (type === "سنوي") {
+  //   end_date = moment(start_date).add(numberType, "years").endOf("hour");
+  // } else if (type === "اسبوعي") {
+  //   end_date = moment(start_date).add(numberType, "weeks").endOf("hour");
+  // } else if (type === "يومي") {
+  //   end_date = moment(start_date).add(numberType, "days").endOf("hour");
+  // } else if (type === "ساعه") {
+  //   end_date = moment(start_date).add(4, "hours");
+  // }
 
-  userData.operations.push({
-    operationKind: "خصم",
-    operationQuantity: price,
-    paymentKind: brand,
-    clubName: club.name,
-    subscriptionType: subscription.type, // Add club name to the operations array
-  });
+  // userData.operations.push({
+  //   operationKind: "خصم",
+  //   operationQuantity: price,
+  //   paymentKind: brand,
+  //   clubName: club.name,
+  //   subscriptionType: subscription.type, // Add club name to the operations array
+  // });
 
-  await userData.save();
-  if (!club) return next(new ApiError("Can't find club", 404));
-  if (type === "90Minutes" || type === "30Minutes" || type === "60Minutes") {
-    end_date = moment(subscription.endData);
-    start_date = moment(subscription.startData);
+  // await userData.save();
+  // if (!club) return next(new ApiError("Can't find club", 404));
+  // if (type === "90Minutes" || type === "30Minutes" || type === "60Minutes") {
+  //   end_date = moment(subscription.endData);
+  //   start_date = moment(subscription.startData);
 
-    subscription.gymsCount--;
-    await subscription.save();
-    if (subscription.gymsCount <= 0) {
-      // Find all subscriptions that contain the same club ID
-      const allClubSubscriptions = await Subscriptions.find({
-        club: club._id,
-      });
+  //   subscription.gymsCount--;
+  //   await subscription.save();
+  //   if (subscription.gymsCount <= 0) {
+  //     // Find all subscriptions that contain the same club ID
+  //     const allClubSubscriptions = await Subscriptions.find({
+  //       club: club._id,
+  //     });
 
-      for (const sub of allClubSubscriptions) {
-        if (
-          (moment(sub.endData).isBefore(subscription.endData) ||
-            moment(sub.endData).isSame(subscription.endData)) &&
-          (moment(sub.startData).isSame(subscription.startData) ||
-            moment(sub.startData).isAfter(subscription.startData))
-        ) {
-          sub.gymsCount = 0;
-          await sub.save();
-        }
-      }
-    }
-  }
-  await userSub
-    .create({
-      user: id,
-      club: subscription.club,
-      subscription: subscription._id,
-      start_date,
-      end_date,
-      code: userData.code,
-    })
-    .then(() => res.status(200).send("Payment successful"));
+  //     for (const sub of allClubSubscriptions) {
+  //       if (
+  //         (moment(sub.endData).isBefore(subscription.endData) ||
+  //           moment(sub.endData).isSame(subscription.endData)) &&
+  //         (moment(sub.startData).isSame(subscription.startData) ||
+  //           moment(sub.startData).isAfter(subscription.startData))
+  //       ) {
+  //         sub.gymsCount = 0;
+  //         await sub.save();
+  //       }
+  //     }
+  //   }
+  // }
+  // await userSub
+  //   .create({
+  //     user: id,
+  //     club: subscription.club,
+  //     subscription: subscription._id,
+  //     start_date,
+  //     end_date,
+  //     code: userData.code,
+  //   })
+  //   .then(() => res.status(200).send("Payment successful"));
 });
 
 // filter clubs by type
