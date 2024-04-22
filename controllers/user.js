@@ -1785,7 +1785,7 @@ console.log("#######################################")
     console.log(club);
     if (!club) return next(new ApiError("Club Not Found", 404));
 
-    const yogaSubscriptionDateParsed = yogaSubscriptionDate;
+    const yogaSubscriptionDateParsed = JSON.parse(yogaSubscriptionDate);
     const userOperations = [];
     const userSubscriptions = [];
 
