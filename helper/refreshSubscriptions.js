@@ -30,6 +30,7 @@ async function refreshSubscriptions() {
         millisecond: 0,
       });
 
+      
       scheduleTask(taskTime, clubSubscriptions);
     } else {
       const endOfDay = moment()
@@ -41,9 +42,11 @@ async function refreshSubscriptions() {
   }
 }
 
-function scheduleTask(time, subscriptions) {
+function scheduleTask(time, subscriptions) { 
+console.log(time.hour(), time.minute(), time.second())
+console.log(`0 ${time.minute()} ${time.hour()} * * *`)
   const job = new cron.CronJob(
-    `0 ${time.minutes()} ${time.hours()} * * *`, // Cron time string for 17:30 every day
+    `0 ${time.minute()} ${time.hour()} * * *`, // Cron time string for 17:30 every day
     async function () {
       console.log(`Task scheduled at: 17:30`);
       console.log(`Task scheduled at: 17:30`);
