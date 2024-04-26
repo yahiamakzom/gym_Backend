@@ -677,12 +677,32 @@ exports.clubReports = asyncHandler(async (req, res, next) => {
             let all_players = (
               await userSub.find({ club: club.id, expired: false })
             ).length;
-            let players_day, players_month, players_week, players_year;
-            players_day = players_month = players_year = players_week = 0;
+            let players_day,
+              players_month,
+              players_week,
+              players_year,
+              players_30Minutes,
+              players_60Minutes,
+              players_120Minutes,
+              players_90Minutes;
+            (players_day = players_month = players_year = players_week),
+              (players_30Minutes =
+                players_60Minutes =
+                players_120Minutes =
+                players_90Minutes =
+                  0);
             let day,
               month,
               week,
               year,
+              minutes30,
+              minutes60,
+              minutes120,
+              minutes90,
+              appgyms30Minutes,
+              appgyms60Minutes,
+              appgyms120Minutes,
+              appgyms90Minutes,
               appgymsDay,
               appGymsWeek,
               appGymsMonth,
@@ -692,6 +712,14 @@ exports.clubReports = asyncHandler(async (req, res, next) => {
               month =
               year =
               week =
+              minutes30 =
+              minutes60 =
+              minutes120 =
+              minutes90 =
+              appgyms30Minutes =
+              appgyms60Minutes =
+              appgyms120Minutes =
+              appgyms90Minutes =
               appGymsMonth =
               appGymsDay =
               appGymsYear =
@@ -724,7 +752,7 @@ exports.clubReports = asyncHandler(async (req, res, next) => {
                   const commission_price = (price * commission) / 100;
                   appGymsWeek += Number(commission_price);
                   week = price - commission_price;
-                } else {
+                } else if (sub.type === "سنوي") {
                   players_year = (await userSub.find({ subscription: sub.id }))
                     .length;
                   const price = Number(sub.price);
@@ -732,6 +760,42 @@ exports.clubReports = asyncHandler(async (req, res, next) => {
                   const commission_price = (price * commission) / 100;
                   appGymsYear += Number(commission_price);
                   year = price - commission_price;
+                } else if (sub.type === "30Minutes") {
+                  players_30Minutes = (
+                    await userSub.find({ subscription: sub.id })
+                  ).length;
+                  const price = Number(sub.price);
+                  const commission = Number(club.commission);
+                  const commission_price = (price * commission) / 100;
+                  appgyms30Minutes += Number(commission_price);
+                  minutes30 = price - commission_price;
+                } else if (sub.type === "60Minutes") {
+                  players_60Minutes = (
+                    await userSub.find({ subscription: sub.id })
+                  ).length;
+                  const price = Number(sub.price);
+                  const commission = Number(club.commission);
+                  const commission_price = (price * commission) / 100;
+                  appgyms60Minutes += Number(commission_price);
+                  minutes60 = price - commission_price;
+                } else if (sub.type === "120Minutes") {
+                  players_120Minutes = (
+                    await userSub.find({ subscription: sub.id })
+                  ).length;
+                  const price = Number(sub.price);
+                  const commission = Number(club.commission);
+                  const commission_price = (price * commission) / 100;
+                  appgyms120Minutes += Number(commission_price);
+                  minutes120 = price - commission_price;
+                } else if (sub.type === "90Minutes") {
+                  players_90Minutes = (
+                    await userSub.find({ subscription: sub.id })
+                  ).length;
+                  const price = Number(sub.price);
+                  const commission = Number(club.commission);
+                  const commission_price = (price * commission) / 100;
+                  appgyms90Minutes += Number(commission_price);
+                  minutes90 = price - commission_price;
                 }
               })
             );
@@ -1075,8 +1139,8 @@ exports.adminCoupon = asyncHandler(async (req, res) => {
 exports.ClubsBankAccount = asyncHandler(async (req, res) => {
   const clubs = await Club.find({});
 
-  const clubsWithBankAccount  =[]
-  
+  const clubsWithBankAccount = [];
+
   clubs.forEach((club) => {
     if (
       club.bankAccount.bankAccountName &&
@@ -1084,20 +1148,20 @@ exports.ClubsBankAccount = asyncHandler(async (req, res) => {
       club.bankAccount.bankName &&
       club.bankAccount.phone &&
       club.bankAccount.name
-    ) { 
-      const obj ={ 
+    ) {
+      const obj = {
         name: club.bankAccount.name,
         phone: club.bankAccount.phone,
         bankName: club.bankAccount.bankName,
         bankAccountName: club.bankAccount.bankAccountName,
-        bankAccountNumber: club.bankAccount.bankAccountNumber ,
-        clubName:club.name
-      }
-      clubsWithBankAccount.push(obj)
+        bankAccountNumber: club.bankAccount.bankAccountNumber,
+        clubName: club.name,
+      };
+      clubsWithBankAccount.push(obj);
     }
-  }); 
+  });
 
-  console.log(clubsWithBankAccount)
+  console.log(clubsWithBankAccount);
 
   res.status(200).json({
     data: clubsWithBankAccount,
