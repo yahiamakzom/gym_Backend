@@ -685,12 +685,16 @@ exports.clubReports = asyncHandler(async (req, res, next) => {
               players_90Minutes,
               players_30Minutes,
               players_120Minutes;
-            (players_day = players_month = players_year = players_week =0),
-              (players_120Minutes =
+
+               players_day =
+               players_month =
+               players_year =
+              players_week =
+              players_120Minutes =
                 players_60Minutes =
                 players_90Minutes =
                 players_30Minutes =
-                  0);
+                  0;
             let day,
               month,
               week,
@@ -703,7 +707,7 @@ exports.clubReports = asyncHandler(async (req, res, next) => {
               appGyms120Minutes,
               appGyms90Minutes,
               appGyms30Minutes,
-              appgymsDay,
+              appGymsDay,
               appGymsWeek,
               appGymsMonth,
               appGymsYear;
@@ -723,7 +727,7 @@ exports.clubReports = asyncHandler(async (req, res, next) => {
               appGymsMonth =
               appGymsYear =
               appGymsWeek =
-              appgymsDay =
+              appGymsDay =
                 0;
             await Promise.all(
               subs.map(async (sub) => {
@@ -733,7 +737,7 @@ exports.clubReports = asyncHandler(async (req, res, next) => {
                   const price = Number(sub.price);
                   const commission = Number(club.commission);
                   const commission_price = (price * commission) / 100;
-                  appgymsDay += Number(commission_price);
+                  appGymsDay = Number(commission_price);
                   day = price - commission_price;
                 } else if (sub.type === "شهري") {
                   players_month = (await userSub.find({ subscription: sub.id }))
@@ -743,7 +747,7 @@ exports.clubReports = asyncHandler(async (req, res, next) => {
                   console.log(commission);
                   console.log(price);
                   const commission_price = (price * commission) / 100;
-                  appGymsMonth += Number(commission_price);
+                  appGymsMonth = Number(commission_price);
                   month = price - commission_price;
                 } else if (sub.type === "اسبوعي") {
                   players_week = (await userSub.find({ subscription: sub.id }))
@@ -753,7 +757,7 @@ exports.clubReports = asyncHandler(async (req, res, next) => {
                   const commission_price = (price * commission) / 100;
                   console.log(commission);
                   console.log(price);
-                  appGymsWeek += Number(commission_price);
+                  appGymsWeek = Number(commission_price);
                   week = price - commission_price;
                 } else if (sub.type === "سنوي") {
                   players_year = (await userSub.find({ subscription: sub.id }))
@@ -761,7 +765,7 @@ exports.clubReports = asyncHandler(async (req, res, next) => {
                   const price = Number(sub.price);
                   const commission = Number(club.commission);
                   const commission_price = (price * commission) / 100;
-                  appGymsYear += Number(commission_price);
+                  appGymsYear = Number(commission_price);
                   console.log(commission);
                   console.log(price);
                   year = price - commission_price;
@@ -772,7 +776,7 @@ exports.clubReports = asyncHandler(async (req, res, next) => {
                   const price = Number(sub.price);
                   const commission = Number(club.commission);
                   const commission_price = (price * commission) / 100;
-                  appGyms120Minutes += Number(commission_price);
+                  appGyms120Minutes = Number(commission_price);
                   minutes120 = price - commission_price;
                 } else if (sub.type === "90Minutes") {
                   players_90Minutes = (
@@ -781,7 +785,7 @@ exports.clubReports = asyncHandler(async (req, res, next) => {
                   const price = Number(sub.price);
                   const commission = Number(club.commission);
                   const commission_price = (price * commission) / 100;
-                  appGyms90Minutes += Number(commission_price);
+                  appGyms90Minutes = Number(commission_price);
                   minutes90 = price - commission_price;
                 } else if (sub.type === "60Minutes") {
                   players_60Minutes = (
@@ -790,7 +794,7 @@ exports.clubReports = asyncHandler(async (req, res, next) => {
                   const price = Number(sub.price);
                   const commission = Number(club.commission);
                   const commission_price = (price * commission) / 100;
-                  appGyms60Minutes += Number(commission_price);
+                  appGyms60Minutes = Number(commission_price);
                   minutes60 = price - commission_price;
                 } else if (sub.type === "30Minutes") {
                   players_30Minutes = (
@@ -799,7 +803,7 @@ exports.clubReports = asyncHandler(async (req, res, next) => {
                   const price = Number(sub.price);
                   const commission = Number(club.commission);
                   const commission_price = (price * commission) / 100;
-                  appGyms30Minutes += Number(commission_price);
+                  appGyms30Minutes = Number(commission_price);
                   minutes30 = price - commission_price;
                 }
               })
@@ -829,7 +833,7 @@ exports.clubReports = asyncHandler(async (req, res, next) => {
                 2
               ),
 
-              appgymsDay: (appgymsDay * players_day).toFixed(2),
+              appGymsDay: (appGymsDay * players_day).toFixed(2),
               appGymsMonth: (appGymsMonth * players_month).toFixed(2),
               appGymsYear: (appGymsYear * players_year).toFixed(2),
               appGymsWeek: (appGymsWeek * players_week).toFixed(2),
