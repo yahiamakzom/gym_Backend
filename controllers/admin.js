@@ -681,15 +681,15 @@ exports.clubReports = asyncHandler(async (req, res, next) => {
               players_month,
               players_week,
               players_year,
-              players_30Minutes,
               players_60Minutes,
-              players_120Minutes,
-              players_90Minutes;
-            (players_day = players_month = players_year = players_week),
-              (players_30Minutes =
+              players_90Minutes,
+              players_30Minutes,
+              players_120Minutes;
+            (players_day = players_month = players_year = players_week =0),
+              (players_120Minutes =
                 players_60Minutes =
-                players_120Minutes =
                 players_90Minutes =
+                players_30Minutes =
                   0);
             let day,
               month,
@@ -697,12 +697,12 @@ exports.clubReports = asyncHandler(async (req, res, next) => {
               year,
               minutes30,
               minutes60,
-              minutes120,
               minutes90,
-              appgyms30Minutes,
-              appgyms60Minutes,
-              appgyms120Minutes,
-              appgyms90Minutes,
+              minutes120,
+              appGyms60Minutes,
+              appGyms120Minutes,
+              appGyms90Minutes,
+              appGyms30Minutes,
               appgymsDay,
               appGymsWeek,
               appGymsMonth,
@@ -712,16 +712,15 @@ exports.clubReports = asyncHandler(async (req, res, next) => {
               month =
               year =
               week =
+              appGyms60Minutes =
+              appGyms120Minutes =
+              appGyms90Minutes =
+              appGyms30Minutes =
               minutes30 =
               minutes60 =
-              minutes120 =
               minutes90 =
-              appgyms30Minutes =
-              appgyms60Minutes =
-              appgyms120Minutes =
-              appgyms90Minutes =
+              minutes120 =
               appGymsMonth =
-              appGymsDay =
               appGymsYear =
               appGymsWeek =
               appgymsDay =
@@ -741,6 +740,8 @@ exports.clubReports = asyncHandler(async (req, res, next) => {
                     .length;
                   const price = Number(sub.price);
                   const commission = Number(club.commission);
+                  console.log(commission);
+                  console.log(price);
                   const commission_price = (price * commission) / 100;
                   appGymsMonth += Number(commission_price);
                   month = price - commission_price;
@@ -750,6 +751,8 @@ exports.clubReports = asyncHandler(async (req, res, next) => {
                   const price = Number(sub.price);
                   const commission = Number(club.commission);
                   const commission_price = (price * commission) / 100;
+                  console.log(commission);
+                  console.log(price);
                   appGymsWeek += Number(commission_price);
                   week = price - commission_price;
                 } else if (sub.type === "سنوي") {
@@ -759,25 +762,9 @@ exports.clubReports = asyncHandler(async (req, res, next) => {
                   const commission = Number(club.commission);
                   const commission_price = (price * commission) / 100;
                   appGymsYear += Number(commission_price);
+                  console.log(commission);
+                  console.log(price);
                   year = price - commission_price;
-                } else if (sub.type === "30Minutes") {
-                  players_30Minutes = (
-                    await userSub.find({ subscription: sub.id })
-                  ).length;
-                  const price = Number(sub.price);
-                  const commission = Number(club.commission);
-                  const commission_price = (price * commission) / 100;
-                  appgyms30Minutes += Number(commission_price);
-                  minutes30 = price - commission_price;
-                } else if (sub.type === "60Minutes") {
-                  players_60Minutes = (
-                    await userSub.find({ subscription: sub.id })
-                  ).length;
-                  const price = Number(sub.price);
-                  const commission = Number(club.commission);
-                  const commission_price = (price * commission) / 100;
-                  appgyms60Minutes += Number(commission_price);
-                  minutes60 = price - commission_price;
                 } else if (sub.type === "120Minutes") {
                   players_120Minutes = (
                     await userSub.find({ subscription: sub.id })
@@ -785,7 +772,7 @@ exports.clubReports = asyncHandler(async (req, res, next) => {
                   const price = Number(sub.price);
                   const commission = Number(club.commission);
                   const commission_price = (price * commission) / 100;
-                  appgyms120Minutes += Number(commission_price);
+                  appGyms120Minutes += Number(commission_price);
                   minutes120 = price - commission_price;
                 } else if (sub.type === "90Minutes") {
                   players_90Minutes = (
@@ -794,8 +781,26 @@ exports.clubReports = asyncHandler(async (req, res, next) => {
                   const price = Number(sub.price);
                   const commission = Number(club.commission);
                   const commission_price = (price * commission) / 100;
-                  appgyms90Minutes += Number(commission_price);
+                  appGyms90Minutes += Number(commission_price);
                   minutes90 = price - commission_price;
+                } else if (sub.type === "60Minutes") {
+                  players_60Minutes = (
+                    await userSub.find({ subscription: sub.id })
+                  ).length;
+                  const price = Number(sub.price);
+                  const commission = Number(club.commission);
+                  const commission_price = (price * commission) / 100;
+                  appGyms60Minutes += Number(commission_price);
+                  minutes60 = price - commission_price;
+                } else if (sub.type === "30Minutes") {
+                  players_30Minutes = (
+                    await userSub.find({ subscription: sub.id })
+                  ).length;
+                  const price = Number(sub.price);
+                  const commission = Number(club.commission);
+                  const commission_price = (price * commission) / 100;
+                  appGyms30Minutes += Number(commission_price);
+                  minutes30 = price - commission_price;
                 }
               })
             );
@@ -807,6 +812,23 @@ exports.clubReports = asyncHandler(async (req, res, next) => {
               month: (month * players_month).toFixed(2),
               year: (year * players_year).toFixed(2),
               week: (week * players_week).toFixed(2),
+              minutes120: (minutes120 * players_120Minutes).toFixed(2),
+              minutes90: (minutes90 * players_90Minutes).toFixed(2),
+              minutes60: (minutes60 * players_60Minutes).toFixed(2),
+              minutes30: (minutes30 * players_30Minutes).toFixed(2),
+              appGyms120Minutes: (
+                appGyms120Minutes * players_120Minutes
+              ).toFixed(2),
+              appGyms90Minutes: (appGyms90Minutes * players_90Minutes).toFixed(
+                2
+              ),
+              appGyms60Minutes: (appGyms60Minutes * players_60Minutes).toFixed(
+                2
+              ),
+              appGyms30Minutes: (appGyms30Minutes * players_30Minutes).toFixed(
+                2
+              ),
+
               appgymsDay: (appgymsDay * players_day).toFixed(2),
               appGymsMonth: (appGymsMonth * players_month).toFixed(2),
               appGymsYear: (appGymsYear * players_year).toFixed(2),
@@ -817,6 +839,7 @@ exports.clubReports = asyncHandler(async (req, res, next) => {
         return clubsGain;
       })
     );
+    console.log(filterClubs);
     res.json({ clubs_report: filterClubs });
   });
 });

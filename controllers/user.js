@@ -404,6 +404,7 @@ exports.getClubAuth = asyncHandler(async (req, res, next) => {
                 club_id: req.params.club_id,
                 user: id,
               });
+              console.log(sub)
               res.json({
                 club,
                 // isFave: isFave ? true : false,
@@ -861,7 +862,8 @@ exports.checkPayment = asyncHandler(async (req, res, next) => {
             if (
               type === "90Minutes" ||
               type === "30Minutes" ||
-              type === "60Minutes"
+              type === "60Minutes"|| 
+              type === "120Minutes"
             ) {
               let end_dateSub = moment(subscription.endData);
               let start_dateSub = moment(subscription.startData);
@@ -1860,7 +1862,7 @@ console.log("#######################################")
 
   await userData.save();
   if (!club) return next(new ApiError("Can't find club", 404));
-  if (type === "90Minutes" || type === "30Minutes" || type === "60Minutes") {
+  if (type === "90Minutes" || type === "30Minutes" || type === "60Minutes" || type === "120Minutes") {
     end_date = moment(subscription.endData);
     start_date = moment(subscription.startData);
 
