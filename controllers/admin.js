@@ -668,185 +668,301 @@ exports.getUserReports = asyncHandler(
     await UserReports.find({}).then((reports) => res.json({ reports }))
 );
 
+// exports.clubReports = asyncHandler(async (req, res, next) => {
+//   await Club.find({}).then(async (clubs) => {
+//     const filterClubs = await Promise.all(
+//       clubs.map(async (club) => {
+//         const clubsGain = await Subscriptions.find({ club: club.id }).then(
+//           async (subs) => {
+//             let all_players = (
+//               await userSub.find({ club: club.id, expired: false })
+//             ).length;
+//             let players_day,
+//               players_month,
+//               players_week,
+//               players_year,
+//               players_60Minutes,
+//               players_90Minutes,
+//               players_30Minutes,
+//               players_120Minutes;
+
+//             players_day =
+//               players_month =
+//               players_year =
+//               players_week =
+//               players_120Minutes =
+//               players_60Minutes =
+//               players_90Minutes =
+//               players_30Minutes =
+//                 0;
+//             let day,
+//               month,
+//               week,
+//               year,
+//               minutes30,
+//               minutes60,
+//               minutes90,
+//               minutes120,
+//               appGyms60Minutes,
+//               appGyms120Minutes,
+//               appGyms90Minutes,
+//               appGyms30Minutes,
+//               appGymsDay,
+//               appGymsWeek,
+//               appGymsMonth,
+//               appGymsYear;
+
+//             day =
+//               month =
+//               year =
+//               week =
+//               appGyms60Minutes =
+//               appGyms120Minutes =
+//               appGyms90Minutes =
+//               appGyms30Minutes =
+//               minutes30 =
+//               minutes60 =
+//               minutes90 =
+//               minutes120 =
+//               appGymsMonth =
+//               appGymsYear =
+//               appGymsWeek =
+//               appGymsDay =
+//                 0;
+//             await Promise.all(
+//               subs.map(async (sub) => {
+//                 if (sub.type === "يومي") {
+//                   players_day = (await userSub.find({ subscription: sub.id }))
+//                     .length;
+//                   const price = Number(sub.price);
+//                   const commission = Number(club.commission);
+//                   const commission_price = (price * commission) / 100;
+//                   appGymsDay = commission_price;
+//                   day = price - commission_price;
+//                 } else if (sub.type === "شهري") {
+//                   players_month = (await userSub.find({ subscription: sub.id }))
+//                     .length;
+//                   const price = Number(sub.price);
+//                   const commission = Number(club.commission);
+//                   console.log(commission);
+//                   console.log(price);
+//                   const commission_price = (price * commission) / 100;
+//                   appGymsMonth = commission_price;
+//                   month = price - commission_price;
+//                 } else if (sub.type === "اسبوعي") {
+//                   players_week = (await userSub.find({ subscription: sub.id }))
+//                     .length;
+//                   const price = Number(sub.price);
+//                   const commission = Number(club.commission);
+//                   const commission_price = (price * commission) / 100;
+//                   console.log(commission);
+//                   console.log(price);
+//                   appGymsWeek = commission_price;
+//                   week = price - commission_price;
+//                 } else if (sub.type === "سنوي") {
+//                   players_year = (await userSub.find({ subscription: sub.id }))
+//                     .length;
+//                   const price = Number(sub.price);
+//                   const commission = Number(club.commission);
+//                   const commission_price = (price * commission) / 100;
+//                   appGymsYear = commission_price;
+//                   console.log(commission);
+//                   console.log(price);
+//                   year = price - commission_price;
+//                 } else if (sub.type.trim() === "120Minutes") {
+//                   players_120Minutes = (
+//                     await userSub.find({ subscription: sub.id })
+//                   ).length;
+//                   const price = Number(sub.price);
+//                   const commission = Number(club.commission);
+//                   const commission_price = (price * commission) / 100;
+//                   appGyms120Minutes = commission_price;
+//                   minutes120 = price - commission_price;
+//                 } else if (sub.type.trim() === "90Minutes") {
+//                   players_90Minutes = (
+//                     await userSub.find({ subscription: sub.id })
+//                   ).length;
+//                   const price = Number(sub.price);
+//                   const commission = Number(club.commission);
+//                   const commission_price = (price * commission) / 100;
+//                   appGyms90Minutes = commission_price;
+//                   minutes90 = price - commission_price;
+//                 } else if (sub.type.trim() === "60Minutes") {
+//                   players_60Minutes = (
+//                     await userSub.find({ subscription: sub.id })
+//                   ).length;
+//                   const price = Number(sub.price);
+//                   const commission = Number(club.commission);
+//                   const commission_price = (price * commission) / 100;
+//                   appGyms60Minutes = commission_price;
+//                   minutes60 = price - commission_price;
+//                 } else if (sub.type.trim() === "30Minutes") {
+//                   players_30Minutes = (
+//                     await userSub.find({ subscription: sub.id })
+//                   ).length;
+//                   const price = Number(sub.price);
+//                   const commission = Number(club.commission);
+//                   const commission_price = (price * commission) / 100;
+//                   appGyms30Minutes = commission_price;
+//                   minutes30 = price - commission_price;
+//                 }
+//               })
+//             );
+//             return {
+//               club_name: club.name,
+//               club_city: club.city,
+//               club_players: all_players,
+//               day: (day * players_day).toFixed(2),
+//               month: (month * players_month).toFixed(2),
+//               year: (year * players_year).toFixed(2),
+//               week: (week * players_week).toFixed(2),
+//               minutes120: (minutes120 * players_120Minutes).toFixed(2),
+//               minutes90: (minutes90 * players_90Minutes).toFixed(2),
+//               minutes60: (minutes60 * players_60Minutes).toFixed(2),
+//               minutes30: (minutes30 * players_30Minutes).toFixed(2),
+//               appGyms120Minutes: (
+//                 appGyms120Minutes * players_120Minutes
+//               ).toFixed(2),
+//               appGyms90Minutes: (appGyms90Minutes * players_90Minutes).toFixed(
+//                 2
+//               ),
+//               appGyms60Minutes: (appGyms60Minutes * players_60Minutes).toFixed(
+//                 2
+//               ),
+//               appGyms30Minutes: (appGyms30Minutes * players_30Minutes).toFixed(
+//                 2
+//               ),
+
+//               appGymsDay: (appGymsDay * players_day).toFixed(2),
+//               appGymsMonth: (appGymsMonth * players_month).toFixed(2),
+//               appGymsYear: (appGymsYear * players_year).toFixed(2),
+//               appGymsWeek: (appGymsWeek * players_week).toFixed(2),
+//             };
+//           }
+//         );
+//         return clubsGain;
+//       })
+//     );
+//     console.log(filterClubs);
+//     res.json({ clubs_report: filterClubs });
+//   });
+// });
+ 
 exports.clubReports = asyncHandler(async (req, res, next) => {
-  await Club.find({}).then(async (clubs) => {
-    const filterClubs = await Promise.all(
-      clubs.map(async (club) => {
-        const clubsGain = await Subscriptions.find({ club: club.id }).then(
-          async (subs) => {
-            let all_players = (
-              await userSub.find({ club: club.id, expired: false })
-            ).length;
-            let players_day,
-              players_month,
-              players_week,
-              players_year,
-              players_60Minutes,
-              players_90Minutes,
-              players_30Minutes,
-              players_120Minutes;
+  try {
+    const clubs = await Club.find({});
+    const filterClubs = await Promise.all(clubs.map(async (club) => {
+      const subscriptions = await Subscriptions.find({ club: club.id });
+      let all_players = (await userSub.find({ club: club.id, expired: false })).length;
 
-            players_day =
-              players_month =
-              players_year =
-              players_week =
-              players_120Minutes =
-              players_60Minutes =
-              players_90Minutes =
-              players_30Minutes =
-                0;
-            let day,
-              month,
-              week,
-              year,
-              minutes30,
-              minutes60,
-              minutes90,
-              minutes120,
-              appGyms60Minutes,
-              appGyms120Minutes,
-              appGyms90Minutes,
-              appGyms30Minutes,
-              appGymsDay,
-              appGymsWeek,
-              appGymsMonth,
-              appGymsYear;
+      let players_day = 0,
+        players_month = 0,
+        players_year = 0,
+        players_week = 0,
+        players_120Minutes = 0,
+        players_90Minutes = 0,
+        players_60Minutes = 0,
+        players_30Minutes = 0,
+        appGymsDay = 0,
+        appGymsMonth = 0,
+        appGymsYear = 0,
+        appGymsWeek = 0,
+        appGyms120Minutes = 0,
+        appGyms90Minutes = 0,
+        appGyms60Minutes = 0,
+        appGyms30Minutes = 0,
+        day = 0,
+        month = 0,
+        year = 0,
+        week = 0,
+        minutes120 = 0,
+        minutes90 = 0,
+        minutes60 = 0,
+        minutes30 = 0;
 
-            day =
-              month =
-              year =
-              week =
-              appGyms60Minutes =
-              appGyms120Minutes =
-              appGyms90Minutes =
-              appGyms30Minutes =
-              minutes30 =
-              minutes60 =
-              minutes90 =
-              minutes120 =
-              appGymsMonth =
-              appGymsYear =
-              appGymsWeek =
-              appGymsDay =
-                0;
-            await Promise.all(
-              subs.map(async (sub) => {
-                if (sub.type === "يومي") {
-                  players_day = (await userSub.find({ subscription: sub.id }))
-                    .length;
-                  const price = Number(sub.price);
-                  const commission = Number(club.commission);
-                  const commission_price = (price * commission) / 100;
-                  appGymsDay = commission_price;
-                  day = price - commission_price;
-                } else if (sub.type === "شهري") {
-                  players_month = (await userSub.find({ subscription: sub.id }))
-                    .length;
-                  const price = Number(sub.price);
-                  const commission = Number(club.commission);
-                  console.log(commission);
-                  console.log(price);
-                  const commission_price = (price * commission) / 100;
-                  appGymsMonth = commission_price;
-                  month = price - commission_price;
-                } else if (sub.type === "اسبوعي") {
-                  players_week = (await userSub.find({ subscription: sub.id }))
-                    .length;
-                  const price = Number(sub.price);
-                  const commission = Number(club.commission);
-                  const commission_price = (price * commission) / 100;
-                  console.log(commission);
-                  console.log(price);
-                  appGymsWeek = commission_price;
-                  week = price - commission_price;
-                } else if (sub.type === "سنوي") {
-                  players_year = (await userSub.find({ subscription: sub.id }))
-                    .length;
-                  const price = Number(sub.price);
-                  const commission = Number(club.commission);
-                  const commission_price = (price * commission) / 100;
-                  appGymsYear = commission_price;
-                  console.log(commission);
-                  console.log(price);
-                  year = price - commission_price;
-                } else if (sub.type === "120Minutes") {
-                  players_120Minutes = (
-                    await userSub.find({ subscription: sub.id })
-                  ).length;
-                  const price = Number(sub.price);
-                  const commission = Number(club.commission);
-                  const commission_price = (price * commission) / 100;
-                  appGyms120Minutes = commission_price;
-                  minutes120 = price - commission_price;
-                } else if (sub.type === "90Minutes") {
-                  players_90Minutes = (
-                    await userSub.find({ subscription: sub.id })
-                  ).length;
-                  const price = Number(sub.price);
-                  const commission = Number(club.commission);
-                  const commission_price = (price * commission) / 100;
-                  appGyms90Minutes = commission_price;
-                  minutes90 = price - commission_price;
-                } else if (sub.type === "60Minutes") {
-                  players_60Minutes = (
-                    await userSub.find({ subscription: sub.id })
-                  ).length;
-                  const price = Number(sub.price);
-                  const commission = Number(club.commission);
-                  const commission_price = (price * commission) / 100;
-                  appGyms60Minutes = commission_price;
-                  minutes60 = price - commission_price;
-                } else if (sub.type === "30Minutes") {
-                  players_30Minutes = (
-                    await userSub.find({ subscription: sub.id })
-                  ).length;
-                  const price = Number(sub.price);
-                  const commission = Number(club.commission);
-                  const commission_price = (price * commission) / 100;
-                  appGyms30Minutes = commission_price;
-                  minutes30 = price - commission_price;
-                }
-              })
-            );
-            return {
-              club_name: club.name,
-              club_city: club.city,
-              club_players: all_players,
-              day: (day * players_day).toFixed(2),
-              month: (month * players_month).toFixed(2),
-              year: (year * players_year).toFixed(2),
-              week: (week * players_week).toFixed(2),
-              minutes120: (minutes120 * players_120Minutes).toFixed(2),
-              minutes90: (minutes90 * players_90Minutes).toFixed(2),
-              minutes60: (minutes60 * players_60Minutes).toFixed(2),
-              minutes30: (minutes30 * players_30Minutes).toFixed(2),
-              appGyms120Minutes: (
-                appGyms120Minutes * players_120Minutes
-              ).toFixed(2),
-              appGyms90Minutes: (appGyms90Minutes * players_90Minutes).toFixed(
-                2
-              ),
-              appGyms60Minutes: (appGyms60Minutes * players_60Minutes).toFixed(
-                2
-              ),
-              appGyms30Minutes: (appGyms30Minutes * players_30Minutes).toFixed(
-                2
-              ),
+      for (const sub of subscriptions) {
+        let playersCount = (await userSub.find({ subscription: sub.id })).length;
+        const price = Number(sub.price);
+        const commission = Number(club.commission);
+        const commission_price = (price * commission) / 100;
 
-              appGymsDay: (appGymsDay * players_day).toFixed(2),
-              appGymsMonth: (appGymsMonth * players_month).toFixed(2),
-              appGymsYear: (appGymsYear * players_year).toFixed(2),
-              appGymsWeek: (appGymsWeek * players_week).toFixed(2),
-            };
-          }
-        );
-        return clubsGain;
-      })
-    );
-    console.log(filterClubs);
+        switch (sub.type.trim()) {
+          case "يومي":
+            players_day += playersCount;
+            appGymsDay += commission_price * playersCount;
+            day += (price - commission_price) * playersCount;
+            break;
+          case "شهري":
+            players_month += playersCount;
+            appGymsMonth += commission_price * playersCount;
+            month += (price - commission_price) * playersCount;
+            break;
+          case "اسبوعي":
+            players_week += playersCount;
+            appGymsWeek += commission_price * playersCount;
+            week += (price - commission_price) * playersCount;
+            break;
+          case "سنوي":
+            players_year += playersCount;
+            appGymsYear += commission_price * playersCount;
+            year += (price - commission_price) * playersCount;
+            break;
+          case "120Minutes":
+            players_120Minutes += playersCount;
+            appGyms120Minutes += commission_price * playersCount;
+            minutes120 += (price - commission_price) * playersCount;
+            break;
+          case "90Minutes":
+            players_90Minutes += playersCount;
+            appGyms90Minutes += commission_price * playersCount;
+            minutes90 += (price - commission_price) * playersCount;
+            break;
+          case "60Minutes":
+            players_60Minutes += playersCount;
+            appGyms60Minutes += commission_price * playersCount;
+            minutes60 += (price - commission_price) * playersCount;
+            break;
+          case "30Minutes":
+            players_30Minutes += playersCount;
+            appGyms30Minutes += commission_price * playersCount;
+            minutes30 += (price - commission_price) * playersCount;
+            break;
+          default:
+            break;
+        }
+      }
+
+      return {
+        club_name: club.name,
+        club_city: club.city,
+        club_players: all_players,
+        day: day.toFixed(2),
+        month: month.toFixed(2),
+        year: year.toFixed(2),
+        week: week.toFixed(2),
+        minutes120: minutes120.toFixed(2),
+        minutes90: minutes90.toFixed(2),
+        minutes60: minutes60.toFixed(2),
+        minutes30: minutes30.toFixed(2),
+        appGyms120Minutes: appGyms120Minutes.toFixed(2),
+        appGyms90Minutes: appGyms90Minutes.toFixed(2),
+        appGyms60Minutes: appGyms60Minutes.toFixed(2),
+        appGyms30Minutes: appGyms30Minutes.toFixed(2),
+        appGymsDay: appGymsDay.toFixed(2),
+        appGymsMonth: appGymsMonth.toFixed(2),
+        appGymsYear: appGymsYear.toFixed(2),
+        appGymsWeek: appGymsWeek.toFixed(2),
+      };
+    }));
+
     res.json({ clubs_report: filterClubs });
-  });
+  } catch (error) {
+    // Handle errors
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 });
+
 
 exports.deleteQuestion = asyncHandler(async (req, res, next) => {
   const { question } = req.body;

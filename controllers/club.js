@@ -440,4 +440,111 @@ exports.getClubBankAccount = async (req, res, next) => {
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
+exports.getClubEarns = asyncHandler(async (req, res, next) => {
+  const userId = req.user.id;
+  const user = await User.findById(userId);
+
+  // Find the club by its ID
+  const club = await Club.findById(user.club);
+  if (!club) {
+    return next(new ApiError("Club Not Found", 404));
+  }
+
+  // Fetch all subscriptions belonging to the club
+  const subscriptions = await Subscriptions.find({ club: club._id });
+
+  // Initialize variables to store earnings
+  let dailyEarnings = 0;
+  let monthlyEarnings = 0;
+  let yearlyEarnings = 0;
+
+  // Get current date, month, and year
+  const currentDate = new Date();
+  const currentMonth = currentDate.getMonth() + 1; // Month is zero-based
+  const currentYear = currentDate.getFullYear();
+
+  // Iterate over each subscription
+  for (const subscription of subscriptions) {
+    // Determine if the subscription is daily, monthly, or yearly
+    const isDailySubscription = [
+      "يومي",
+      "60Minutes",
+      "30Minutes",
+      "90Minutes",
+      "120Minutes",
+    ].includes(subscription.type);
+    const isMonthlySubscription = [
+      "يومي",
+      "شهري",
+      "60Minutes",
+      "30Minutes",
+      "90Minutes",
+      "120Minutes",
+    ].includes(subscription.type);
+    const isYearlySubscription = [
+      "يومي",
+      "شهري",
+      "سنوي",
+      "60Minutes",
+      "30Minutes",
+      "90Minutes",
+      "120Minutes",
+    ].includes(subscription.type);
+
+    // Find user subscriptions corresponding to this subscription
+    const userSubscriptions = await userSub.find({
+      subscription: subscription._id,
+      expired: false,
+      club: club._id,
+    });
+
+    for (const userSubscription of userSubscriptions) {
+      const startDate = new Date(userSubscription.start_date);
+      if (
+        (isDailySubscription &&
+          startDate.toDateString() === currentDate.toDateString()) ||
+        (isMonthlySubscription && startDate.getMonth() + 1 === currentMonth) ||
+        (isYearlySubscription && startDate.getFullYear() === currentYear)
+      ) {
+        switch (subscription.type) {
+          case "يومي":
+          case "شهري":
+          case "سنوي":
+          case "60Minutes":
+          case "30Minutes":
+          case "90Minutes":
+          case "120Minutes":
+            yearlyEarnings += subscription.price;
+
+          case "يومي":
+          case "شهري":
+
+          case "60Minutes":
+          case "30Minutes":
+          case "90Minutes":
+          case "120Minutes":
+            monthlyEarnings += subscription.price;
+
+          case "60Minutes":
+          case "30Minutes":
+          case "90Minutes":
+          case "120Minutes":
+            dailyEarnings += subscription.price;
+            break;
+
+          default:
+            break;
+        }
+      }
+    }
+  }
+
+  // Respond with the calculated earnings
+  res.status(200).json({
+    dailyEarnings,
+    monthlyEarnings,
+    yearlyEarnings,
+  });
+});
+
 exports.clubReports;
