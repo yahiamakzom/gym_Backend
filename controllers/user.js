@@ -1998,7 +1998,7 @@ exports.resetPassowrd = asyncHandler(async (req, res) => {
   if (!user) {
     return res.status(404).json({ error: "User not found" ,success:false});
   }
- if(password.length>6){ 
+ if(password.length<6){ 
   return res.status(404).json({ error: "Password should be at least 6 characters" ,success:false});
  }
   const hashedPassword = await bcrypt.hash(password, 10);
