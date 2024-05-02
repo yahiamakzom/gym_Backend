@@ -1990,10 +1990,10 @@ exports.updateUserLocation = asyncHandler(async (req, res) => {
   }
 });
 exports.resetPassowrd = asyncHandler(async (req, res) => {
-  const { code, password } = req.body;
+  const { code, password ,email } = req.body;
   console.log(code, password); 
   const codeParsed = parseInt(code);
-  const user = await User.findOne({ "otp": codeParsed });
+  const user = await User.findOne({ "otp": codeParsed ,"email":email });
   console.log(user);
   if (!user) {
     return res.status(404).json({ error: "User not found" ,success:false});
