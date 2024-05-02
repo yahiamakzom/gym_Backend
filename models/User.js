@@ -26,40 +26,42 @@ module.exports = mongoose.model(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Club",
     },
-    
+    otp: {
+      type: Number,
+    },
+
     wallet: Number,
     token: String,
     photo: String,
     lat: {
       type: String,
       default: "24.7136", // Default latitude value
-  },
-  long: {
+    },
+    long: {
       type: String,
       default: "46.6753", // Default longitude value
-  },
-    operations: [{
-      operationKind: {
-        type: String,
-        enum: ['خصم', 'ايداع'],
-    
+    },
+    operations: [
+      {
+        operationKind: {
+          type: String,
+          enum: ["خصم", "ايداع"],
+        },
+        operationQuantity: {
+          type: Number,
+        },
+        paymentKind: {
+          type: String,
+        },
+        subscriptionType: {
+          type: String,
+          default: null,
+        },
+        clubName: {
+          type: String,
+          default: null,
+        },
       },
-      operationQuantity: {
-        type: Number,
-      
-      },
-      paymentKind: {
-        type: String,
-      
-      },
-      subscriptionType: {
-        type: String,
-        default: null,
-      },
-      clubName: {
-        type: String,
-        default: null,
-      }
-    }]
+    ],
   })
 );

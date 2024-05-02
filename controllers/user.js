@@ -11,6 +11,8 @@ const Favorite = require("../models/Favorite");
 const ApiError = require("../utils/ApiError");
 const paypal = require("paypal-rest-sdk");
 const axios = require("axios");
+const bcrypt = require("bcrypt");
+const nodemailer = require("nodemailer");
 const {
   getBarandEntityId,
   getHyperPayHost,
@@ -303,7 +305,7 @@ exports.getClub = asyncHandler(async (req, res, next) => {
     if (club.sports.length == 1 && club.sports[0].trim() === "يوغا") {
       let filteredSubs = [];
       arr = [];
-      
+
       await Subscriptions.find({ club: req.params.club_id }).then(
         async (subscriptions) => {
           filteredSubs = subscriptions.filter(
@@ -861,7 +863,7 @@ exports.checkPayment = asyncHandler(async (req, res, next) => {
             if (
               type === "90Minutes" ||
               type === "30Minutes" ||
-              type === "60Minutes" || 
+              type === "60Minutes" ||
               type === "120Minutes"
             ) {
               let end_dateSub = moment(subscription.endData);
@@ -1769,11 +1771,10 @@ exports.walletDiscountSubscription = asyncHandler(async (req, res, next) => {
 });
 
 exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
-
   const yogaDataParsed = req.body;
-console.log("#######################################") 
-  console.log(yogaDataParsed)
-  console.log("#######################################")
+  console.log("#######################################");
+  console.log(yogaDataParsed);
+  console.log("#######################################");
   const { subId, brand, price, yogaSubscriptionDate, isYoga, clubId } =
     yogaDataParsed;
   const { id } = req.user;
@@ -1781,7 +1782,7 @@ console.log("#######################################")
   const userData = await User.findById(id);
   if (!userData) return next(new ApiError("User Not Found", 404));
 
-  if (isYoga === 'true') {
+  if (isYoga === "true") {
     const club = await Club.findById({ _id: clubId });
     console.log(club);
     if (!club) return next(new ApiError("Club Not Found", 404));
@@ -1861,7 +1862,12 @@ console.log("#######################################")
 
   await userData.save();
   if (!club) return next(new ApiError("Can't find club", 404));
-  if (type === "90Minutes" || type === "30Minutes" || type === "60Minutes" || type ==="120Minutes") {
+  if (
+    type === "90Minutes" ||
+    type === "30Minutes" ||
+    type === "60Minutes" ||
+    type === "120Minutes"
+  ) {
     end_date = moment(subscription.endData);
     start_date = moment(subscription.startData);
 
@@ -1982,4 +1988,63 @@ exports.updateUserLocation = asyncHandler(async (req, res) => {
     console.error("Error updating user location:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
+});
+exports.resetPassowrd = asyncHandler(async (req, res) => {
+  const { code, password } = req.body;
+  console.log(code, password); 
+  const codeParsed = parseInt(code);
+  const user = await User.findOne({ "otp": codeParsed });
+  console.log(user);
+  if (!user) {
+    return res.status(404).json({ error: "User not found" ,success:false});
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+  user.password = hashedPassword;
+  await user.save();
+  res.status(200).json({ message: "Password reset successful" ,success:true });
+});
+
+exports.forgetPassowrd = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    return res.status(404).json({ error: "User not found" });
+  }
+
+  const otp = Math.floor(Math.random() * 9000) + 1000;
+  user.otp = otp;
+  await user.save();
+  async function sendOTP() {
+    let transporter = nodemailer.createTransport({
+      service: "gmail",
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
+      auth: {
+        user: "mostafaisa208@gmail.com",
+        pass: "bqzl uyxy lvdu bfbk",
+      },
+    });
+
+    let info = await transporter.sendMail({
+      from: "appgyms.com",
+      to: user.email,
+      subject: "Your code for Password Reset",
+      html: `<h1>Your code is: ${otp}</h1>`,
+    });
+
+    console.log("Message sent: %s", info.messageId);
+  }
+
+  sendOTP()
+    .then((result) => {
+      console.log("Message sent: %s", result);
+      res
+        .status(200)
+        .json({ message: "OTP sent", success: true, code: otp });
+    })
+    .catch((err) => console.error(err));
 });
