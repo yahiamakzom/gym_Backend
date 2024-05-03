@@ -1794,7 +1794,7 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
 
     for (let i = 0; i < yogaSubscriptionDateParsed.length; i++) {
       const date = moment(yogaSubscriptionDateParsed[i].date);
-      const newDate = date.add(1, "day");
+      const newDate = date.add(24, "hours");
       console.log(date);
       console.log(newDate);
       const subscription = await Subscriptions.create({
