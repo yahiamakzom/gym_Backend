@@ -443,7 +443,8 @@ exports.getClubAuth = asyncHandler(async (req, res, next) => {
                       username: (await User.findById(id)).username,
                       club_name: club.name,
                       club_location: club.location,
-
+                      start_date: sub.start_date,
+                      end_date: sub.end_date,
                       subscription_id: sub.subscription.id,
 
                       subscription_name: sub.subscription.name,
@@ -1907,7 +1908,10 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
       end_date,
       code: userData.code,
     })
-    .then(() => res.status(200).send("Payment successful"));
+    .then(() => {
+      
+      res.status(200).send("Payment successful")
+    });
 });
 
 // filter clubs by type
@@ -2057,3 +2061,7 @@ exports.forgetPassowrd = asyncHandler(async (req, res) => {
     })
     .catch((err) => console.error(err));
 });
+ 
+
+
+
