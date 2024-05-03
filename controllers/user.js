@@ -1814,20 +1814,25 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
         subscriptionType: subscription.type,
       });
 
-      userSubscriptions.push({
-        user: id,
-        club: club._id,
-        subscription: subscription._id,
-        start_date: date,
-        end_date: newDate,
-        code: userData.code,
-      });
+      await userSub
+        .create({
+          user: id,
+          club: club._id,
+          subscription: subscription._id,
+          start_date: date,
+          end_date: newDate,
+          code: userData.code,
+        })
+        .then((res) => { 
+
+          console.log("user sub #####################")
+          console.log(res)
+          console.log("user sub #####################")
+        });
     }
 
     userData.operations.push(...userOperations);
     await userData.save();
-
-    await userSub.create(...userSubscriptions).then((res) => console.log(res));
 
     res.status(200).send("Payment successful");
   }
@@ -2000,12 +2005,10 @@ exports.resetPassowrd = asyncHandler(async (req, res) => {
     return res.status(404).json({ error: "User not found", success: false });
   }
   if (password.length < 6) {
-    return res
-      .status(200)
-      .json({
-        message: "Password should be at least 6 characters",
-        success: false,
-      });
+    return res.status(200).json({
+      message: "Password should be at least 6 characters",
+      success: false,
+    });
   }
   const hashedPassword = await bcrypt.hash(password, 10);
   user.password = hashedPassword;
