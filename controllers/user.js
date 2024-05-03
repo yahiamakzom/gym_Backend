@@ -1794,7 +1794,8 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
     for (let i = 0; i < yogaSubscriptionDateParsed.length; i++) {
       const date = moment(yogaSubscriptionDateParsed[i].date);
       const newDate = date.add(1, "day");
-
+      console.log(date);
+      console.log(newDate);
       const subscription = await Subscriptions.create({
         club: club._id,
         name: "subPersonal",
@@ -1826,7 +1827,7 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
     userData.operations.push(...userOperations);
     await userData.save();
 
-    await userSub.create(...userSubscriptions).then(res => console.log(res));
+    await userSub.create(...userSubscriptions).then((res) => console.log(res));
 
     res.status(200).send("Payment successful");
   }
@@ -1990,21 +1991,26 @@ exports.updateUserLocation = asyncHandler(async (req, res) => {
   }
 });
 exports.resetPassowrd = asyncHandler(async (req, res) => {
-  const { code, password ,email } = req.body;
-  console.log(code, password); 
+  const { code, password, email } = req.body;
+  console.log(code, password);
   const codeParsed = parseInt(code);
-  const user = await User.findOne({ "otp": codeParsed ,"email":email });
+  const user = await User.findOne({ otp: codeParsed, email: email });
   console.log(user);
   if (!user) {
-    return res.status(404).json({ error: "User not found" ,success:false});
+    return res.status(404).json({ error: "User not found", success: false });
   }
- if(password.length<6){ 
-  return res.status(200).json({ message: "Password should be at least 6 characters" ,success:false});
- }
+  if (password.length < 6) {
+    return res
+      .status(200)
+      .json({
+        message: "Password should be at least 6 characters",
+        success: false,
+      });
+  }
   const hashedPassword = await bcrypt.hash(password, 10);
   user.password = hashedPassword;
   await user.save();
-  res.status(200).json({ message: "Password reset successful" ,success:true });
+  res.status(200).json({ message: "Password reset successful", success: true });
 });
 
 exports.forgetPassowrd = asyncHandler(async (req, res) => {
@@ -2044,9 +2050,7 @@ exports.forgetPassowrd = asyncHandler(async (req, res) => {
   sendOTP()
     .then((result) => {
       console.log("Message sent: %s", result);
-      res
-        .status(200)
-        .json({ message: "OTP sent", success: true, code: otp });
+      res.status(200).json({ message: "OTP sent", success: true, code: otp });
     })
     .catch((err) => console.error(err));
 });

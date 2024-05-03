@@ -541,9 +541,9 @@ exports.getClubEarns = asyncHandler(async (req, res, next) => {
 
   // Respond with the calculated earnings
   res.status(200).json({
-    dailyEarnings,
-    monthlyEarnings,
-    yearlyEarnings,
+    dailyEarnings: dailyEarnings.toFixed(2),
+    monthlyEarnings: monthlyEarnings.toFixed(2),
+    yearlyEarnings: monthlyEarnings.toFixed(2),
   });
 });
 
