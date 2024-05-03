@@ -1809,7 +1809,7 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
 
       userOperations.push({
         operationKind: "خصم",
-        operationQuantity: price,
+        operationQuantity: yogaSubscriptionDateParsed[i].price,
         paymentKind: brand,
         clubName: club.name,
         subscriptionType: subscription.type,
