@@ -57,6 +57,10 @@ module.exports = mongoose.model(
         required: [true, "Please Enter city Name"],
         trim: true,
       },
+      ClubAdd:{ 
+        type: String,
+      },
+
       lat: {
         type: String,
         required: [true, "please add club lat"],

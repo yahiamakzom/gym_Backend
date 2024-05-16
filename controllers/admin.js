@@ -170,6 +170,7 @@ exports.addClub = asyncHandler(async (req, res, next) => {
     discountCode,
     discountQuantity,
     mapUrl,
+    ClubAdd
   } = req.body;
 
   let SportData = sports.split(",");
@@ -210,6 +211,7 @@ exports.addClub = asyncHandler(async (req, res, next) => {
         sports: [...SportData],
         WorkingDays: [...Days],
         mapUrl,
+        ClubAdd: ClubAdd || '',
 
         discounts: [{ discountCode, discountQuantity }],
       }).then(async (club) => {
@@ -249,6 +251,7 @@ exports.addClub = asyncHandler(async (req, res, next) => {
         to: null,
         mapUrl,
         commission,
+        ClubAdd: ClubAdd || '',
         sports: [...SportData],
         WorkingDays: [...Days],
         discounts: [{ discountCode, discountQuantity }],

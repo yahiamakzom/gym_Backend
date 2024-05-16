@@ -67,10 +67,29 @@ exports.makeReport = asyncHandler(
 );
 
 exports.getClubs = asyncHandler(async (req, res, next) => {
-  const { lat, long } = req.body;
+  const { lat, long, clubId } = req.body;
+  const clubsAddByAdmin = [];
+  let clubs;
+  if (clubId) {
+    const clubAdmin = await Club.findById(clubId); 
+  
+    if (!clubAdmin) return next(new ApiError("Can't find clubAdmin", 404));
+
+    let allClubs = await Club.find({});
+
+    allClubs.forEach((club) => {
+      if (club.ClubAdd == clubAdmin._id) {
+        clubsAddByAdmin.push(club);
+      }
+    });
+
+    clubs = [...clubsAddByAdmin];
+  
+  } else {
+    clubs = await Club.find({});
+  }
 
   // Retrieve all clubs
-  const clubs = await Club.find({});
 
   // Retrieve subscription prices for type "يومي" for all clubs
   const subscriptionPrices = await Promise.all(
@@ -1824,11 +1843,10 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
           end_date: newDate,
           code: userData.code,
         })
-        .then((res) => { 
-
-          console.log("user sub #####################")
-          console.log(res)
-          console.log("user sub #####################")
+        .then((res) => {
+          console.log("user sub #####################");
+          console.log(res);
+          console.log("user sub #####################");
         });
     }
 
@@ -1909,8 +1927,7 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
       code: userData.code,
     })
     .then(() => {
-      
-      res.status(200).send("Payment successful")
+      res.status(200).send("Payment successful");
     });
 });
 
@@ -2061,7 +2078,3 @@ exports.forgetPassowrd = asyncHandler(async (req, res) => {
     })
     .catch((err) => console.error(err));
 });
- 
-
-
-

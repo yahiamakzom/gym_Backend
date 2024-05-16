@@ -547,4 +547,126 @@ exports.getClubEarns = asyncHandler(async (req, res, next) => {
   });
 });
 
+exports.getCLubsReportsAdded = asyncHandler(async (req, res, next) => {
+  try {
+    let clubs = [];
+    const { id } = req.body;
+    const allClubs = await Club.find({});
+    const clubAdmin = await Club.findById(id);
+    if (!clubAdmin) return res.json({ clubs_report: [] });
+    allClubs.forEach((club) => {
+      if (club.ClubAdd == clubAdmin._id) {
+        clubs.push(club);
+      }
+    });
+    if (clubs.length < 0) return res.json({ clubs_report: [] });
+    const filterClubs = await Promise.all(
+      clubs.map(async (club) => {
+        const subscriptions = await Subscriptions.find({ club: club.id });
+        let all_players = (
+          await userSub.find({ club: club.id, expired: false })
+        ).length;
+
+        let players_day = 0,
+          players_month = 0,
+          players_year = 0,
+          players_week = 0,
+          players_120Minutes = 0,
+          players_90Minutes = 0,
+          players_60Minutes = 0,
+          players_30Minutes = 0,
+          appGymsDay = 0,
+          appGymsMonth = 0,
+          appGymsYear = 0,
+          appGymsWeek = 0,
+          appGyms120Minutes = 0,
+          appGyms90Minutes = 0,
+          appGyms60Minutes = 0,
+          appGyms30Minutes = 0,
+          day = 0,
+          month = 0,
+          year = 0,
+          week = 0,
+          minutes120 = 0,
+          minutes90 = 0,
+          minutes60 = 0,
+          minutes30 = 0;
+
+        for (const sub of subscriptions) {
+          let playersCount = (await userSub.find({ subscription: sub.id }))
+            .length;
+          const price = Number(sub.price);
+          const commission = Number(club.commission);
+          const commission_price = (price * commission) / 100;
+
+          switch (sub.type.trim()) {
+            case "يومي":
+              players_day += playersCount;
+              appGymsDay += commission_price * playersCount;
+              day += (price - commission_price) * playersCount;
+              break;
+            case "شهري":
+              players_month += playersCount;
+              appGymsMonth += commission_price * playersCount;
+              month += (price - commission_price) * playersCount;
+              break;
+            case "اسبوعي":
+              players_week += playersCount;
+              appGymsWeek += commission_price * playersCount;
+              week += (price - commission_price) * playersCount;
+              break;
+            case "سنوي":
+              players_year += playersCount;
+              appGymsYear += commission_price * playersCount;
+              year += (price - commission_price) * playersCount;
+              break;
+            case "120Minutes":
+              players_120Minutes += playersCount;
+              appGyms120Minutes += commission_price * playersCount;
+              minutes120 += (price - commission_price) * playersCount;
+              break;
+            case "90Minutes":
+              players_90Minutes += playersCount;
+              appGyms90Minutes += commission_price * playersCount;
+              minutes90 += (price - commission_price) * playersCount;
+              break;
+            case "60Minutes":
+              players_60Minutes += playersCount;
+              appGyms60Minutes += commission_price * playersCount;
+              minutes60 += (price - commission_price) * playersCount;
+              break;
+            case "30Minutes":
+              players_30Minutes += playersCount;
+              appGyms30Minutes += commission_price * playersCount;
+              minutes30 += (price - commission_price) * playersCount;
+              break;
+            default:
+              break;
+          }
+        }
+
+        return {
+          club_name: club.name,
+          club_city: club.city,
+          club_players: all_players,
+          day: day.toFixed(2),
+          month: month.toFixed(2),
+          year: year.toFixed(2),
+          week: week.toFixed(2),
+          minutes120: minutes120.toFixed(2),
+          minutes90: minutes90.toFixed(2),
+          minutes60: minutes60.toFixed(2),
+          minutes30: minutes30.toFixed(2),
+        
+        };
+      })
+    );
+
+    res.json({ clubs_report: filterClubs });
+  } catch (error) {
+    // Handle errors
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
 exports.clubReports;

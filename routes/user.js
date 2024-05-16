@@ -45,7 +45,7 @@ const verifyToken = require("../middlewares/verifyToken");
 const upload = require("../middlewares/upload");
 const imgUploader = require("../middlewares/imgUploader");
 
-router.get("/clubs", getClubs);
+router.post("/clubs", getClubs);
 router.get("/minclubs", getMinClubs);
 router.get("/blogs", getBlog);
 router.get("/blog/:blog_id", getBlogById);
