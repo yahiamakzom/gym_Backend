@@ -36,7 +36,10 @@ module.exports = mongoose.model(
         default:
           "https://www.google.com/maps/@24.7207538,46.4222781,9.96z?entry=ttu",
       },
-
+      isAddClubs: {
+        type: Boolean,
+        default: false,
+      },
       from: {
         type: String,
       },
@@ -57,7 +60,7 @@ module.exports = mongoose.model(
         required: [true, "Please Enter city Name"],
         trim: true,
       },
-      ClubAdd:{ 
+      ClubAdd: {
         type: String,
       },
 
