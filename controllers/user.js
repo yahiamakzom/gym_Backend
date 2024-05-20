@@ -136,6 +136,76 @@ exports.getClubs = asyncHandler(async (req, res, next) => {
     res.json({ Clubs: clubsWithPrices, countries });
   }
 });
+exports.getClubsByGet = asyncHandler(async (req, res, next) => {
+  const { lat, long, clubId } = req.body;
+  const clubsAddByAdmin = [];
+  let clubs;
+  if (clubId) {
+    const clubAdmin = await Club.findById(clubId); 
+  
+    if (!clubAdmin) return next(new ApiError("Can't find clubAdmin", 404));
+
+    let allClubs = await Club.find({});
+
+    allClubs.forEach((club) => {
+      if (club.ClubAdd == clubAdmin._id) {
+        clubsAddByAdmin.push(club);
+      }
+    });
+
+    clubs = [...clubsAddByAdmin];
+  
+  } else {
+    clubs = await Club.find({});
+  }
+
+  // Retrieve all clubs
+
+  // Retrieve subscription prices for type "يومي" for all clubs
+  const subscriptionPrices = await Promise.all(
+    clubs.map(async (club) => {
+      const dailySubscription = await Subscriptions.findOne({
+        club: club._id,
+        type: "يومي", // Filter by subscription type
+      });
+      const price = dailySubscription ? dailySubscription.price : null;
+      return { clubId: club._id, price };
+    })
+  );
+
+  const countries = {};
+  for (const club of clubs) {
+    if (countries[club.country]) {
+      countries[club.country].push(club.city);
+    } else {
+      countries[club.country] = [club.city];
+    }
+  }
+
+  if (lat && long) {
+    const clubsWithDistance = [];
+    for (const [index, club] of clubs.entries()) {
+      const distance = await calcDistance(
+        `${club.lat},${club.long}`,
+        `${lat},${long}`
+      );
+      if (!distance) return next(new ApiError("Invalid distance", 400));
+      clubsWithDistance.push({
+        ...club.toObject(),
+        distance: distance && distance,
+        subscriptionPrice: subscriptionPrices[index].price,
+      });
+    }
+
+    res.json({ Clubs: clubsWithDistance, countries });
+  } else {
+    const clubsWithPrices = clubs.map((club, index) => ({
+      ...club.toObject(),
+      subscriptionPrice: subscriptionPrices[index].price,
+    }));
+    res.json({ Clubs: clubsWithPrices, countries });
+  }
+});
 // exports.getClubs = asyncHandler(async (req, res, next) => {
 //   const { lat, long } = req.body;
 

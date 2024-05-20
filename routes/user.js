@@ -38,7 +38,8 @@ const {
   deleteUser,
   updateUserLocation,
   resetPassowrd,
-  forgetPassowrd
+  forgetPassowrd ,
+  getClubsByGet
 } = require("../controllers/user");
 const router = require("express").Router();
 const verifyToken = require("../middlewares/verifyToken");
@@ -46,6 +47,7 @@ const upload = require("../middlewares/upload");
 const imgUploader = require("../middlewares/imgUploader");
 
 router.post("/clubs", getClubs);
+router.get("/clubs", getClubsByGet);
 router.get("/minclubs", getMinClubs);
 router.get("/blogs", getBlog);
 router.get("/blog/:blog_id", getBlogById);
