@@ -18,7 +18,7 @@ module.exports = mongoose.model(
     role: {
       type: String,
       default: "client",
-      enum: ["admin", "club", "client"],
+      enum: ["admin", "club", "client" ,"clubManger"],
     },
 
     code: Number,

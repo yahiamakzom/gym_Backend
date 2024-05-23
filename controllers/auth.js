@@ -4,6 +4,7 @@ const Representative = require("../models/Representative ");
 const asyncHandler = require("express-async-handler");
 const ApiError = require("../utils/ApiError");
 const { sign } = require("jsonwebtoken");
+const Clubs = require("../models/Club");
 // exports.Register = asyncHandler(async (req, res, next) => {
 //   const {
 //     username,
@@ -104,6 +105,7 @@ exports.Login = asyncHandler(async (req, res, next) => {
       res
         .status(200)
         .json({ user: representative, token: representative.token });
+
       return;
     }
 
@@ -123,6 +125,17 @@ exports.Login = asyncHandler(async (req, res, next) => {
     delete user._doc.password;
     user.token = token;
     console.log(token);
+    const club = await Clubs.findById(user.club);
+    if (club) {
+      if ((club.isAddClubs = true)) {
+        const allClubsAdded = await Clubs.find({ ClubAdd: club._id });
+
+        if (allClubsAdded.length > 0) {
+          return res.json({ user, token });
+        }
+      }
+    }
+
     res.json({ user, token });
   } catch (error) {
     console.error(error);
