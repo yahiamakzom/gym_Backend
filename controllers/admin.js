@@ -171,7 +171,7 @@ exports.addClub = asyncHandler(async (req, res, next) => {
     discountQuantity,
     mapUrl,
     ClubAdd,
-    isAddClubs
+    isAddClubs,
   } = req.body;
 
   let SportData = sports.split(",");
@@ -266,9 +266,14 @@ exports.addClub = asyncHandler(async (req, res, next) => {
           representative.save();
           console.log(representative);
         }
+        let hashedPassword = await bcrypt.hash(password, 10);
+        if (ClubAdd) {
+          const user = await User.findOne({ club: ClubAdd });
+          hashedPassword = user.password;
+        }
         await User.create({
           email,
-          password: await bcrypt.hash(password, 10),
+          password: hashedPassword,
           role: "club",
           club: club.id,
           home_location: place_name,

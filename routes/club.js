@@ -11,6 +11,7 @@ const {
   deleteSubscription,
   BankData,
   getClubBankAccount,
+  getClubMangerClubs
 } = require("../controllers/club");
 const { addSubscreptionvalidatior } = require("../utils/validators/club");
 const imgUploader = require("../middlewares/imgUploader");
@@ -29,4 +30,5 @@ router.post("/bank_data", BankData);
 router.get("/bank_data", getClubBankAccount);
 router.get("/club_earns", getClubEarns);
 router.post("/clubs-report", getCLubsReportsAdded);
+router.get("/clubs-manger", getClubMangerClubs);
 module.exports = router;

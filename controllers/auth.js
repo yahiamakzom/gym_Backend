@@ -126,13 +126,18 @@ exports.Login = asyncHandler(async (req, res, next) => {
     user.token = token;
     console.log(token);
     const club = await Clubs.findById(user.club);
-    if (club) {
-      if ((club.isAddClubs = true)) {
+    console.log(club); 
+    if (club) { 
+      console.log(club)
+      if (club.isAddClubs = true) {
         const allClubsAdded = await Clubs.find({ ClubAdd: club._id });
-
+      
         if (allClubsAdded.length > 0) {
+          user.role ="clubManger"
           return res.json({ user, token });
         }
+      }else{ 
+        user.role ="client"
       }
     }
 

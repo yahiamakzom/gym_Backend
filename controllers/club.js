@@ -657,7 +657,6 @@ exports.getCLubsReportsAdded = asyncHandler(async (req, res, next) => {
           minutes90: minutes90.toFixed(2),
           minutes60: minutes60.toFixed(2),
           minutes30: minutes30.toFixed(2),
-        
         };
       })
     );
@@ -668,5 +667,17 @@ exports.getCLubsReportsAdded = asyncHandler(async (req, res, next) => {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
+});
+
+exports.getClubMangerClubs = asyncHandler(async (req, res, next) => {
+  const userId = req.user.id;
+  const user = await User.findById(userId);
+  const club = await Club.findById(user.club);
+  if (!club) {
+    return next(new ApiError("Club Not Found", 404));
+  }
+  const allClubs = await Club.find({ ClubAdd: club._id });
+
+  res.json({ clubs: allClubs, success: true });
 });
 exports.clubReports;
