@@ -126,20 +126,52 @@ exports.Login = asyncHandler(async (req, res, next) => {
     user.token = token;
     console.log(token);
     const club = await Clubs.findById(user.club);
-    console.log(club); 
-    if (club) { 
-      console.log(club)
-      if (club.isAddClubs = true) {
+    console.log(club);
+    if (club) {
+      console.log(club);
+      if ((club.isAddClubs = true)) {
         const allClubsAdded = await Clubs.find({ ClubAdd: club._id });
-      
+
         if (allClubsAdded.length > 0) {
-          user.role ="clubManger"
+          user.role = "clubManger";
           return res.json({ user, token });
         }
-      }else{ 
-        user.role ="client"
+      } else {
+        user.role = "client";
       }
     }
+
+    res.json({ user, token });
+  } catch (error) {
+    console.error(error);
+    return next(new ApiError("Internal Server Error", 500));
+  }
+});
+
+exports.ClubLogin = asyncHandler(async (req, res, next) => {
+
+  const { email, id } = req.body; 
+
+  try {
+    const user = await User.findOne({ email });
+console.log(user)
+    if (!user) {
+      return next(new ApiError("User not found", 404));
+    }
+
+    const token = sign({ id: user.id, role: user.role }, process.env.TOKEN);
+    delete user._doc.password;
+    user.token = token;
+
+    const club = await Clubs.findById(user.club);
+
+    if (!club) {
+      return next(new ApiError("User not found", 404));
+    }
+    if (club._id != id) {
+      return next(new ApiError("User not found", 404));
+    } 
+    console.log(club._id ,id ,'result of ' , club._id == id)
 
     res.json({ user, token });
   } catch (error) {
