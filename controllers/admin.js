@@ -172,6 +172,7 @@ exports.addClub = asyncHandler(async (req, res, next) => {
     mapUrl,
     ClubAdd,
     isAddClubs,
+    clubMemberCode
   } = req.body;
 
   let SportData = sports.split(",");
@@ -214,6 +215,7 @@ exports.addClub = asyncHandler(async (req, res, next) => {
         mapUrl,
         ClubAdd: ClubAdd || "",
         isAddClubs: isAddClubs || false,
+        clubMemberCode: clubMemberCode ,
 
         discounts: [{ discountCode, discountQuantity }],
       }).then(async (club) => {
@@ -257,6 +259,7 @@ exports.addClub = asyncHandler(async (req, res, next) => {
         sports: [...SportData],
         WorkingDays: [...Days],
         isAddClubs: isAddClubs || false,
+        clubMemberCode: clubMemberCode ,
         discounts: [{ discountCode, discountQuantity }],
       }).then(async (club) => {
         console.log(club);

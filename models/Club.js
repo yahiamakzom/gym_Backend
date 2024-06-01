@@ -63,7 +63,14 @@ module.exports = mongoose.model(
       ClubAdd: {
         type: String,
       },
-
+      clubMemberCode: {
+        type: String,
+        unique: true,
+      },
+      isWork: {
+        type: Boolean,
+        default: true,
+      },
       lat: {
         type: String,
         required: [true, "please add club lat"],

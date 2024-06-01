@@ -185,6 +185,7 @@ exports.editClub = asyncHandler(async (req, res, next) => {
     discountQuantity,
     yogaCardData,
     mapUrl,
+    isWork,
   } = req.body;
   const parsedYogaCardData = JSON.parse(yogaCardData);
 
@@ -247,6 +248,7 @@ exports.editClub = asyncHandler(async (req, res, next) => {
           yogaSessions: [...parsedYogaCardData],
           WorkingDays: uniqueCheckedDays,
           sports: uniqueCheckedItemsSports,
+          isWork: isWork,
         },
         { new: true }
       ).then((newclub) => {
@@ -278,7 +280,7 @@ exports.editClub = asyncHandler(async (req, res, next) => {
           mapUrl: mapUrl && mapUrl,
           to: null,
           yogaSessions: [...parsedYogaCardData],
-
+          isWork: isWork,
           WorkingDays: uniqueCheckedDays,
           sports: uniqueCheckedItemsSports,
         },
