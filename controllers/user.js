@@ -71,8 +71,8 @@ exports.getClubs = asyncHandler(async (req, res, next) => {
   const clubsAddByAdmin = [];
   let clubs;
   if (clubId) {
-    const clubAdmin = await Club.findById(clubId); 
-  
+    const clubAdmin = await Club.findById(clubId);
+
     if (!clubAdmin) return next(new ApiError("Can't find clubAdmin", 404));
 
     let allClubs = await Club.find({});
@@ -84,7 +84,6 @@ exports.getClubs = asyncHandler(async (req, res, next) => {
     });
 
     clubs = [...clubsAddByAdmin];
-  
   } else {
     clubs = await Club.find({});
   }
@@ -141,8 +140,8 @@ exports.getClubsByGet = asyncHandler(async (req, res, next) => {
   const clubsAddByAdmin = [];
   let clubs;
   if (clubId) {
-    const clubAdmin = await Club.findById(clubId); 
-  
+    const clubAdmin = await Club.findById(clubId);
+
     if (!clubAdmin) return next(new ApiError("Can't find clubAdmin", 404));
 
     let allClubs = await Club.find({});
@@ -154,7 +153,6 @@ exports.getClubsByGet = asyncHandler(async (req, res, next) => {
     });
 
     clubs = [...clubsAddByAdmin];
-  
   } else {
     clubs = await Club.find({});
   }
@@ -199,10 +197,13 @@ exports.getClubsByGet = asyncHandler(async (req, res, next) => {
 
     res.json({ Clubs: clubsWithDistance, countries });
   } else {
-    const clubsWithPrices = clubs.map((club, index) => ({
+    let clubsWithPrices = clubs.map((club, index) => ({
       ...club.toObject(),
       subscriptionPrice: subscriptionPrices[index].price,
     }));
+    clubsWithPrices = clubsWithPrices.filter(
+      (club, index) => club.isWork === true
+    );
     res.json({ Clubs: clubsWithPrices, countries });
   }
 });
@@ -1462,10 +1463,11 @@ exports.getClubByActivity = asyncHandler(async (req, res, next) => {
     );
 
     // Combine club details with subscription prices in the response
-    const clubsWithPrices = clubs.map((club, index) => ({
+    let clubsWithPrices = clubs.map((club, index) => ({
       ...club.toObject(),
       subscriptionPrice: subscriptionPrices[index].price,
     }));
+    clubsWithPrices = clubsWithPrices.filter((club) => club.isWork === true);
 
     res.status(200).json({ result: clubsWithPrices });
   } catch (e) {
@@ -2013,7 +2015,7 @@ exports.filterClubsBySubscriptionType = asyncHandler(async (req, res, next) => {
 
     // Retrieve all clubs with subscriptions of the specified type
     const clubs = await Club.find({});
-    const clubsWithSubscription = [];
+    let clubsWithSubscription = [];
 
     for (const club of clubs) {
       const subscription = await Subscriptions.findOne({
@@ -2028,7 +2030,9 @@ exports.filterClubsBySubscriptionType = asyncHandler(async (req, res, next) => {
         });
       }
     }
-
+    clubsWithSubscription = clubsWithSubscription.filter(
+      (club) => club.isWork === true
+    );
     res.json({ Clubs: clubsWithSubscription });
   } catch (error) {
     console.error(error);
