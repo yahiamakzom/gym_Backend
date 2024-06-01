@@ -149,12 +149,11 @@ exports.Login = asyncHandler(async (req, res, next) => {
 });
 
 exports.ClubLogin = asyncHandler(async (req, res, next) => {
-
-  const { email, id } = req.body; 
+  const { email, id } = req.body;
 
   try {
     const user = await User.findOne({ email });
-console.log(user)
+    console.log(user);
     if (!user) {
       return next(new ApiError("User not found", 404));
     }
@@ -170,11 +169,38 @@ console.log(user)
     }
     if (club._id != id) {
       return next(new ApiError("User not found", 404));
-    } 
-    console.log(club._id ,id ,'result of ' , club._id == id)
+    }
+    console.log(club._id, id, "result of ", club._id == id);
 
     res.json({ user, token });
   } catch (error) {
+    console.error(error);
+    return next(new ApiError("Internal Server Error", 500));
+  }
+});
+
+exports.ClubMemberLogin = asyncHandler(async (req, res, next) => {
+  const { clubMemberCode } = req.body;
+
+  try {
+    const club = await Clubs.findOne({ clubMemberCode });
+
+    if (!club) {
+      return next(new ApiError("User not found", 404));
+    }
+    const user = await User.findOne({ club: club._id });
+
+    console.log("user", user);
+    if (!user) {
+      return next(new ApiError("User not found", 404));
+    }
+    const token = sign({ id: user.id, role: user.role }, process.env.TOKEN);
+    delete user._doc.password;
+    user.token = token;
+
+    res.json({ user, token });
+  } catch (error) {
+    console.log("errrororoorororoor");
     console.error(error);
     return next(new ApiError("Internal Server Error", 500));
   }
