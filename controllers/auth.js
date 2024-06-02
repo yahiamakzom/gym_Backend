@@ -186,13 +186,13 @@ exports.ClubMemberLogin = asyncHandler(async (req, res, next) => {
     const club = await Clubs.findOne({ clubMemberCode });
 
     if (!club) {
-      return next(new ApiError("User not found", 404));
+      return res.status(404).json({});
     }
     const user = await User.findOne({ club: club._id });
 
     console.log("user", user);
     if (!user) {
-      return next(new ApiError("User not found", 404));
+      return res.status(404).json({});
     }
     const token = sign({ id: user.id, role: user.role }, process.env.TOKEN);
     delete user._doc.password;
