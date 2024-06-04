@@ -2359,7 +2359,7 @@ exports.AddOrderClub = asyncHandler(async (req, res, next) => {
 
           let info = await transporter.sendMail({
             from: "appgyms.com",
-            to: "mostafaisa208@gmail.com",
+            to: user.email,
             subject: "Your code for Password Reset",
             html: `<h1>Your club order has been successfully added to clubs!</h1>`,
           });
