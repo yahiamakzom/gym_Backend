@@ -109,7 +109,7 @@ router.post(
   AddClubOrder
 );
 router.get("/club_order", getOrderClubs);
-router.post("/get_club_order", getOrderClub);
+router.post("/get_club_order",getOrderClub);
 router.post("/add_order_data", AddOrderClub);
 router.post("/reset_password", resetPassowrd);
 module.exports = router;

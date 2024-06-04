@@ -2282,7 +2282,7 @@ exports.getOrderClubs = asyncHandler(async (req, res) => {
 exports.getOrderClub = asyncHandler(async (req, res) => {
   try {
     const { id } = req.body;
-    const order = await CLubOrder.findById({ id });
+    const order = await CLubOrder.findOne({_id: id });
     if (!order) {
       return next(new ApiError("Order Not Found", 404));
     }
@@ -2294,7 +2294,8 @@ exports.getOrderClub = asyncHandler(async (req, res) => {
       success: true,
       data: order,
     });
-  } catch (error) {
+  } catch (error) { 
+    console.log(error)
     res.status(500).json({
       success: false,
       message: "Server Error",
