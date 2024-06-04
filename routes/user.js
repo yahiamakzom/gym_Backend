@@ -109,7 +109,11 @@ router.post(
   AddClubOrder
 );
 router.get("/club_order", getOrderClubs);
-router.post("/get_club_order",getOrderClub);
-router.post("/add_order_data", AddOrderClub);
+router.post("/get_club_order", getOrderClub);
+router.post(
+  "/add_order_data",
+  imgUploader.fields([{ name: "clubImg" }, { name: "logo", maxCount: 1 }]),
+  AddOrderClub
+);
 router.post("/reset_password", resetPassowrd);
 module.exports = router;

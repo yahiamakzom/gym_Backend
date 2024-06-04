@@ -2282,7 +2282,7 @@ exports.getOrderClubs = asyncHandler(async (req, res) => {
 exports.getOrderClub = asyncHandler(async (req, res) => {
   try {
     const { id } = req.body;
-    const order = await CLubOrder.findOne({_id: id });
+    const order = await CLubOrder.findOne({ _id: id });
     if (!order) {
       return next(new ApiError("Order Not Found", 404));
     }
@@ -2294,19 +2294,93 @@ exports.getOrderClub = asyncHandler(async (req, res) => {
       success: true,
       data: order,
     });
-  } catch (error) { 
-    console.log(error)
+  } catch (error) {
+    console.log(error);
     res.status(500).json({
       success: false,
       message: "Server Error",
     });
   }
 });
-
-
-exports.AddOrderClub = asyncHandler(async (req, res) => {
+exports.AddOrderClub = asyncHandler(async (req, res, next) => {
   try {
-console.log(req.body)
+    const { id, commission } = req.body;
+
+    const order = await CLubOrder.findOne({ _id: id });
+    if (!order) {
+      return next(new ApiError("Order Not Found", 404));
+    }
+
+    await Club.create({
+      name: order.name,
+      country: order.country,
+      city: order.city,
+      location: order.location,
+      description: order.description,
+      gender: order.gender,
+      images: order.images,
+      lat: order.lat,
+      long: order.long,
+      logo: order.logo,
+      allDay: order.allDay,
+      from: order.from,
+      to: order.to,
+      mapUrl: order.mapUrl,
+      commission: commission,
+
+      sports: [...order.sports],
+      WorkingDays: [...order.WorkingDays],
+    })
+      .then(async (club) => {
+        console.log(club);
+
+        const hashedPassword = await bcrypt.hash(order.password, 10);
+
+        const user = await User.create({
+          email: order.email,
+          password: hashedPassword,
+          role: "club",
+          club: club.id,
+          home_location: order.location,
+          username: order.name,
+        });
+        // await CLubOrder.deleteOne({ _id: id });
+        async function sendOTP() {
+          let transporter = nodemailer.createTransport({
+            service: "gmail",
+            host: "smtp.gmail.com",
+            port: 587,
+            secure: false,
+            auth: {
+              user: "mostafaisa208@gmail.com",
+              pass: "bqzl uyxy lvdu bfbk",
+            },
+          });
+
+          let info = await transporter.sendMail({
+            from: "appgyms.com",
+            to: "mostafaisa208@gmail.com",
+            subject: "Your code for Password Reset",
+            html: `<h1>Your club order has been successfully added to clubs!</h1>`,
+          });
+
+          console.log("Message sent: %s", info.messageId);
+        }
+
+        sendOTP()
+          .then(async (result) => {
+            await CLubOrder.deleteOne({ _id: id });
+            console.log("Message sent: %s", result);
+            res.status(201).json({ club });
+          })
+          .catch((err) => console.error(err));
+      })
+      .catch((err) => {
+        res.status(500).json({
+          success: false,
+          message: e,
+        });
+      });
   } catch (error) {
     res.status(500).json({
       success: false,
