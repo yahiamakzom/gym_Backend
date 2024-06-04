@@ -2253,3 +2253,63 @@ exports.AddClubOrder = asyncHandler(async (req, res) => {
     res.status(500).json({ error: e });
   }
 });
+exports.getOrderClubs = asyncHandler(async (req, res) => {
+  try {
+    // Fetch all orders and select specific fields
+    const orders = await CLubOrder.find().select("createdAt logo name email");
+
+    // Ensure that all required fields are included in the response
+    const formattedOrders = orders.map((order) => ({
+      _id: order._id,
+      name: order.name || "N/A", // Default to "N/A" if name is missing
+      email: order.email || "N/A", // Default to "N/A" if email is missing
+      createdAt: order.createdAt,
+      logo: order.logo || "N/A", // Default to "N/A" if logo is missing
+    }));
+
+    // Send the response with the fetched data
+    res.status(200).json({
+      success: true,
+      data: formattedOrders,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+});
+exports.getOrderClub = asyncHandler(async (req, res) => {
+  try {
+    const { id } = req.body;
+    const order = await CLubOrder.findById({ id });
+    if (!order) {
+      return next(new ApiError("Order Not Found", 404));
+    }
+
+    // Ensure that all required fields are included in the response
+
+    // Send the response with the fetched data
+    res.status(200).json({
+      success: true,
+      data: order,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+});
+
+
+exports.AddOrderClub = asyncHandler(async (req, res) => {
+  try {
+console.log(req.body)
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+});

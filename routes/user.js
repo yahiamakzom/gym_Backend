@@ -41,6 +41,9 @@ const {
   forgetPassowrd,
   getClubsByGet,
   AddClubOrder,
+  getOrderClubs,
+  getOrderClub,
+  AddOrderClub,
 } = require("../controllers/user");
 const router = require("express").Router();
 const verifyToken = require("../middlewares/verifyToken");
@@ -105,6 +108,8 @@ router.post(
   imgUploader.fields([{ name: "clubImg" }, { name: "logo", maxCount: 1 }]),
   AddClubOrder
 );
-
+router.get("/club_order", getOrderClubs);
+router.post("/get_club_order", getOrderClub);
+router.post("/add_order_data", AddOrderClub);
 router.post("/reset_password", resetPassowrd);
 module.exports = router;
