@@ -65,7 +65,7 @@ module.exports = mongoose.model(
       },
       clubMemberCode: {
         type: String,
-        unique: true,
+        // unique: true,
       },
       isWork: {
         type: Boolean,

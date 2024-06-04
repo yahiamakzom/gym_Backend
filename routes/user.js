@@ -38,8 +38,9 @@ const {
   deleteUser,
   updateUserLocation,
   resetPassowrd,
-  forgetPassowrd ,
-  getClubsByGet
+  forgetPassowrd,
+  getClubsByGet,
+  AddClubOrder,
 } = require("../controllers/user");
 const router = require("express").Router();
 const verifyToken = require("../middlewares/verifyToken");
@@ -99,6 +100,11 @@ router.post("/pay-visa", verifyToken, hyperCheckout);
 router.get("/activities", GetActivities);
 router.post("/filter_by_subscriptionType", filterClubsBySubscriptionType);
 router.post("/forget_password", forgetPassowrd);
+router.post(
+  "/club_order",
+  imgUploader.fields([{ name: "clubImg" }, { name: "logo", maxCount: 1 }]),
+  AddClubOrder
+);
 
 router.post("/reset_password", resetPassowrd);
 module.exports = router;

@@ -1,4 +1,5 @@
 const Club = require("../models/Club");
+const CLubOrder = require("../models/ClubOrder.js");
 const Blog = require("../models/Blog");
 const Opinion = require("../models/Opinion");
 const asyncHandler = require("express-async-handler");
@@ -13,6 +14,7 @@ const paypal = require("paypal-rest-sdk");
 const axios = require("axios");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
+const { getLocationName } = require("../utils/Map");
 const {
   getBarandEntityId,
   getHyperPayHost,
@@ -2151,4 +2153,103 @@ exports.forgetPassowrd = asyncHandler(async (req, res) => {
       res.status(200).json({ message: "OTP sent", success: true, code: otp });
     })
     .catch((err) => console.error(err));
+});
+
+exports.AddClubOrder = asyncHandler(async (req, res) => {
+  try {
+    const {
+      name,
+      email,
+      password,
+      lat,
+      long,
+      description,
+      gender,
+      from,
+      to,
+      allDay,
+      sports,
+      days,
+      mapUrl,
+    } = req.body;
+    console.log(lat, long);
+    let SportData = sports.split(",");
+    let Days = days.split(",");
+    if (!req.files.clubImg)
+      return next(new ApiError("Please Add Club Imgs", 409));
+    if (!req.files.logo) return next(new ApiError("Please Add Club logo", 409));
+    const place_name = await getLocationName(lat, long);
+    if (!place_name) return next(new ApiError("Location Not Found", 404));
+
+    const imgs_path = await Promise.all(
+      req.files.clubImg.map(async (img) => {
+        const uploadImg = await cloudinary.uploader.upload(img.path);
+        return uploadImg.secure_url;
+      })
+    );
+    const logo = (await cloudinary.uploader.upload(req.files.logo[0].path))
+      .secure_url;
+    console.log(imgs_path);
+    console.log(logo);
+    await User.findOne({ email }).then(async (user) => {
+      if (user)
+        return next(new ApiError("User With This Email is Exists", 409));
+      console.log(allDay);
+      if (allDay == "false" || allDay == undefined) {
+        await CLubOrder.create({
+          name: name,
+          country: `${place_name.split(",")[place_name.split(",").length - 1]}`,
+          city: `${place_name.split(",")[place_name.split(",").length - 2]}`,
+          location: place_name,
+          logo,
+          description,
+          gender,
+          images: imgs_path,
+          lat: Number(lat),
+          long: Number(long),
+          // logo,
+          from,
+          to,
+          allDay: false,
+          email,
+          password,
+          sports: [...SportData],
+          WorkingDays: [...Days],
+          mapUrl,
+        }).then(async (club) => {
+          console.log(club);
+
+          res.status(201).json({ club });
+        });
+      } else {
+        await CLubOrder.create({
+          name: name,
+          country: `${place_name.split(",")[place_name.split(",").length - 1]}`,
+          city: `${place_name.split(",")[place_name.split(",").length - 2]}`,
+          location: place_name,
+          // description,
+          gender,
+          images: imgs_path,
+          lat: Number(lat),
+          long: Number(long),
+
+          description,
+          logo,
+          allDay,
+          from: null,
+          to: null,
+          email,
+          password,
+          mapUrl,
+          sports: [...SportData],
+          WorkingDays: [...Days],
+        }).then(async (club) => {
+          res.status(201).json({ club });
+        });
+      }
+    });
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({ error: e });
+  }
 });
