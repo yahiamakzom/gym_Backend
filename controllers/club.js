@@ -7,6 +7,7 @@ const userSub = require("../models/userSub");
 const { getLocationName } = require("../utils/Map");
 const Bank = require("../models/BankData");
 const cloudinary = require("cloudinary").v2;
+const { scheduleClubWorkOff } = require("../helper/clubDays");
 const moment = require("moment");
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
@@ -186,6 +187,7 @@ exports.editClub = asyncHandler(async (req, res, next) => {
     yogaCardData,
     mapUrl,
     isWork,
+    daysOf,
   } = req.body;
   const parsedYogaCardData = JSON.parse(yogaCardData);
 
@@ -285,8 +287,12 @@ exports.editClub = asyncHandler(async (req, res, next) => {
           sports: uniqueCheckedItemsSports,
         },
         { new: true }
-      ).then((newclub) => {
-        console.log(newclub);
+      ).then(async (newclub) => {
+        if (daysOf) {
+          newclub.isWork = false;
+          await newclub.save();
+          scheduleClubWorkOff(newclub._id, daysOf);
+        }
         res.json({ club: newclub });
       });
     }
