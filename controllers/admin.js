@@ -22,8 +22,6 @@ cloudinary.config({
   api_secret: process.env.CLOUD_API_SECRET,
 });
 
-
-
 exports.addClub = asyncHandler(async (req, res, next) => {
   const {
     name,
@@ -33,132 +31,77 @@ exports.addClub = asyncHandler(async (req, res, next) => {
     long,
     description,
     gender,
-    from,
-    to,
-    allDay,
     commission,
-    repreentative_id,
     sports,
-    days,
-    discountCode,
-    discountQuantity,
     mapUrl,
     ClubAdd,
     isAddClubs,
-    clubMemberCode
+    clubMemberCode,
   } = req.body;
 
   let SportData = sports.split(",");
-  let Days = days.split(",");
-  if (!req.files.clubImg)
-    return next(new ApiError("Please Add Club Imgs", 409));
-  if (!req.files.logo) return next(new ApiError("Please Add Club logo", 409));
-  const place_name = await getLocationName(lat, long);
-  if (!place_name) return next(new ApiError("Location Not Found", 404));
+
+  if (!req.files.clubImg || !req.files.logo) {
+    return next(new ApiError("Please Add Club Images and Logo", 409));
+  }
+  console.log(lat, long);
+  // const place_name = await getLocationName(Number(lat), Number(long));
+  const place_name =
+    "Awlad Nijm Bahjurah, Nag Hammadi, Qena Governorate, Egypt";
+
+  console.log("error");
   console.log(place_name);
+  if (!place_name) return next(new ApiError("Location Not Found", 404));
+
   const imgs_path = await Promise.all(
     req.files.clubImg.map(async (img) => {
       const uploadImg = await cloudinary.uploader.upload(img.path);
       return uploadImg.secure_url;
     })
   );
+
   const logo = (await cloudinary.uploader.upload(req.files.logo[0].path))
     .secure_url;
-  await User.findOne({ email }).then(async (user) => {
-    if (user) return next(new ApiError("User With This Email is Exists", 409));
-    console.log(allDay);
-    if (allDay == "false" || allDay == undefined) {
-      await Club.create({
-        name: name,
-        country: `${place_name.split(",")[place_name.split(",").length - 1]}`,
-        city: `${place_name.split(",")[place_name.split(",").length - 2]}`,
-        location: place_name,
-        description,
-        gender,
-        images: imgs_path,
-        lat: Number(lat),
-        long: Number(long),
-        logo,
-        from,
-        to,
-        allDay: false,
-        commission,
-        sports: [...SportData],
-        WorkingDays: [...Days],
-        mapUrl,
-        ClubAdd: ClubAdd || "",
-        isAddClubs: isAddClubs || false,
-        clubMemberCode: clubMemberCode ,
 
-        discounts: [{ discountCode, discountQuantity }],
-      }).then(async (club) => {
-        console.log(club);
+  const existingUser = await User.findOne({ email });
+  if (existingUser)
+    return next(new ApiError("User With This Email Already Exists", 409));
 
-        let representative = await Representative.findById(repreentative_id);
-        if (representative) {
-          representative.clups.push(club.id);
-          representative.save();
-          console.log(representative);
-        }
-
-        await User.create({
-          email,
-          password: await bcrypt.hash(password, 10),
-          role: "club",
-          club: club.id,
-          home_location: place_name,
-          username: name,
-        });
-        res.status(201).json({ club });
-      });
-    } else {
-      await Club.create({
-        name: name,
-        country: `${place_name.split(",")[place_name.split(",").length - 1]}`,
-        city: `${place_name.split(",")[place_name.split(",").length - 2]}`,
-        location: place_name,
-        description,
-        gender,
-        images: imgs_path,
-        lat: Number(lat),
-        long: Number(long),
-        logo,
-        allDay,
-        from: null,
-        to: null,
-        mapUrl,
-        commission,
-        ClubAdd: ClubAdd || "",
-        sports: [...SportData],
-        WorkingDays: [...Days],
-        isAddClubs: isAddClubs || false,
-        clubMemberCode: clubMemberCode ,
-        discounts: [{ discountCode, discountQuantity }],
-      }).then(async (club) => {
-        console.log(club);
-        let representative = await Representative.findById(repreentative_id);
-        if (representative) {
-          representative.clups.push(club.id);
-          representative.save();
-          console.log(representative);
-        }
-        let hashedPassword = await bcrypt.hash(password, 10);
-        if (ClubAdd) {
-          const user = await User.findOne({ club: ClubAdd });
-          hashedPassword = user.password;
-        }
-        await User.create({
-          email,
-          password: hashedPassword,
-          role: "club",
-          club: club.id,
-          home_location: place_name,
-          username: name,
-        });
-        res.status(201).json({ club });
-      });
-    }
+  const club = await Club.create({
+    name,
+    country: `${place_name.split(",").pop()}`,
+    city: `${place_name.split(",").slice(-2, -1)[0]}`,
+    location: place_name,
+    description,
+    gender,
+    images: imgs_path,
+    lat: Number(lat),
+    long: Number(long),
+    logo,
+    mapUrl,
+    commission,
+    ClubAdd: ClubAdd || "",
+    sports: [...SportData],
+    isAddClubs: isAddClubs || false,
+    clubMemberCode: clubMemberCode,
   });
+
+  let hashedPassword = await bcrypt.hash(password, 10);
+  if (ClubAdd) {
+    const user = await User.findOne({ club: ClubAdd });
+    hashedPassword = user.password;
+  }
+
+  await User.create({
+    email,
+    password: hashedPassword,
+    role: "club",
+    club: club.id,
+    home_location: place_name,
+    username: name,
+  });
+
+  res.status(201).json({ club });
 });
 
 // exports.editClub = asyncHandler(async (req, res, next) => {

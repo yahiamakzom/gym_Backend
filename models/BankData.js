@@ -1,22 +1,29 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
-module.exports = new mongoose.Schema(
-  {
-    name: {
-      type: String,
-    },
-    phone: {
-      type: String,
-    },
-    bankName: {
-      type: String,
-    },
-    bankAccountName: {
-      type: String,
-    },
-    bankAccountNumber: {
-      type: String,
-    },
+// Define the schema for the bank account
+const bankAccountSchema = new mongoose.Schema({
+  ownerName: {
+    type: String,
+    required: true,
+    trim: true, // Removes whitespace from both ends of the string
   },
-  { timestamps: true }
-);
+  iban: {
+    type: String,
+    required: true,
+    unique: true, // IBANs are unique identifiers for bank accounts
+    trim: true,
+    match: /^[A-Z0-9]+$/, // Basic regex to ensure IBAN format (letters and digits only)
+  },
+  bankName: {
+    type: String,
+    required: true,
+    trim: true,
+  }
+}, {
+  timestamps: true, // Adds createdAt and updatedAt timestamps
+});
+
+// Create the model from the schema
+const BankAccount = mongoose.model('BankAccount', bankAccountSchema);
+
+module.exports = BankAccount;

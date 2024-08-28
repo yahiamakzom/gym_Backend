@@ -12,6 +12,7 @@ const {
   BankData,
   getClubBankAccount,
   getClubMangerClubs,
+
 } = require("../controllers/club");
 const { addSubscreptionvalidatior } = require("../utils/validators/club");
 const imgUploader = require("../middlewares/imgUploader");
@@ -64,9 +65,7 @@ const imgUploader = require("../middlewares/imgUploader");
  *       500:
  *         description: Internal Server Error
  */
-router.post("/subscription", addSubscreptionvalidatior, addSubscreptions);  
-
-
+router.post("/subscription", addSubscreptionvalidatior, addSubscreptions);
 
 /**
  * @swagger
@@ -124,7 +123,6 @@ router.post("/subscription", addSubscreptionvalidatior, addSubscreptions);
  *         description: Internal server error.
  */
 router.get("/subscriptions", getSubscriptions);
- 
 
 /**
  * @swagger
@@ -394,7 +392,6 @@ router.put(
  */
 router.put("/subscription/:subId", editSubscription);
 
-
 /**
  * @swagger
  * /club/subscription/{subId}:
@@ -421,9 +418,6 @@ router.put("/subscription/:subId", editSubscription);
  *         description: Internal server error.
  */
 router.delete("/subscription/:subId", deleteSubscription);
-
-
-
 
 /**
  * @swagger
@@ -535,8 +529,6 @@ router.delete("/subscription/:subId", deleteSubscription);
  *                   example: Internal Server Error
  */
 router.post("/bank_data", BankData);
-
-
 
 /**
  * @swagger
@@ -663,9 +655,6 @@ router.get("/bank_data", getClubBankAccount);
  *                   example: Internal Server Error
  */
 router.get("/club_earns", getClubEarns);
-
-
-
 
 /**
  * @swagger
@@ -794,7 +783,7 @@ router.get("/club_earns", getClubEarns);
  *                 message: 'Internal server error'
  */
 
-router.post("/clubs-report", getCLubsReportsAdded); 
+router.post("/clubs-report", getCLubsReportsAdded);
 
 /**
  * @swagger
@@ -876,4 +865,6 @@ router.post("/clubs-report", getCLubsReportsAdded);
  */
 
 router.get("/clubs-manger", getClubMangerClubs);
+
+
 module.exports = router;

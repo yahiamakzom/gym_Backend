@@ -8,7 +8,8 @@ const { getLocationName } = require("../utils/Map");
 const Bank = require("../models/BankData");
 const cloudinary = require("cloudinary").v2;
 const { scheduleClubWorkOff } = require("../helper/clubDays");
-const moment = require("moment");
+const moment = require("moment"); 
+const CLubOrder = require("../models/ClubOrder");
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.CLOUD_API_KEY,
@@ -687,5 +688,9 @@ exports.getClubMangerClubs = asyncHandler(async (req, res, next) => {
   const allClubs = await Club.find({ ClubAdd: club._id });
 
   res.json({ clubs: allClubs, success: true });
-});
+}); 
+
+
+
+
 exports.clubReports;
