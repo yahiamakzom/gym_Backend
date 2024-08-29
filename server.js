@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 require("dotenv").config();
-const PORT = process.env.PORT ||8080;
+const PORT = process.env.PORT || 8080;
 const path = require("path");
 const DB = require("./config/DB.config");
 const verifyRoles = require("./middlewares/verifyRoles");
@@ -32,17 +32,16 @@ app.use(
 );
 app.use("/representative", require("./routes/representative"));
 app.use("/user", require("./routes/user"));
-app.use("/club", verifyRoles("club"), require("./routes/club")); 
+app.use("/club", verifyRoles("club"), require("./routes/club"));
 app.use("/orders", require("./routes/clubOrder"));
+app.use("/suberadmin", require("./routes/suberAdmin"));
 app.get("/rule/:type", getRuleType);
 
 app.use(require("./middlewares/globalError"));
 
 app.use("*", (req, res, next) =>
   res.status(404).json({ message: "Page Not Found" })
-); 
-
-
+);
 
 DB.then((con) => {
   app.listen(PORT, () => {

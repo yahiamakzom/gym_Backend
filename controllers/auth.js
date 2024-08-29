@@ -205,3 +205,48 @@ exports.ClubMemberLogin = asyncHandler(async (req, res, next) => {
     return next(new ApiError("Internal Server Error", 500));
   }
 });
+
+exports.LoginControlPanel = asyncHandler(async (req, res, next) => {
+  const { email, password } = req.body;
+
+  try {
+    // Find the user by email
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ error: "User not found", success: false });
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res
+        .status(400)
+        .json({ error: "Invalid password", success: false });
+    }
+
+    // Generate JWT token
+    const token = sign({ id: user.id }, process.env.TOKEN);
+
+    delete user._doc.password;
+    user.token = token;
+
+    // Find the club associated with the user
+    const club = await Clubs.findById(user.club);
+    if (!club) {
+      return res.status(404).json({ error: "Club not found", success: false });
+    }
+
+    // Fetch sub-clubs associated with the found club
+    const subClubs = await club.getSubClubs();
+
+    // Respond with the club information and its sub-clubs
+    res.status(200).json({
+      success: true,
+      IR: club._id,
+      message: "Login successful",
+      data: subClubs,
+    });
+  } catch (error) {
+    console.error(error);
+    return next(new ApiError("Internal Server Error", 500));
+  }
+});
