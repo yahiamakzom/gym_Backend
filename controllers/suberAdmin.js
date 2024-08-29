@@ -208,6 +208,8 @@ exports.editSubClub = asyncHandler(async (req, res, next) => {
   subClub.clubMemberCode = clubMemberCode || subClub.clubMemberCode;
   subClub.images = imgs_path;
   subClub.logo = logo;
+  // 
+  // 
 
 
   const updatedSubClub = await subClub.save();
