@@ -34,15 +34,32 @@ discountCodeSchema.pre('save', async function (next) {
   const currentDate = new Date();
   if (this.validTo && this.validTo <= currentDate) {
 
-    await this.remove();
+  console.log(this)
   }
   next();
 });
 
 
+discountCodeSchema.methods.deleteIfExpired = async function () {
+  const currentDate = new Date();
+  if (this.validTo && this.validTo <= currentDate) {
+    await this.remove();
+    return true;
+  }
+  return false;
+};
+
+// Static method to delete all expired discount codes
 discountCodeSchema.statics.deleteExpiredDiscounts = async function () {
   const currentDate = new Date();
-  await this.deleteMany({ validTo: { $lte: currentDate } });
+  const results = await this.find({ validTo: { $lte: currentDate, $exists: true, $ne: null } });
+  
+
+  const deletionResults = await Promise.all(results.map(async (doc) => await doc.deleteIfExpired()));
+
+  return {
+    deletedCount: deletionResults.filter(result => result).length
+  };
 };
 
 const DiscountCode = mongoose.model('DiscountCode', discountCodeSchema);

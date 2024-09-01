@@ -13,6 +13,7 @@ const { getRuleType } = require("./controllers/rules");
 const { refreshSubscriptions } = require("./helper/refreshSubscriptions");
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./swager");
+const startClubReactivationJob = require("./helper/reActiveClubs");
 const startDiscountCleanupJob = require("./helper/discountsClean");
 app.use(express.static(path.join(__dirname, "images")));
 app.use(express.static("public"));
@@ -35,6 +36,7 @@ app.use("/user", require("./routes/user"));
 app.use("/club", verifyRoles("club"), require("./routes/club"));
 app.use("/orders", require("./routes/clubOrder"));
 app.use("/suberadmin", require("./routes/suberAdmin"));
+app.use("/clubs", require("./routes/global_clubs"));
 app.get("/rule/:type", getRuleType);
 
 app.use(require("./middlewares/globalError"));
@@ -47,6 +49,7 @@ DB.then((con) => {
   app.listen(PORT, () => {
     refreshSubscriptions();
     startDiscountCleanupJob();
+    startClubReactivationJob();
     console.log(
       "Listening On   " + PORT + " DB Connect To" + con.connection.host
     );

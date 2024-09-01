@@ -7,6 +7,8 @@ const {
   deleteSubClub,
   getSubClub,
   editSubClub,
+  addDiscount,
+  deleteDiscount
 } = require("../controllers/suberAdmin");
 
 /**
@@ -516,4 +518,181 @@ router.put(
   editSubClub
 );
 
+
+
+
+
+/**
+ * @swagger
+ * /suberadmin/add-discount/{suberadminclub Id}:
+ *   post:
+ *     summary: Add a discount code to a club
+ *     description: Creates a new discount code and associates it with a specified club. The discount code includes details such as the discount percentage, start date, and end date of validity.
+ *     tags:
+ *       - Suber Admin
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: The ID of the club to which the discount code will be added
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               code:
+ *                 type: string
+ *                 description: The unique discount code to be created
+ *               discountPercentage:
+ *                 type: number
+ *                 format: float
+ *                 description: The discount percentage (0-100)
+ *               validFrom:
+ *                 type: string
+ *                 format: date-time
+ *                 description: The start date and time from which the discount code is valid. If not provided, defaults to the current date and time
+ *               validTo:
+ *                 type: string
+ *                 format: date-time
+ *                 description: The end date and time until which the discount code is valid. Optional; if not provided, the discount code does not expire
+ *             required:
+ *               - code
+ *               - discountPercentage
+ *     responses:
+ *       '201':
+ *         description: Discount code successfully created and associated with the club
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Discount code added successfully"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     code:
+ *                       type: string
+ *                       example: "SUMMER20"
+ *                     discountPercentage:
+ *                       type: number
+ *                       format: float
+ *                       example: 20
+ *                     validFrom:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2024-08-01T00:00:00Z"
+ *                     validTo:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2024-12-31T23:59:59Z"
+ *                     club:
+ *                       type: string
+ *                       example: "60d21b4667d0d8992e610c85"
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2024-08-01T12:00:00Z"
+ *                     updatedAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2024-08-01T12:00:00Z"
+ *       '400':
+ *         description: Invalid request data or discount percentage
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Invalid discount percentage or request data"
+ *       '404':
+ *         description: Club not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Club Not Found"
+ */
+
+router.post("/add-discount/:id", addDiscount);
+
+
+
+/**
+ * @swagger
+ * /suberadmin/delete-discount/{id}:
+ *   delete:
+ *     summary: Delete a discount code
+ *     description: Deletes a discount code from the database by its ID.
+ *     tags:
+ *       - Club
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: The ID of the discount code to delete
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Discount code deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Discount code deleted successfully"
+ *       '404':
+ *         description: Discount code not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Discount code not found"
+ *       '500':
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
+ */
+
+router.delete("/delete-discount/:id", deleteDiscount);
 module.exports = router;

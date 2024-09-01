@@ -12,15 +12,20 @@ const bankAccountSchema = new mongoose.Schema({
     required: true,
     unique: true, // IBANs are unique identifiers for bank accounts
     trim: true,
-    match: /^[A-Z0-9]+$/, // Basic regex to ensure IBAN format (letters and digits only)
+    match: /^[A-Z0-9]+$/, 
   },
   bankName: {
     type: String,
     required: true,
     trim: true,
+  } ,
+  club: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Club',
+    required: true, 
   }
 }, {
-  timestamps: true, // Adds createdAt and updatedAt timestamps
+  timestamps: true, 
 });
 
 // Create the model from the schema

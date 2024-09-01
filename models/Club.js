@@ -5,7 +5,7 @@ const clubSchema = new mongoose.Schema(
     type: {
       type: String,
       default: "superadmin",
-      enum: [ "admin", "superadmin"],
+      enum: ["admin", "superadmin"],
     },
     name: {
       type: String,
@@ -19,7 +19,8 @@ const clubSchema = new mongoose.Schema(
     },
     mapUrl: {
       type: String,
-      default: "https://www.google.com/maps/@24.7207538,46.4222781,9.96z?entry=ttu",
+      default:
+        "https://www.google.com/maps/@24.7207538,46.4222781,9.96z?entry=ttu",
     },
     isAddClubs: {
       type: Boolean,
@@ -97,23 +98,47 @@ const clubSchema = new mongoose.Schema(
     parentClub: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Club",
-      default: null, 
+      default: null,
     },
-
+    stopSchedule: {
+      start: {
+        type: Date,
+        default: null,
+      },
+      end: {
+        type: Date,
+        default: null,
+      },
+    },
+    isTemporarilyStopped: {
+      type: Boolean,
+      default: false,
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
   },
   { timestamps: true }
 );
-
 
 clubSchema.methods.getSubClubs = async function () {
   return await mongoose.model("Club").find({ parentClub: this._id });
 };
 
-
 clubSchema.statics.findSubClubs = async function (superAdminClubId) {
   return await this.find({ parentClub: superAdminClubId });
 };
 
-
+clubSchema.methods.reactivateIfNeeded = async function () {
+  const now = new Date();
+  if (this.isTemporarilyStopped) {
+    if (this.stopSchedule.end && new Date(this.stopSchedule.end) <= now) {
+      this.isTemporarilyStopped = false;
+      this.isActive = true;
+      await this.save();
+    }
+  }
+};
 
 module.exports = mongoose.model("Club", clubSchema);

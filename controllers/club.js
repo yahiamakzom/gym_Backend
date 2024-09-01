@@ -8,8 +8,11 @@ const { getLocationName } = require("../utils/Map");
 const Bank = require("../models/BankData");
 const cloudinary = require("cloudinary").v2;
 const { scheduleClubWorkOff } = require("../helper/clubDays");
-const moment = require("moment"); 
-const CLubOrder = require("../models/ClubOrder");
+const moment = require("moment");
+const DiscountCode = require("../models/DiscountCode");
+const CLubOrder = require("../models/ClubOrder"); 
+const ClubHours = require("../models/clubHours");
+
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.CLOUD_API_KEY,
@@ -688,9 +691,306 @@ exports.getClubMangerClubs = asyncHandler(async (req, res, next) => {
   const allClubs = await Club.find({ ClubAdd: club._id });
 
   res.json({ clubs: allClubs, success: true });
-}); 
+});
+
+exports.scheduleClubSuspension = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+  const { start, end, isTemporarilyStopped } = req.body;
+
+  const club = await Club.findById(id);
+  if (!club) {
+    return next(new ApiError("Club Not Found", 404));
+  }
+  console.log(start, end);
+
+  if (start && end && new Date(start) <= new Date(end)) {
+    // Update the stop schedule
+    club.stopSchedule.start = new Date(start);
+    club.stopSchedule.end = new Date(end);
+
+    if (isTemporarilyStopped == "true") {
+      club.isTemporarilyStopped = true;
+      club.isActive = false;
+    } else {
+      club.isTemporarilyStopped = false;
+      club.isActive = false;
+    }
+
+    await club.save();
+
+    res
+      .status(200)
+      .json({ success: true, message: "Club status updated", data: club });
+  } else {
+    res.status(400).json({ error: "Invalid start or end dates" });
+  }
+});
+
+exports.removeClubSuspension = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+
+  const club = await Club.findById(id);
+  if (!club) {
+    return next(new ApiError("Club Not Found", 404));
+  }
+
+  // Remove the suspension
+  club.stopSchedule.start = null;
+  club.stopSchedule.end = null;
+  club.isTemporarilyStopped = false;
+  club.isActive = true;
+
+  await club.save();
+
+  res
+    .status(200)
+    .json({ success: true, message: "Club suspension removed", data: club });
+});
+
+exports.addDiscount = asyncHandler(async (req, res, next) => {
+  const { id } = req.params; // ID of the club to associate with the discount
+  const { code, discountPercentage, validFrom, validTo } = req.body; // Discount details
+
+  // Find the club by ID
+  const club = await Club.findById(id);
+  if (!club) {
+    return next(new ApiError("Club Not Found", 404));
+  }
+
+  // Validate the discount percentage
+  if (discountPercentage < 0 || discountPercentage > 100) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Invalid discount percentage" });
+  }
+
+  // Create a new discount code 
+
+  const discountCode = new DiscountCode({
+    code,
+    discountPercentage,
+    validFrom: validFrom ? new Date(validFrom) : Date.now(),
+    validTo: validTo ? new Date(validTo) : null,
+    club: id,
+  });
+
+  // Save the discount code to the database
+  await discountCode.save();
+
+  res.status(201).json({
+    success: true,
+    message: "Discount code added successfully",
+    data: discountCode,
+  });
+});
+
+exports.getDiscount = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+
+  // Find the discount code by ID
+  const discountCode = await DiscountCode.findById(id);
+
+  // Check if the discount code exists
+  if (!discountCode) {
+    return res
+      .status(404)
+      .json({ success: false, message: "Discount code not found" });
+  }
+
+  res.status(200).json({
+    success: true,
+    message: "Discount code retrieved successfully",
+    data: discountCode,
+  });
+});
+
+exports.getAllDiscounts = asyncHandler(async (req, res, next) => {
+  // Retrieve all discount codes from the database
+  const id = req.params.id;
+  const discounts = await DiscountCode.find({ club: id });
+
+  res.status(200).json({
+    success: true,
+    message: "Discount codes retrieved successfully",
+    data: discounts,
+  });
+});
+
+exports.deleteDiscount = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+
+  const discounts = await DiscountCode.findByIdAndDelete(id);
+
+  res.status(200).json({
+    success: true,
+    message: "Discount codes deleted successfully",
+  });
+});
+
+exports.addBankAccount = asyncHandler(async (req, res) => {
+  const { ownerName, iban, bankName, club } = req.body;
+
+  // Validation: Ensure all fields are provided
+  if (!ownerName || !iban || !bankName || !club) {
+    return res
+      .status(400)
+      .json({ success: false, message: "All fields are required" });
+  }
+
+  // Create a new bank account
+  const existClubAccount = await Bank.findOne({ club });
+  if (existClubAccount) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Bank account already exists" });
+  }
+  const newBankAccount = new Bank({
+    ownerName,
+    iban,
+    bankName,
+    club,
+  });
+
+  // Save the bank account to the database
+  await newBankAccount.save();
+
+  res.status(201).json({
+    success: true,
+    message: "Bank account added successfully",
+    data: newBankAccount,
+  });
+});
+
+exports.getBankAccountById = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  const bankAccount = await Bank.findById(id);
+
+  if (!bankAccount) {
+    return res
+      .status(404)
+      .json({ success: false, message: "Bank account not found" });
+  }
+
+  res.status(200).json({
+    success: true,
+    message: "Bank account retrieved successfully",
+    data: bankAccount,
+  });
+});
+
+exports.updateBankAccount = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { ownerName, iban, bankName } = req.body;
+
+  // Find the bank account by ID and update it
+  const updatedBankAccount = await Bank.findByIdAndUpdate(
+    id,
+    { ownerName, iban, bankName },
+    { new: true, runValidators: true }
+  );
+
+  if (!updatedBankAccount) {
+    return res
+      .status(404)
+      .json({ success: false, message: "Bank account not found" });
+  }
+
+  res.status(200).json({
+    success: true,
+    message: "Bank account updated successfully",
+    data: updatedBankAccount,
+  });
+});
 
 
 
+exports.createClubHours = asyncHandler(async (req, res) => {
+  const { club, day, gender, openTime, closeTime, isOpen } = req.body;
 
+  // Validation: Ensure all required fields are provided
+  if (!club || !day || !gender || !openTime || !closeTime) {
+    return res.status(400).json({ success: false, message: 'All fields are required' });
+  }
+
+  // Validation: Ensure isOpen is a boolean
+  if (typeof isOpen !== 'undefined' && typeof isOpen !== 'boolean') {
+    return res.status(400).json({ success: false, message: 'isOpen must be a boolean value' });
+  }
+
+  // Create a new club hours entry
+  const newClubHours = new ClubHours({
+    club,
+    day,
+    gender,
+    openTime,
+    closeTime,
+    isOpen: isOpen !== undefined ? isOpen : true, // Default to true if not provided
+  });
+
+  // Save the new club hours to the database
+  await newClubHours.save();
+
+  res.status(201).json({
+    success: true,
+    message: 'Club hours added successfully',
+    data: newClubHours,
+  });
+});
+
+
+
+exports.getAllClubHours = asyncHandler(async (req, res) => {
+  const { clubId } = req.params;
+
+  // Find all club hours for the specified club ID
+  const clubHours = await ClubHours.find({ club: clubId });
+
+  if (!clubHours ) {
+    return res.status(404).json({
+      success: false,
+      message: 'No club hours found for this club',
+    });
+  }
+
+  res.status(200).json({
+    success: true,
+    message: 'Club hours retrieved successfully',
+    data: clubHours,
+  });
+});
+
+
+exports.updateClubHours = asyncHandler(async (req, res) => {
+  const { id } = req.params; 
+  const { day, gender, openTime, closeTime, isOpen } = req.body; // Updated fields
+
+  // Validate required fields
+  if (!day || !gender || !openTime || !closeTime || isOpen === undefined) {
+    return res.status(400).json({
+      success: false,
+      message: 'All fields are required: day, gender, openTime, closeTime, and isOpen',
+    });
+  }
+
+  // Update the club hours by ID
+  const updatedClubHours = await ClubHours.findByIdAndUpdate(
+    id,
+    { day, gender, openTime, closeTime, isOpen },
+    { new: true, runValidators: true }
+  );
+
+  if (!updatedClubHours) {
+    return res.status(404).json({
+      success: false,
+      message: 'Club hours not found',
+    });
+  }
+
+  res.status(200).json({
+    success: true,
+    message: 'Club hours updated successfully',
+    data: updatedClubHours,
+  });
+});
 exports.clubReports;
