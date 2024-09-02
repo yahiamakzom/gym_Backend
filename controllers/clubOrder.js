@@ -46,7 +46,7 @@ exports.addClubOrder = asyncHandler(async (req, res, next) => {
   if (existingUser)
     return next(new ApiError("Club  With This Email Already Exists", 409));
 
-  const existingClub = await CLubOrder({ email });
+  const existingClub = await CLubOrder.findOne({ email });
   if (existingClub)
     return next(new ApiError("Club  With This Email Already Exists", 409));
 
