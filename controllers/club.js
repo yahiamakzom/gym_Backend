@@ -10,7 +10,7 @@ const cloudinary = require("cloudinary").v2;
 const { scheduleClubWorkOff } = require("../helper/clubDays");
 const moment = require("moment");
 const DiscountCode = require("../models/DiscountCode");
-const CLubOrder = require("../models/ClubOrder"); 
+const CLubOrder = require("../models/ClubOrder");
 const ClubHours = require("../models/clubHours");
 
 cloudinary.config({
@@ -708,22 +708,17 @@ exports.scheduleClubSuspension = asyncHandler(async (req, res, next) => {
     club.stopSchedule.start = new Date(start);
     club.stopSchedule.end = new Date(end);
 
-    if (isTemporarilyStopped == "true") {
-      club.isTemporarilyStopped = true;
-      club.isActive = false;
-    } else {
-      club.isTemporarilyStopped = false;
-      club.isActive = false;
-    }
+    club.isTemporarilyStopped = false;
+    club.isActive = false;
 
     await club.save();
-
-    res
-      .status(200)
-      .json({ success: true, message: "Club status updated", data: club });
   } else {
-    res.status(400).json({ error: "Invalid start or end dates" });
+    club.isTemporarilyStopped = true;
+    club.isActive = false;
   }
+  res
+    .status(200)
+    .json({ success: true, message: "Club status updated", data: club });
 });
 
 exports.removeClubSuspension = asyncHandler(async (req, res, next) => {
@@ -764,7 +759,7 @@ exports.addDiscount = asyncHandler(async (req, res, next) => {
       .json({ success: false, message: "Invalid discount percentage" });
   }
 
-  // Create a new discount code 
+  // Create a new discount code
 
   const discountCode = new DiscountCode({
     code,
@@ -903,19 +898,21 @@ exports.updateBankAccount = asyncHandler(async (req, res) => {
   });
 });
 
-
-
 exports.createClubHours = asyncHandler(async (req, res) => {
   const { club, day, gender, openTime, closeTime, isOpen } = req.body;
 
   // Validation: Ensure all required fields are provided
   if (!club || !day || !gender || !openTime || !closeTime) {
-    return res.status(400).json({ success: false, message: 'All fields are required' });
+    return res
+      .status(400)
+      .json({ success: false, message: "All fields are required" });
   }
 
   // Validation: Ensure isOpen is a boolean
-  if (typeof isOpen !== 'undefined' && typeof isOpen !== 'boolean') {
-    return res.status(400).json({ success: false, message: 'isOpen must be a boolean value' });
+  if (typeof isOpen !== "undefined" && typeof isOpen !== "boolean") {
+    return res
+      .status(400)
+      .json({ success: false, message: "isOpen must be a boolean value" });
   }
 
   // Create a new club hours entry
@@ -933,12 +930,10 @@ exports.createClubHours = asyncHandler(async (req, res) => {
 
   res.status(201).json({
     success: true,
-    message: 'Club hours added successfully',
+    message: "Club hours added successfully",
     data: newClubHours,
   });
 });
-
-
 
 exports.getAllClubHours = asyncHandler(async (req, res) => {
   const { clubId } = req.params;
@@ -946,30 +941,30 @@ exports.getAllClubHours = asyncHandler(async (req, res) => {
   // Find all club hours for the specified club ID
   const clubHours = await ClubHours.find({ club: clubId });
 
-  if (!clubHours ) {
+  if (!clubHours) {
     return res.status(404).json({
       success: false,
-      message: 'No club hours found for this club',
+      message: "No club hours found for this club",
     });
   }
 
   res.status(200).json({
     success: true,
-    message: 'Club hours retrieved successfully',
+    message: "Club hours retrieved successfully",
     data: clubHours,
   });
 });
 
-
 exports.updateClubHours = asyncHandler(async (req, res) => {
-  const { id } = req.params; 
+  const { id } = req.params;
   const { day, gender, openTime, closeTime, isOpen } = req.body; // Updated fields
 
   // Validate required fields
   if (!day || !gender || !openTime || !closeTime || isOpen === undefined) {
     return res.status(400).json({
       success: false,
-      message: 'All fields are required: day, gender, openTime, closeTime, and isOpen',
+      message:
+        "All fields are required: day, gender, openTime, closeTime, and isOpen",
     });
   }
 
@@ -983,13 +978,13 @@ exports.updateClubHours = asyncHandler(async (req, res) => {
   if (!updatedClubHours) {
     return res.status(404).json({
       success: false,
-      message: 'Club hours not found',
+      message: "Club hours not found",
     });
   }
 
   res.status(200).json({
     success: true,
-    message: 'Club hours updated successfully',
+    message: "Club hours updated successfully",
     data: updatedClubHours,
   });
 });
