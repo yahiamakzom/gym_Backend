@@ -274,6 +274,7 @@ exports.LoginControlPanel = asyncHandler(async (req, res, next) => {
         status: true,
         role: "suberadmin",
         token,
+        id:club._id,
         message: "Login successful",
       });
     }
