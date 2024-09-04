@@ -15,6 +15,7 @@ const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./swager");
 const startClubReactivationJob = require("./helper/reActiveClubs");
 const startDiscountCleanupJob = require("./helper/discountsClean");
+const verifyToken = require("./middlewares/verifyToken");
 app.use(express.static(path.join(__dirname, "images")));
 app.use(express.static("public"));
 app.use(express.json());
@@ -36,6 +37,7 @@ app.use("/user", require("./routes/user"));
 app.use("/club", verifyRoles("club"), require("./routes/club"));
 app.use("/orders", require("./routes/clubOrder"));
 app.use("/suberadmin", require("./routes/suberAdmin"));
+app.use('/owner' , require('./routes/owner'))
 app.use("/clubs", require("./routes/global_clubs"));
 app.get("/rule/:type", getRuleType);
 
@@ -60,6 +62,7 @@ DB.then((con) => {
     err.status
   );
 });
+
 
 // Import NodeMailer (after npm install)
 

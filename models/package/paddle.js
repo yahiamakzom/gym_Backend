@@ -48,6 +48,9 @@ const paddleSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    superadminId: {
+  type :String
+  },
   },
   {
     timestamps: true,

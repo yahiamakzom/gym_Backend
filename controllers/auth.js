@@ -148,63 +148,63 @@ exports.Login = asyncHandler(async (req, res, next) => {
   }
 });
 
-exports.ClubLogin = asyncHandler(async (req, res, next) => {
-  const { email, id } = req.body;
+// exports.ClubLogin = asyncHandler(async (req, res, next) => {
+//   const { email, id } = req.body;
 
-  try {
-    const user = await User.findOne({ email });
-    console.log(user);
-    if (!user) {
-      return next(new ApiError("User not found", 404));
-    }
+//   try {
+//     const user = await User.findOne({ email });
+//     console.log(user);
+//     if (!user) {
+//       return next(new ApiError("User not found", 404));
+//     }
 
-    const token = sign({ id: user.id, role: user.role }, process.env.TOKEN);
-    delete user._doc.password;
-    user.token = token;
+//     const token = sign({ id: user.id, role: user.role }, process.env.TOKEN);
+//     delete user._doc.password;
+//     user.token = token;
 
-    const club = await Clubs.findById(user.club);
+//     const club = await Clubs.findById(user.club);
 
-    if (!club) {
-      return next(new ApiError("User not found", 404));
-    }
-    if (club._id != id) {
-      return next(new ApiError("User not found", 404));
-    }
-    console.log(club._id, id, "result of ", club._id == id);
+//     if (!club) {
+//       return next(new ApiError("User not found", 404));
+//     }
+//     if (club._id != id) {
+//       return next(new ApiError("User not found", 404));
+//     }
+//     console.log(club._id, id, "result of ", club._id == id);
 
-    res.json({ user, token });
-  } catch (error) {
-    console.error(error);
-    return next(new ApiError("Internal Server Error", 500));
-  }
-});
+//     res.json({ user, token });
+//   } catch (error) {
+//     console.error(error);
+//     return next(new ApiError("Internal Server Error", 500));
+//   }
+// });
 
-exports.ClubMemberLogin = asyncHandler(async (req, res, next) => {
-  const { clubMemberCode } = req.body;
+// exports.ClubMemberLogin = asyncHandler(async (req, res, next) => {
+//   const { clubMemberCode } = req.body;
 
-  try {
-    const club = await Clubs.findOne({ clubMemberCode });
+//   try {
+//     const club = await Clubs.findOne({ clubMemberCode });
 
-    if (!club) {
-      return res.status(404).json({});
-    }
-    const user = await User.findOne({ club: club._id });
+//     if (!club) {
+//       return res.status(404).json({});
+//     }
+//     const user = await User.findOne({ club: club._id });
 
-    console.log("user", user);
-    if (!user) {
-      return res.status(404).json({});
-    }
-    const token = sign({ id: user.id, role: user.role }, process.env.TOKEN);
-    delete user._doc.password;
-    user.token = token;
+//     console.log("user", user);
+//     if (!user) {
+//       return res.status(404).json({});
+//     }
+//     const token = sign({ id: user.id, role: user.role }, process.env.TOKEN);
+//     delete user._doc.password;
+//     user.token = token;
 
-    res.json({ user, token });
-  } catch (error) {
-    console.log("errrororoorororoor");
-    console.error(error);
-    return next(new ApiError("Internal Server Error", 500));
-  }
-});
+//     res.json({ user, token });
+//   } catch (error) {
+//     console.log("errrororoorororoor");
+//     console.error(error);
+//     return next(new ApiError("Internal Server Error", 500));
+//   }
+// });
 
 exports.LoginControlPanel = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
@@ -229,6 +229,14 @@ exports.LoginControlPanel = asyncHandler(async (req, res, next) => {
     delete user._doc.password;
     user.token = token;
 
+    if (user.role === "admin") {
+      return res.status(200).json({
+        success: true,
+        token,
+        message: "Login successful",
+        data: user,
+      });
+    }
     // Find the club associated with the user
     const club = await Clubs.findById(user.club);
     if (!club) {
@@ -242,6 +250,7 @@ exports.LoginControlPanel = asyncHandler(async (req, res, next) => {
     res.status(200).json({
       success: true,
       IR: club._id,
+      token,
       message: "Login successful",
       data: subClubs,
     });

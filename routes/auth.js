@@ -3,8 +3,8 @@ const router = require("express").Router();
 const {
   Login,
   Register,
-  ClubLogin,
-  ClubMemberLogin,
+  // ClubLogin,
+  // ClubMemberLogin,
   LoginControlPanel,
 } = require("../controllers/auth");
 
@@ -15,8 +15,8 @@ const {
 
 router.post("/login", LoginValidator, Login);
 router.post("/register", RegisterValidator, Register);
-router.post("/club-login", ClubLogin);
-router.post("/club-member", ClubMemberLogin);
+// router.post("/club-login", ClubLogin);
+// router.post("/club-member", ClubMemberLogin);
 
 // controle panel
 

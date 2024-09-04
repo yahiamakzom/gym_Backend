@@ -58,13 +58,13 @@ exports.addSubClub = asyncHandler(async (req, res, next) => {
 
   // Check if the club admin has the correct type
   if (clubSuberAdmin.type !== "superadmin") {
-    return next(new ApiError("User is not an admin", 403));
+    return next(new ApiError("User is not an superadmin", 403));
   }
 
   // Check if a club with the same member code already exists
   const clubExist = await Clubs.findOne({ clubMemberCode });
   if (clubExist) {
-    return next(new ApiError("Club Already Exist", 409));
+    return next(new ApiError("Club Already Exist with this Member Code", 409));
   }
 
   // Create a new club

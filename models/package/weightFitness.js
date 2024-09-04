@@ -25,11 +25,20 @@ const weightFitnessSchema = new mongoose.Schema(
     },
     discount: {
       type: discountSchema, // Embed the reusable discount schema
-      default: {}, 
+      default: {},
     },
     description: {
       type: String,
       default: "",
+    },
+    freezeTime: {
+      type: Number,
+    },
+    freezeCountTime: {
+      type: Number,
+    },
+    superadminId: {
+      type: String,
     },
   },
   {

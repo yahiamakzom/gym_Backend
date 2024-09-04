@@ -3,7 +3,7 @@ const Bank = require("./BankData");
 module.exports = mongoose.model(
   "orders",
   new mongoose.Schema(
-    { 
+    {
       email: {
         type: String,
         required: [true, "Please Enter Your Email Address "],
@@ -42,12 +42,17 @@ module.exports = mongoose.model(
         required: [true, "Please Enter country Name"],
         trim: true,
       },
+      status: {
+        type: String,
+        default: "pending",
+        enum: ["pending", "refused"],
+      },
       city: {
         type: String,
         required: [true, "Please Enter city Name"],
         trim: true,
       },
-  
+
       clubMemberCode: {
         type: String,
         // unique: true,
@@ -79,7 +84,6 @@ module.exports = mongoose.model(
         type: Number,
         required: [true, "Please Enter Commmission Of Club"],
       },
-
     },
 
     { timestamps: true }

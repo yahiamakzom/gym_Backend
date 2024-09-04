@@ -19,10 +19,4 @@ const createTimeSlots = (startTime, endTime, duration, numberOfSeats) => {
   return slots;
 };
 
-// Example usage
-const startTime = new Date("2024-09-01T08:00:00Z"); // 8 AM
-const endTime = new Date("2024-09-01T21:00:00Z"); // 9 PM
-const duration = 60; // 60 minutes
-const numberOfSeats = 5;
 
-const slots = createTimeSlots(startTime, endTime, duration, numberOfSeats);
