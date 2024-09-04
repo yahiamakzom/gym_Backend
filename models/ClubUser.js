@@ -21,15 +21,16 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  token: String,
   createdAt: {
     type: Date,
     default: Date.now,
-  }, 
-  club:{ 
+  },
+  club: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Club",
-    required: true
-  }
+    required: true,
+  },
 });
 
 // Hash password before saving the user

@@ -5,6 +5,7 @@ const asyncHandler = require("express-async-handler");
 const ApiError = require("../utils/ApiError");
 const { sign } = require("jsonwebtoken");
 const Clubs = require("../models/Club");
+const ClubUser = require("../models/ClubUser");
 // exports.Register = asyncHandler(async (req, res, next) => {
 //   const {
 //     username,
@@ -212,50 +213,70 @@ exports.LoginControlPanel = asyncHandler(async (req, res, next) => {
   try {
     // Find the user by email
     const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(404).json({ error: "User not found", success: false });
-    }
+    if (user) {
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      if (!isPasswordValid) {
+        return res
+          .status(400)
+          .json({ error: "Invalid password", success: false });
+      }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      return res
-        .status(400)
-        .json({ error: "Invalid password", success: false });
-    }
+      // Generate JWT token
+      const token = sign({ id: user.id }, process.env.TOKEN);
 
-    // Generate JWT token
-    const token = sign({ id: user.id }, process.env.TOKEN);
+      // Remove password from the user object
+      const userResponse = { ...user._doc, token };
+      delete userResponse.password;
 
-    delete user._doc.password;
-    user.token = token;
+      if (user.role === "admin") {
+        return res.status(200).json({
+          success: true,
+          token,
+          message: "Login successful",
+          data: userResponse,
+        });
+      }
+    } else {
+      // If user is not found, check for club user
+      const clubUser = await ClubUser.findOne({ email });
+      if (!clubUser) {
+        return res.status(404).json({ error: "User not found", success: false });
+      }
 
-    if (user.role === "admin") {
+      const isPasswordValid = await bcrypt.compare(password, clubUser.password);
+      if (!isPasswordValid) {
+        return res
+          .status(400)
+          .json({ error: "Invalid password", success: false });
+      }
+
+      // Generate JWT token
+      const token = sign({ id: clubUser.id }, process.env.TOKEN);
+
+      // Remove password from the clubUser object
+      const clubUserResponse = { ...clubUser._doc, token };
+      delete clubUserResponse.password;
+
+      const club = await Clubs.findById(clubUser.club);
+      if (!club) {
+        return res.status(404).json({ error: "Club not found", success: false });
+      }
+
+      // Fetch sub-clubs associated with the found club
+      const subClubs = await club.getSubClubs();
+
+      // Respond with the club information and its sub-clubs
       return res.status(200).json({
         success: true,
+        IR: club._id,
         token,
         message: "Login successful",
-        data: user,
+        data: subClubs,
       });
     }
-    // Find the club associated with the user
-    const club = await Clubs.findById(user.club);
-    if (!club) {
-      return res.status(404).json({ error: "Club not found", success: false });
-    }
-
-    // Fetch sub-clubs associated with the found club
-    const subClubs = await club.getSubClubs();
-
-    // Respond with the club information and its sub-clubs
-    res.status(200).json({
-      success: true,
-      IR: club._id,
-      token,
-      message: "Login successful",
-      data: subClubs,
-    });
   } catch (error) {
     console.error(error);
     return next(new ApiError("Internal Server Error", 500));
   }
 });
+
