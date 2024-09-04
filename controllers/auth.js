@@ -230,17 +230,19 @@ exports.LoginControlPanel = asyncHandler(async (req, res, next) => {
 
       if (user.role === "admin") {
         return res.status(200).json({
+          role: "owner",
           success: true,
           token,
           message: "Login successful",
-          data: userResponse,
         });
       }
     } else {
       // If user is not found, check for club user
       const clubUser = await ClubUser.findOne({ email });
       if (!clubUser) {
-        return res.status(404).json({ error: "User not found", success: false });
+        return res
+          .status(404)
+          .json({ error: "User not found", success: false });
       }
 
       const isPasswordValid = await bcrypt.compare(password, clubUser.password);
@@ -259,7 +261,9 @@ exports.LoginControlPanel = asyncHandler(async (req, res, next) => {
 
       const club = await Clubs.findById(clubUser.club);
       if (!club) {
-        return res.status(404).json({ error: "Club not found", success: false });
+        return res
+          .status(404)
+          .json({ error: "Club not found", success: false });
       }
 
       // Fetch sub-clubs associated with the found club
@@ -267,11 +271,10 @@ exports.LoginControlPanel = asyncHandler(async (req, res, next) => {
 
       // Respond with the club information and its sub-clubs
       return res.status(200).json({
-        success: true,
-        IR: club._id,
+        status: true,
+        role: "suberadmin",
         token,
         message: "Login successful",
-        data: subClubs,
       });
     }
   } catch (error) {
@@ -279,4 +282,3 @@ exports.LoginControlPanel = asyncHandler(async (req, res, next) => {
     return next(new ApiError("Internal Server Error", 500));
   }
 });
-
