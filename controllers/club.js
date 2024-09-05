@@ -715,7 +715,9 @@ exports.scheduleClubSuspension = asyncHandler(async (req, res, next) => {
   } else {
     club.isTemporarilyStopped = true;
     club.isActive = false;
-  }
+    await club.save();
+  } 
+
   res
     .status(200)
     .json({ success: true, message: "Club status updated", data: club });
