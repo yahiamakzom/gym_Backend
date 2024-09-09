@@ -1051,7 +1051,7 @@ exports.isCodeValid = async (req, res) => {
         })
       : res.status(400).json({
           status: false,
-          data: { message: "Code is valid", isValid: false },
+          data: { message: "Code is not valid", isValid: false },
         });
   } catch (error) {
     console.error("Error creating transfer order:", error.message);
