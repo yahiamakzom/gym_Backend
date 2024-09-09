@@ -11,6 +11,7 @@ const clubSchema = new mongoose.Schema(
       type: String,
       required: [true, "Please Enter Club Name"],
       trim: true,
+      unique: true,
     },
     gender: {
       type: String,

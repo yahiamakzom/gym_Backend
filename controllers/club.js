@@ -12,6 +12,7 @@ const moment = require("moment");
 const DiscountCode = require("../models/DiscountCode");
 const CLubOrder = require("../models/ClubOrder");
 const ClubHours = require("../models/clubHours");
+const TransferOrder = require("../models/TransferOrder");
 
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
@@ -716,7 +717,7 @@ exports.scheduleClubSuspension = asyncHandler(async (req, res, next) => {
     club.isTemporarilyStopped = true;
     club.isActive = false;
     await club.save();
-  } 
+  }
 
   res
     .status(200)
@@ -990,4 +991,73 @@ exports.updateClubHours = asyncHandler(async (req, res) => {
     data: updatedClubHours,
   });
 });
+
+exports.createTransferOrder = async (req, res) => {
+  try {
+    const { clubId } = req.params;
+    const { amount, transferCause } = req.body;
+
+    if (!amount || !transferCause) {
+      return res
+        .status(400)
+        .json({ message: "Amount and transfer cause are required" });
+    }
+
+    // Find the bank account associated with the club ID
+    const bankAccount = await Bank.findOne({ club: clubId });
+
+    if (!bankAccount) {
+      return res
+        .status(404)
+        .json({ message: "Bank account not found for the provided club " });
+    }
+
+    // Create the transfer order using the bank account details
+    const transferOrder = new TransferOrder({
+      amount,
+      transferCause,
+      iban: bankAccount.iban, // Get IBAN from the bank account
+      ownerName: bankAccount.ownerName, // Get owner name from the bank account
+      club: clubId,
+    });
+
+    // Save the transfer order to the database
+    await transferOrder.save();
+
+    // Respond with the created transfer order
+    return res
+      .status(201)
+      .json({ message: "Transfer order created successfully", transferOrder });
+  } catch (error) {
+    console.error("Error creating transfer order:", error.message);
+    return res
+      .status(500)
+      .json({ message: "Server error", error: error.message });
+  }
+};
+
+exports.isCodeValid = async (req, res) => {
+  try {
+    const code = req.body.code;
+    const id = req.params.id;
+    const club = await Club.findById(id);
+    if (!club) {
+      return res.status(404).json({ message: "Club not found" });
+    }
+    club.clubMemberCode == code
+      ? res.status(200).json({
+          status: true,
+          data: { message: "Code is valid", isValid: true },
+        })
+      : res.status(400).json({
+          status: false,
+          data: { message: "Code is valid", isValid: false },
+        });
+  } catch (error) {
+    console.error("Error creating transfer order:", error.message);
+    return res
+      .status(500)
+      .json({ message: "Server error", error: error.message });
+  }
+};
 exports.clubReports;

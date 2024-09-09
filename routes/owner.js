@@ -10,6 +10,10 @@ const {
   getOrder,
   acceptOrder,
   refuseOrder,
+  getAllTransferOrders,
+  acceptTransfer,
+  refuseTransfer,
+  getAllTransfers,
 } = require("../controllers/owner");
 
 /**
@@ -442,8 +446,7 @@ router.get("/get-order/:orderId", getOrder);
  *                   type: string
  *                   example: "Internal server error"
  */
-router.post("/accept-order/:orderId", acceptOrder); 
-
+router.post("/accept-order/:orderId", acceptOrder);
 
 /**
  * @swagger
@@ -492,4 +495,326 @@ router.post("/accept-order/:orderId", acceptOrder);
  *                   example: "An unexpected error occurred"
  */
 router.patch("/refuse-order/:orderId", refuseOrder);
+
+/**
+ * @swagger
+ * /owner/transfer-orders:
+ *   get:
+ *     summary: Retrieve all transfer orders
+ *     description: Fetches a list of all transfer orders in the system.
+ *     tags:
+ *       - Owner
+ *     responses:
+ *       200:
+ *         description: A list of transfer orders
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       _id:
+ *                         type: string
+ *                         description: The unique ID of the transfer order
+ *                         example: 64f85e87e69bdf1a479efc12
+ *                       amount:
+ *                         type: number
+ *                         description: The transfer amount
+ *                         example: 500
+ *                       transferCause:
+ *                         type: string
+ *                         description: The reason for the transfer
+ *                         example: Payment for services
+ *                       iban:
+ *                         type: string
+ *                         description: The IBAN linked to the bank account
+ *                         example: GB33BUKB20201555555555
+ *                       ownerName:
+ *                         type: string
+ *                         description: The name of the bank account owner
+ *                         example: John Doe
+ *                       club:
+ *                         type: string
+ *                         description: The ID of the club related to the transfer
+ *                         example: 64f85b96e69bdf1a479efc11
+ *                       createdAt:
+ *                         type: string
+ *                         format: date-time
+ *                         example: 2024-09-04T14:48:00.000Z
+ *                       updatedAt:
+ *                         type: string
+ *                         format: date-time
+ *                         example: 2024-09-04T14:48:00.000Z
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Server error
+ */
+router.get("/transfer-orders", getAllTransferOrders);
+
+/**
+ * @swagger
+ * /owner/transfers:
+ *   get:
+ *     summary: Retrieve all transfer orders
+ *     description: Fetches a list of all transfer orders in the system.
+ *     tags:
+ *       - Owner
+ *     responses:
+ *       200:
+ *         description: A list of transfer orders
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       _id:
+ *                         type: string
+ *                         description: The unique ID of the transfer order
+ *                         example: 64f85e87e69bdf1a479efc12
+ *                       amount:
+ *                         type: number
+ *                         description: The transfer amount
+ *                         example: 500
+ *                       transferCause:
+ *                         type: string
+ *                         description: The reason for the transfer
+ *                         example: Payment for services
+ *                       iban:
+ *                         type: string
+ *                         description: The IBAN linked to the bank account
+ *                         example: GB33BUKB20201555555555
+ *                       ownerName:
+ *                         type: string
+ *                         description: The name of the bank account owner
+ *                         example: John Doe
+ *                       club:
+ *                         type: string
+ *                         description: The ID of the club related to the transfer
+ *                         example: 64f85b96e69bdf1a479efc11
+ *                       createdAt:
+ *                         type: string
+ *                         format: date-time
+ *                         example: 2024-09-04T14:48:00.000Z
+ *                       updatedAt:
+ *                         type: string
+ *                         format: date-time
+ *                         example: 2024-09-04T14:48:00.000Z
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Server error
+ */
+router.get("/transfers", getAllTransfers);
+/**
+ * @swagger
+ * /owner/accept-transfer-order/{id}:
+ *   post:
+ *     summary: Accept a transfer order
+ *     description: Uploads a PDF, accepts the transfer, and removes the original transfer order.
+ *     tags:
+ *       - Owner
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The ID of the transfer order to be accepted
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               amount:
+ *                 type: number
+ *                 example: 1000
+ *               pdf:
+ *                 type: string
+ *                 format: binary
+ *                 description: The PDF file to be uploaded
+ *     responses:
+ *       200:
+ *         description: Transfer successfully accepted and saved
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                       example: "60d21b4667d0d8992e610c85"
+ *                     amount:
+ *                       type: number
+ *                       example: 1000
+ *                     pdf:
+ *                       type: string
+ *                       example: "https://res.cloudinary.com/demo/image/upload/v1609459200/sample.pdf"
+ *                     status:
+ *                       type: string
+ *                       example: "accepted"
+ *                     club:
+ *                       type: string
+ *                       example: "60d21b4667d0d8992e610c85"
+ *       400:
+ *         description: Bad request, e.g., no PDF provided
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Please provide a PDF"
+ *       404:
+ *         description: Transfer order not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Transfer order not found"
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Error processing transfer"
+ */
+
+router.post(
+  "/accept-transfer-order/:id",
+  imgUploader.single("pdf"),
+  acceptTransfer
+);
+
+/**
+ * @swagger
+ * /owner/refuse-transfer-order/{id}:
+ *   post:
+ *     summary: Refuse a transfer order
+ *     description: Marks a transfer order as refused and provides a reason for refusal.
+ *     tags:
+ *       - Owner
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The ID of the transfer order to be refused
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               refusedReason:
+ *                 type: string
+ *                 example: "Missing required documents"
+ *                 description: Reason for refusing the transfer order
+ *     responses:
+ *       200:
+ *         description: Transfer successfully refused and saved
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                       example: "60d21b4667d0d8992e610c85"
+ *                     amount:
+ *                       type: number
+ *                       example: 1000
+ *                     refusedReason:
+ *                       type: string
+ *                       example: "Missing required documents"
+ *                     status:
+ *                       type: string
+ *                       example: "rejected"
+ *                     club:
+ *                       type: string
+ *                       example: "60d21b4667d0d8992e610c85"
+ *       400:
+ *         description: Bad request, e.g., no refusal reason provided
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Please provide a refusal reason"
+ *       404:
+ *         description: Transfer order not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Transfer order not found"
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Error processing refusal"
+ */
+
+router.post("/refuse-transfer-order/:id", refuseTransfer);
 module.exports = router;

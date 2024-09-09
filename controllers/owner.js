@@ -7,6 +7,8 @@ const CLubOrder = require("../models/ClubOrder");
 const ClubUser = require("../models/ClubUser");
 const sendEmail = require("../helper/sendEmail");
 const bcrypt = require("bcrypt");
+const Transfers = require("../models/Transafers.js");
+const TransferOrder = require("../models/TransferOrder.js");
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.CLOUD_API_KEY,
@@ -355,3 +357,78 @@ exports.refuseOrder = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.getAllTransferOrders = asyncHandler(async (req, res, next) => {
+  const transferOrders = await TransferOrder.find();
+  res.json({ success: true, data: transferOrders });
+});
+exports.getAllTransfers = asyncHandler(async (req, res, next) => {
+  const transfers = await Transfers.find();
+  res.json({ success: true, data: transfers });
+});
+exports.acceptTransfer = asyncHandler(async (req, res, next) => {
+  const amount = req.body.amount;
+  const transferOrder = await TransferOrder.findById(req.params.id);
+
+  if (!transferOrder) {
+    return res.status(404).json({ message: "Transfer order not found" });
+  }
+
+  if (!req.file) {
+    return res.status(400).json({ message: "Please provide a PDF" });
+  }
+  console.log(req.file);
+
+  try {
+    // Upload PDF to Cloudinary
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      resource_type: "auto",
+    });
+
+    // Create new transfer
+    const transfer = await Transfers.create({
+      amount,
+      pdf: result.secure_url,
+      status: "accepted",
+      club: transferOrder.club,
+    });
+
+    await TransferOrder.findByIdAndDelete(req.params.id); // Remove original transfer order
+
+    res.json({ success: true, data: transfer });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error processing transfer", error: error.message });
+  }
+});
+
+exports.refuseTransfer = asyncHandler(async (req, res, next) => {
+  const transferOrderId = req.params.id;
+  const { refusedReason } = req.body;
+
+  // Validate the request body
+  if (!refusedReason) {
+    return res.status(400).json({ message: "Please provide a refusal reason" });
+  }
+
+  // Find the transfer order
+  const transferOrder = await TransferOrder.findById(transferOrderId);
+  if (!transferOrder) {
+    return res.status(404).json({ message: "Transfer order not found" });
+  }
+
+  // Create a refused transfer entry
+  const refusedTransfer = await Transfers.create({
+    amount: transferOrder.amount,
+    refusedReason,
+    status: "rejected",
+    club: transferOrder.club,
+  });
+
+  // Delete the original transfer order
+  await TransferOrder.findByIdAndDelete(transferOrderId);
+
+  // Respond with the refused transfer details
+  res.json({ success: true, data: refusedTransfer });
+});

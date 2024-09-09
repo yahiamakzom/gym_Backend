@@ -12,6 +12,8 @@ const {
   createClubHours,
   getAllClubHours,
   updateClubHours,
+  createTransferOrder,
+  isCodeValid,
 } = require("../controllers/club");
 const {
   createWeightFitnessPackage,
@@ -1998,4 +2000,207 @@ router.delete("/delete-paddle-package/:id", deletePaddlePackage);
  *         description: Paddle package not found
  */
 router.put("/update-paddle-package/:id", updatePaddlePackage);
+
+/**
+ * @swagger
+ * /clubs/transfer-order/{clubId}:
+ *   post:
+ *     summary: Create a new transfer order
+ *     description: |
+ *       Creates a transfer order for a given club based on the club's bank account information.
+ *       It retrieves the IBAN and owner name from the bank account linked to the club and uses this to process the transfer order.
+ *     tags:
+ *       - Club
+ *     parameters:
+ *       - name: clubId
+ *         in: path
+ *         required: true
+ *         description: The ID of the club for which to create the transfer order
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               amount:
+ *                 type: number
+ *                 description: Amount to transfer
+ *                 example: 500
+ *               transferCause:
+ *                 type: string
+ *                 description: Reason for the transfer
+ *                 example: Payment for services
+ *     responses:
+ *       201:
+ *         description: Transfer order created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Transfer order created successfully
+ *                 transferOrder:
+ *                   type: object
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                       description: The unique ID of the transfer order
+ *                       example: 64f85e87e69bdf1a479efc12
+ *                     amount:
+ *                       type: number
+ *                       description: The transfer amount
+ *                       example: 500
+ *                     transferCause:
+ *                       type: string
+ *                       description: The reason for the transfer
+ *                       example: Payment for services
+ *                     iban:
+ *                       type: string
+ *                       description: The IBAN linked to the bank account
+ *                       example: GB33BUKB20201555555555
+ *                     ownerName:
+ *                       type: string
+ *                       description: The name of the bank account owner
+ *                       example: John Doe
+ *                     club:
+ *                       type: string
+ *                       description: The ID of the club related to the transfer
+ *                       example: 64f85b96e69bdf1a479efc11
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: 2024-09-04T14:48:00.000Z
+ *                     updatedAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: 2024-09-04T14:48:00.000Z
+ *       400:
+ *         description: Invalid input, amount or transfer cause missing
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Amount and transfer cause are required
+ *       404:
+ *         description: Bank account not found for the provided club ID
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Bank account not found for the provided club ID
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Server error
+ */
+router.post("/transfer-order/:clubId", createTransferOrder);
+
+/**
+ * @swagger
+ * /clubs/validate-code/{id}:
+ *   post:
+ *     summary: Validate the club member code.
+ *     description: Validates if the provided code matches the club's member code.
+ *     tags:
+ *       - Club
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the club to validate the code for.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               code:
+ *                 type: string
+ *                 example: "MEMBER123"
+ *                 description: The club member code to validate.
+ *     responses:
+ *       200:
+ *         description: Code is valid.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     message:
+ *                       type: string
+ *                       example: "Code is valid"
+ *                     isValid:
+ *                       type: boolean
+ *                       example: true
+ *       400:
+ *         description: Code is invalid.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     message:
+ *                       type: string
+ *                       example: "Code is invalid"
+ *                     isValid:
+ *                       type: boolean
+ *                       example: false
+ *       404:
+ *         description: Club not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Club not found"
+ *       500:
+ *         description: Server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Server error"
+ *                 error:
+ *                   type: string
+ *                   example: "Detailed error message"
+ */
+
+router.post("/validate-code/:id", isCodeValid);
 module.exports = router;
