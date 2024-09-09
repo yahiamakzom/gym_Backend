@@ -231,8 +231,9 @@ exports.LoginControlPanel = asyncHandler(async (req, res, next) => {
       if (user.role === "admin") {
         return res.status(200).json({
           role: "owner",
-          success: true,
+          id: user.id,
           token,
+          status: true,
           message: "Login successful",
         });
       }
@@ -274,7 +275,7 @@ exports.LoginControlPanel = asyncHandler(async (req, res, next) => {
         status: true,
         role: "suberadmin",
         token,
-        id:club._id,
+        id: club._id,
         message: "Login successful",
       });
     }
