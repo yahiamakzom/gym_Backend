@@ -336,29 +336,52 @@ exports.updateDiscount = asyncHandler(async (req, res, next) => {
   if (!discountCode) {
     return res
       .status(404)
-      .json({ success: false, message: "Discount code not found for the specified club" });
+      .json({
+        success: false,
+        message: "Discount code not found for the specified club",
+      });
   }
 
   // Get and update sub-clubs, if applicable
   const subClubs = await club.getSubClubs(); // Assuming getSubClubs() is a method on Club model
   if (subClubs && subClubs.length > 0) {
-    await Promise.all(subClubs.map(async (subClub) => {
-      await DiscountCode.findOneAndUpdate(
-        { club: subClub._id },
-        {
-          code,
-          discountPercentage,
-          validFrom: validFrom ? new Date(validFrom) : Date.now(),
-          validTo: validTo ? new Date(validTo) : null,
-        },
-        { new: true, runValidators: true }
-      );
-    }));
+    await Promise.all(
+      subClubs.map(async (subClub) => {
+        await DiscountCode.findOneAndUpdate(
+          { club: subClub._id },
+          {
+            code,
+            discountPercentage,
+            validFrom: validFrom ? new Date(validFrom) : Date.now(),
+            validTo: validTo ? new Date(validTo) : null,
+          },
+          { new: true, runValidators: true }
+        );
+      })
+    );
   }
 
   res.status(200).json({
     success: true,
     message: "Discount codes updated successfully",
     data: discountCode,
+  });
+});
+
+exports.getSuberAdminSubs = asyncHandler(async (req, res, next) => {
+  const id = req.params.id;
+
+  const club = await Clubs.findOne({ _id: id });
+  if (!club) {
+    res.status(404).json({ error: "Club Not Found" });
+    return;
+  }
+  const allSubClubs = await club.getSubClubs();
+
+  return res.status(200).json({
+    status: true,
+    data: {
+      allSubClubs,
+    },
   });
 });

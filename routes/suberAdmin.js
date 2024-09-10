@@ -8,10 +8,9 @@ const {
   getSubClub,
   editSubClub,
   addDiscount,
-  deleteDiscount
+  deleteDiscount,
+  getSuberAdminSubs,
 } = require("../controllers/suberAdmin");
-
-
 
 const {
   createWeightFitnessPackage,
@@ -401,9 +400,6 @@ router.delete("/delete-sub/:id", deleteSubClub);
 
 router.get("/get-sub/:id", getSubClub);
 
-
-
-
 /**
  * @swagger
  * suberadmin/edit-sub/{id}:
@@ -535,10 +531,6 @@ router.put(
   editSubClub
 );
 
-
-
-
-
 /**
  * @swagger
  * /suberadmin/add-discount/{suberadminclub Id}:
@@ -652,8 +644,6 @@ router.put(
 
 router.post("/add-discount/:id", addDiscount);
 
-
-
 /**
  * @swagger
  * /suberadmin/delete-discount/{id}:
@@ -712,9 +702,6 @@ router.post("/add-discount/:id", addDiscount);
  */
 
 router.delete("/delete-discount/:id", deleteDiscount);
-
-
-
 
 /**
  * @swagger
@@ -1586,4 +1573,27 @@ router.delete("/delete-paddle-package/:id", deletePaddlePackage);
  *         description: Paddle package not found
  */
 router.put("/update-paddle-package/:id", updatePaddlePackage);
+
+
+/**
+ * @swagger
+ * /suberadmin/suberadmin-get-subs/{id}:
+ *   get:
+ *     summary: get all suberadmin subs
+ *     tags:
+ *       - Suber Admin
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: 609c1f2f8f8d4d3a5c9a8b12
+ *     responses:
+ *       200:
+ *         description: Paddle package deleted successfully
+ *       404:
+ *         description: Paddle package not found
+ */
+router.get("/suberadmin-get-subs/:id", getSuberAdminSubs);
 module.exports = router;

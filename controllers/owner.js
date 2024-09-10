@@ -104,14 +104,10 @@ exports.getSubClubsForSuberAdmin = asyncHandler(async (req, res, next) => {
   }
   const allSubClubs = await club.getSubClubs();
 
-  for (const subClub of allSubClubs) {
-    cities.push(subClub.city);
-  }
-
   return res.status(200).json({
     status: true,
     data: {
-      clubs: [...allSubClubs],
+      allSubClubs,
     },
   });
 });
