@@ -116,7 +116,7 @@ exports.getSuberAdminClubs = asyncHandler(async (req, res, next) => {
   const clubs = await Club.find({ type: "suberadmin" });
 
   const cities = [];
-  const subsCount = allSubClubs.length;
+  const subsCount = clubs.length;
   const subsSubscriptions = 0;
 
   for (const suberadmin of clubs) {
