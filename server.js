@@ -37,16 +37,13 @@ app.use("/user", require("./routes/user"));
 app.use("/club", verifyRoles("club"), require("./routes/club"));
 app.use("/orders", require("./routes/clubOrder"));
 app.use("/suberadmin", require("./routes/suberAdmin"));
-app.use('/owner' , require('./routes/owner'))
+app.use('/owner'  , require('./routes/owner'))
 app.use("/clubs", require("./routes/global_clubs"));
 app.get("/rule/:type", getRuleType);
-
 app.use(require("./middlewares/globalError"));
-
 app.use("*", (req, res, next) =>
   res.status(404).json({ message: "Page Not Found" })
 );
-
 DB.then((con) => {
   app.listen(PORT, () => {
     refreshSubscriptions();

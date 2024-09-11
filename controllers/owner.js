@@ -113,8 +113,8 @@ exports.getSubClubsForSuberAdmin = asyncHandler(async (req, res, next) => {
 });
 
 exports.getSuberAdminClubs = asyncHandler(async (req, res, next) => {
-  const clubs = await Club.find({ type: "suberadmin" });
-
+  const clubs = await Club.find({ type: "superadmin" });
+console.log(clubs)
   const cities = [];
   const subsCount = clubs.length;
   const subsSubscriptions = 0;
