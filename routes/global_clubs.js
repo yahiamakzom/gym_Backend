@@ -1511,6 +1511,7 @@ router.delete("/delete-weight-Fitness/:id", deleteWeightFitnessPackage);
  *                 example: ["Monday", "Wednesday", "Friday"]
  *               sessionsPerDay:
  *                 type: array
+ *                 description: Array of session objects for each day, including time, price, seats, and discount info
  *                 items:
  *                   type: object
  *                   properties:
@@ -1522,41 +1523,44 @@ router.delete("/delete-weight-Fitness/:id", deleteWeightFitnessPackage);
  *                       type: string
  *                       description: End time of the session
  *                       example: "09:00 AM"
- *                 description: Sessions per day with start and end times
- *               price:
- *                 type: number
- *                 description: Price of the yoga package
- *                 example: 150
- *               numberOfSeats:
- *                 type: number
- *                 description: Number of seats available for the package
- *                 example: 10
- *               discountForAll:
- *                 type: boolean
- *                 description: Whether the discount applies to all members
- *                 example: false
- *               discountFrom:
- *                 type: string
- *                 format: date-time
- *                 description: Start date for the discount period
- *                 example: "2024-09-01T00:00:00Z"
- *               discountTo:
- *                 type: string
- *                 format: date-time
- *                 description: End date for the discount period
- *                 example: "2024-09-30T23:59:59Z"
- *               priceAfterDiscount:
- *                 type: number
- *                 description: Price after applying the discount
- *                 example: 120
- *               discountApplicableToNewMembersOnly:
- *                 type: boolean
- *                 description: True if discount only applies to new members
- *                 example: true
- *               discountStopDays:
- *                 type: number
- *                 description: Number of days the discount is applicable
- *                 example: 10
+ *                     price:
+ *                       type: number
+ *                       description: Price of the session
+ *                       example: 50
+ *                     numberOfSeats:
+ *                       type: number
+ *                       description: Number of seats available for the session
+ *                       example: 10
+ *                     discount:
+ *                       type: object
+ *                       description: Discount details for the session
+ *                       properties:
+ *                         discountForAll:
+ *                           type: boolean
+ *                           description: Whether the discount applies to all members
+ *                           example: false
+ *                         discountFrom:
+ *                           type: string
+ *                           format: date-time
+ *                           description: Start date for the discount period
+ *                           example: "2024-09-01T00:00:00Z"
+ *                         discountTo:
+ *                           type: string
+ *                           format: date-time
+ *                           description: End date for the discount period
+ *                           example: "2024-09-30T23:59:59Z"
+ *                         priceAfterDiscount:
+ *                           type: number
+ *                           description: Price after applying the discount
+ *                           example: 40
+ *                         discountApplicableToNewMembersOnly:
+ *                           type: boolean
+ *                           description: True if discount only applies to new members
+ *                           example: true
+ *                         discountStopDays:
+ *                           type: number
+ *                           description: Number of days the discount is applicable
+ *                           example: 10
  *               description:
  *                 type: string
  *                 description: Additional description for the package
@@ -1567,6 +1571,7 @@ router.delete("/delete-weight-Fitness/:id", deleteWeightFitnessPackage);
  *       400:
  *         description: Bad request
  */
+
 router.post("/yoga-create", createYogaPackage);
 
 /**
@@ -1618,41 +1623,44 @@ router.post("/yoga-create", createYogaPackage);
  *                       type: string
  *                       description: End time of the session
  *                       example: "09:00 AM"
- *                 description: Sessions per day with start and end times
- *               price:
- *                 type: number
- *                 description: Price of the yoga package
- *                 example: 150
- *               numberOfSeats:
- *                 type: number
- *                 description: Number of seats available for the package
- *                 example: 10
- *               discountForAll:
- *                 type: boolean
- *                 description: Whether the discount applies to all members
- *                 example: false
- *               discountFrom:
- *                 type: string
- *                 format: date-time
- *                 description: Start date for the discount period
- *                 example: "2024-09-01T00:00:00Z"
- *               discountTo:
- *                 type: string
- *                 format: date-time
- *                 description: End date for the discount period
- *                 example: "2024-09-30T23:59:59Z"
- *               priceAfterDiscount:
- *                 type: number
- *                 description: Price after applying the discount
- *                 example: 120
- *               discountApplicableToNewMembersOnly:
- *                 type: boolean
- *                 description: True if discount only applies to new members
- *                 example: true
- *               discountStopDays:
- *                 type: number
- *                 description: Number of days the discount is applicable
- *                 example: 10
+ *                     price:
+ *                       type: number
+ *                       description: Price for the session
+ *                       example: 50
+ *                     numberOfSeats:
+ *                       type: number
+ *                       description: Number of available seats for the session
+ *                       example: 10
+ *                     discount:
+ *                       type: object
+ *                       properties:
+ *                         discountForAll:
+ *                           type: boolean
+ *                           description: Whether the discount applies to all members
+ *                           example: false
+ *                         discountFrom:
+ *                           type: string
+ *                           format: date-time
+ *                           description: Start date for the discount period
+ *                           example: "2024-09-01T00:00:00Z"
+ *                         discountTo:
+ *                           type: string
+ *                           format: date-time
+ *                           description: End date for the discount period
+ *                           example: "2024-09-30T23:59:59Z"
+ *                         priceAfterDiscount:
+ *                           type: number
+ *                           description: Price after applying the discount
+ *                           example: 40
+ *                         discountApplicableToNewMembersOnly:
+ *                           type: boolean
+ *                           description: Whether the discount only applies to new members
+ *                           example: true
+ *                         discountStopDays:
+ *                           type: number
+ *                           description: Number of days the discount is applicable
+ *                           example: 10
+ *                 description: Array of sessions with start time, end time, price, number of seats, and discount details
  *               description:
  *                 type: string
  *                 description: Additional description for the package
@@ -1665,6 +1673,7 @@ router.post("/yoga-create", createYogaPackage);
  *       404:
  *         description: Yoga package not found
  */
+
 router.put("/yoga-update/:id", updateYogaPackage);
 
 /**

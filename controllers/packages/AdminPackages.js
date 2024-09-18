@@ -166,29 +166,16 @@ const createYogaPackage = asyncHandler(async (req, res) => {
     packageName,
     yogaType,
     daysOfWeek,
-    sessionsPerDay,
-    price,
-    numberOfSeats,
+    sessionsPerDay, // Expect an array of sessions, each with its own price, seats, and discount
     description,
-    // Discount-related fields as primitives
-    discountForAll,
-    discountFrom,
-    discountTo,
-    priceAfterDiscount,
-    discountApplicableToNewMembersOnly,
-    discountStopDays,
+
   } = req.body;
 
-  // Create a discount object using the extracted primitive values
-  const discount = {
-    discountForAll: discountForAll || false,
-    discountFrom: discountFrom ? new Date(discountFrom) : undefined,
-    discountTo: discountTo ? new Date(discountTo) : undefined,
-    priceAfterDiscount: priceAfterDiscount || undefined,
-    discountApplicableToNewMembersOnly:
-      discountApplicableToNewMembersOnly || false,
-    discountStopDays: discountStopDays || undefined,
-  };
+  // Validate sessionsPerDay array and ensure each session contains price, numberOfSeats, and discount
+  if (!sessionsPerDay || !Array.isArray(sessionsPerDay) || sessionsPerDay.length === 0) {
+    res.status(400);
+    throw new Error("Please provide at least one session with price, seats, and discount information.");
+  }
 
   // Check if the package already exists for the club with the same name and type
   const existingPackage = await YogaPackage.findOne({
@@ -196,6 +183,7 @@ const createYogaPackage = asyncHandler(async (req, res) => {
     packageName,
     yogaType,
   });
+
   if (existingPackage) {
     res.status(400);
     throw new Error(
@@ -203,16 +191,49 @@ const createYogaPackage = asyncHandler(async (req, res) => {
     );
   }
 
+  // Prepare the sessions with their specific prices, seats, and discount objects
+  const preparedSessions = sessionsPerDay.map((session) => {
+    const {
+      startTime,
+      endTime,
+      price,
+      numberOfSeats,
+      discountForAll,
+      discountFrom,
+      discountTo,
+      priceAfterDiscount,
+      discountApplicableToNewMembersOnly,
+      discountStopDays,
+    } = session;
+
+    const discount = {
+      discountForAll: discountForAll || false,
+      discountFrom: discountFrom ? new Date(discountFrom) : undefined,
+      discountTo: discountTo ? new Date(discountTo) : undefined,
+      priceAfterDiscount: priceAfterDiscount || undefined,
+      discountApplicableToNewMembersOnly:
+        discountApplicableToNewMembersOnly || false,
+      discountStopDays: discountStopDays || undefined,
+    };
+
+    return {
+      startTime,
+      endTime,
+      price,
+      numberOfSeats,
+      discount, // Assign the constructed discount object for each session
+    };
+  });
+
+  // Create the new yoga package with sessions
   const newPackage = new YogaPackage({
     club,
     packageName,
     yogaType,
     daysOfWeek,
-    sessionsPerDay,
-    price,
-    numberOfSeats,
-    discount, // Assign the constructed discount object
+    sessionsPerDay: preparedSessions, // Pass the prepared sessions with their respective details
     description,
+  
   });
 
   await newPackage.save();
@@ -221,6 +242,7 @@ const createYogaPackage = asyncHandler(async (req, res) => {
     .json({ message: "Yoga package created successfully", data: newPackage });
 });
 
+
 // Update an existing Yoga package by ID
 const updateYogaPackage = asyncHandler(async (req, res) => {
   const { id } = req.params;
@@ -228,58 +250,82 @@ const updateYogaPackage = asyncHandler(async (req, res) => {
     packageName,
     yogaType,
     daysOfWeek,
-    sessionsPerDay,
-    price,
-    numberOfSeats,
+    sessionsPerDay, // Array of sessions with updated session details
     description,
-    // Discount-related fields as primitives
-    discountForAll,
-    discountFrom,
-    discountTo,
-    priceAfterDiscount,
-    discountApplicableToNewMembersOnly,
-    discountStopDays,
   } = req.body;
 
+  // Find the existing package by ID
   const package = await YogaPackage.findById(id);
   if (!package) {
     res.status(404);
     throw new Error("Yoga package not found");
   }
 
-  // Update the discount object using the extracted primitive values
-  const updatedDiscount = {
-    discountForAll:
-      discountForAll !== undefined
-        ? discountForAll
-        : package.discount.discountForAll,
-    discountFrom: discountFrom
-      ? new Date(discountFrom)
-      : package.discount.discountFrom,
-    discountTo: discountTo ? new Date(discountTo) : package.discount.discountTo,
-    priceAfterDiscount:
-      priceAfterDiscount || package.discount.priceAfterDiscount,
-    discountApplicableToNewMembersOnly:
-      discountApplicableToNewMembersOnly !== undefined
-        ? discountApplicableToNewMembersOnly
-        : package.discount.discountApplicableToNewMembersOnly,
-    discountStopDays: discountStopDays || package.discount.discountStopDays,
-  };
+  // Validate the sessionsPerDay array (if provided) and ensure each session has required fields
+  let updatedSessions = package.sessionsPerDay;
+  if (sessionsPerDay && Array.isArray(sessionsPerDay)) {
+    updatedSessions = sessionsPerDay.map((session, index) => {
+      const existingSession = package.sessionsPerDay[index] || {};
 
+      const {
+        startTime,
+        endTime,
+        price,
+        numberOfSeats,
+        discountForAll,
+        discountFrom,
+        discountTo,
+        priceAfterDiscount,
+        discountApplicableToNewMembersOnly,
+        discountStopDays,
+      } = session;
+
+      const updatedDiscount = {
+        discountForAll:
+          discountForAll !== undefined
+            ? discountForAll
+            : existingSession.discount?.discountForAll,
+        discountFrom: discountFrom
+          ? new Date(discountFrom)
+          : existingSession.discount?.discountFrom,
+        discountTo: discountTo
+          ? new Date(discountTo)
+          : existingSession.discount?.discountTo,
+        priceAfterDiscount:
+          priceAfterDiscount || existingSession.discount?.priceAfterDiscount,
+        discountApplicableToNewMembersOnly:
+          discountApplicableToNewMembersOnly !== undefined
+            ? discountApplicableToNewMembersOnly
+            : existingSession.discount?.discountApplicableToNewMembersOnly,
+        discountStopDays:
+          discountStopDays || existingSession.discount?.discountStopDays,
+      };
+
+      return {
+        startTime: startTime || existingSession.startTime,
+        endTime: endTime || existingSession.endTime,
+        price: price || existingSession.price,
+        numberOfSeats: numberOfSeats || existingSession.numberOfSeats,
+        discount: updatedDiscount, // Update the discount for each session
+      };
+    });
+  }
+
+  // Update package details
   package.packageName = packageName || package.packageName;
   package.yogaType = yogaType || package.yogaType;
   package.daysOfWeek = daysOfWeek || package.daysOfWeek;
-  package.sessionsPerDay = sessionsPerDay || package.sessionsPerDay;
-  package.price = price || package.price;
-  package.numberOfSeats = numberOfSeats || package.numberOfSeats;
-  package.discount = updatedDiscount; // Assign the updated discount object
+  package.sessionsPerDay = updatedSessions; // Update the sessions array
   package.description = description || package.description;
 
+  // Save the updated package
   await package.save();
+
   res
     .status(200)
     .json({ message: "Yoga package updated successfully", data: package });
 });
+
 
 const deleteYogaPackageById = async (req, res) => {
   try {
