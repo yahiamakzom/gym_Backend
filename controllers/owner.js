@@ -9,6 +9,7 @@ const sendEmail = require("../helper/sendEmail");
 const bcrypt = require("bcrypt");
 const Transfers = require("../models/Transafers.js");
 const TransferOrder = require("../models/TransferOrder.js");
+const DiscountCode = require("../models/DiscountCode.js");
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.CLOUD_API_KEY,
@@ -114,7 +115,7 @@ exports.getSubClubsForSuberAdmin = asyncHandler(async (req, res, next) => {
 
 exports.getSuberAdminClubs = asyncHandler(async (req, res, next) => {
   const clubs = await Club.find({ type: "superadmin" });
-console.log(clubs)
+  console.log(clubs);
   const cities = [];
   const subsCount = clubs.length;
   const subsSubscriptions = 0;
@@ -427,4 +428,79 @@ exports.refuseTransfer = asyncHandler(async (req, res, next) => {
 
   // Respond with the refused transfer details
   res.json({ success: true, data: refusedTransfer });
+});
+
+exports.getAllGlobalDiscounts = asyncHandler(async (req, res) => {
+  const globalDiscounts = await DiscountCode.find({ global: true });
+  res
+    .status(200)
+    .json({
+      success: true,
+      count: globalDiscounts.length,
+      data: globalDiscounts,
+    });
+});
+
+exports.getGlobalDiscountById = asyncHandler(async (req, res) => {
+  const discountCode = await DiscountCode.findOne({
+    _id: req.params.id,
+    global: true,
+  });
+  if (!discountCode) {
+    return res.status(404).json({ message: "Global discount code not found" });
+  }
+  res.status(200).json({ success: true, data: discountCode });
+});
+
+exports.createGlobalDiscount = asyncHandler(async (req, res) => {
+  const { code, discountPercentage, validFrom, validTo } = req.body;
+
+  // Validate required fields
+  if (!code || !discountPercentage) {
+    return res
+      .status(400)
+      .json({ message: "Code and discount percentage are required" });
+  }
+
+  const newDiscount = await DiscountCode.create({
+    code,
+    discountPercentage,
+    validFrom,
+    validTo,
+    global: true, // Set to global
+  });
+
+  res.status(201).json({ success: true, data: newDiscount });
+});
+
+exports.updateGlobalDiscount = asyncHandler(async (req, res) => {
+  const { code, discountPercentage, validFrom, validTo } = req.body;
+
+  let discountCode = await DiscountCode.findOne({
+    _id: req.params.id,
+    global: true,
+  });
+  if (!discountCode) {
+    return res.status(404).json({ message: "Global discount code not found" });
+  }
+
+  // Update fields only if they are provided in the request
+  discountCode.code = code || discountCode.code;
+  discountCode.discountPercentage =
+    discountPercentage || discountCode.discountPercentage;
+  discountCode.validFrom = validFrom || discountCode.validFrom;
+  discountCode.validTo = validTo || discountCode.validTo;
+
+  await discountCode.save();
+  res.status(200).json({ success: true, data: discountCode });
+});
+ 
+exports.deleteGlobalDiscount = asyncHandler(async (req, res) => {
+  const discountCode = await DiscountCode.findOneAndDelete({ _id: req.params.id, global: true });
+
+  if (!discountCode) {
+    return res.status(404).json({ message: "Global discount code not found" });
+  }
+
+  res.status(200).json({ success: true, message: "Global discount code deleted" });
 });

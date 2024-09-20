@@ -14,6 +14,11 @@ const {
   acceptTransfer,
   refuseTransfer,
   getAllTransfers,
+  deleteGlobalDiscount,
+  getAllGlobalDiscounts,
+  getGlobalDiscountById,
+  createGlobalDiscount,
+  updateGlobalDiscount,
 } = require("../controllers/owner");
 
 /**
@@ -817,4 +822,359 @@ router.post(
  */
 
 router.post("/refuse-transfer-order/:id", refuseTransfer);
+
+/**
+ * @swagger
+ * /owner/discounts/:
+ *   get:
+ *     summary: Get all global discount codes
+ *     description: Fetch all discount codes that are global (applicable to all clubs).
+ *     tags:
+ *       - Owner
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved all global discount codes
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 count:
+ *                   type: number
+ *                   example: 5
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       _id:
+ *                         type: string
+ *                         example: "60d21b4667d0d8992e610c85"
+ *                       code:
+ *                         type: string
+ *                         example: "SUMMER20"
+ *                       discountPercentage:
+ *                         type: number
+ *                         example: 20
+ *                       validFrom:
+ *                         type: string
+ *                         example: "2023-01-01T00:00:00Z"
+ *                       validTo:
+ *                         type: string
+ *                         example: "2023-12-31T23:59:59Z"
+ *                       global:
+ *                         type: boolean
+ *                         example: true
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Error fetching global discounts"
+ */
+router.get("/discounts/", getAllGlobalDiscounts);
+
+/**
+ * @swagger
+ * /owner/discounts/{id}:
+ *   get:
+ *     summary: Get a specific global discount code by ID
+ *     description: Fetch a single global discount code by its ID.
+ *     tags:
+ *       - Owner
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The ID of the global discount code
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved the global discount code
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                       example: "60d21b4667d0d8992e610c85"
+ *                     code:
+ *                       type: string
+ *                       example: "SUMMER20"
+ *                     discountPercentage:
+ *                       type: number
+ *                       example: 20
+ *                     validFrom:
+ *                       type: string
+ *                       example: "2023-01-01T00:00:00Z"
+ *                     validTo:
+ *                       type: string
+ *                       example: "2023-12-31T23:59:59Z"
+ *                     global:
+ *                       type: boolean
+ *                       example: true
+ *       404:
+ *         description: Global discount code not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Global discount code not found"
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Error fetching global discount"
+ */
+router.get("/discounts/:id", getGlobalDiscountById);
+
+/**
+ * @swagger
+ * /owner/create-discount:
+ *   post:
+ *     summary: Create a new global discount code
+ *     description: Owner creates a discount code that is applicable to all clubs.
+ *     tags:
+ *       - Owner
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - code
+ *               - discountPercentage
+ *             properties:
+ *               code:
+ *                 type: string
+ *                 example: "WINTER25"
+ *               discountPercentage:
+ *                 type: number
+ *                 example: 25
+ *               validFrom:
+ *                 type: string
+ *                 example: "2023-11-01T00:00:00Z"
+ *               validTo:
+ *                 type: string
+ *                 example: "2024-01-31T23:59:59Z"
+ *     responses:
+ *       201:
+ *         description: Successfully created the global discount code
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                       example: "60d21b4667d0d8992e610c85"
+ *                     code:
+ *                       type: string
+ *                       example: "WINTER25"
+ *                     discountPercentage:
+ *                       type: number
+ *                       example: 25
+ *                     validFrom:
+ *                       type: string
+ *                       example: "2023-11-01T00:00:00Z"
+ *                     validTo:
+ *                       type: string
+ *                       example: "2024-01-31T23:59:59Z"
+ *                     global:
+ *                       type: boolean
+ *                       example: true
+ *       400:
+ *         description: Validation error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Code and discount percentage are required"
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Error creating global discount"
+ */
+router.post("/create-discount", createGlobalDiscount);
+
+/**
+ * @swagger
+ * /owner/update-discount/{id}:
+ *   put:
+ *     summary: Update a global discount code
+ *     description: Modify the details of an existing global discount code by its ID.
+ *     tags:
+ *       - Owner
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The ID of the global discount code to update
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               code:
+ *                 type: string
+ *                 example: "WINTER25"
+ *               discountPercentage:
+ *                 type: number
+ *                 example: 25
+ *               validFrom:
+ *                 type: string
+ *                 example: "2023-11-01T00:00:00Z"
+ *               validTo:
+ *                 type: string
+ *                 example: "2024-01-31T23:59:59Z"
+ *     responses:
+ *       200:
+ *         description: Successfully updated the global discount code
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                       example: "60d21b4667d0d8992e610c85"
+ *                     code:
+ *                       type: string
+ *                       example: "WINTER25"
+ *                     discountPercentage:
+ *                       type: number
+ *                       example: 25
+ *                     validFrom:
+ *                       type: string
+ *                       example: "2023-11-01T00:00:00Z"
+ *                     validTo:
+ *                       type: string
+ *                       example: "2024-01-31T23:59:59Z"
+ *                     global:
+ *                       type: boolean
+ *                       example: true
+ *       404:
+ *         description: Global discount code not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Global discount code not found"
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Error updating global discount"
+ */
+
+router.put("/update-discount/:id", updateGlobalDiscount);
+
+/**
+ * @swagger
+ * /owner/delete-discount/{id}:
+ *   delete:
+ *     summary: Delete a global discount code
+ *     description: Remove a global discount code by its ID.
+ *     tags:
+ *       - Owner
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The ID of the global discount code to delete
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Successfully deleted the global discount code
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Global discount code successfully deleted"
+ *       404:
+ *         description: Global discount code not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Global discount code not found"
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Error deleting global discount"
+ */
+router.delete("/delete-discount/:id", deleteGlobalDiscount);
 module.exports = router;
