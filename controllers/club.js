@@ -777,7 +777,7 @@ exports.addDiscount = asyncHandler(async (req, res, next) => {
 
   res.status(201).json({
     success: true,
-    message: "Discount code added successfully",
+
     data: discountCode,
   });
 });
@@ -797,7 +797,7 @@ exports.getDiscount = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     success: true,
-    message: "Discount code retrieved successfully",
+
     data: discountCode,
   });
 });
@@ -809,7 +809,7 @@ exports.getAllDiscounts = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     success: true,
-    message: "Discount codes retrieved successfully",
+    count: discounts.length,
     data: discounts,
   });
 });
@@ -866,7 +866,7 @@ exports.getBankAccountById = asyncHandler(async (req, res) => {
 
   if (!bankAccount) {
     return res
-      .status(404)
+      .status(200)
       .json({ success: false, message: "Bank account not found" });
   }
 
