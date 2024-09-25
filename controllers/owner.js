@@ -346,7 +346,7 @@ exports.refuseOrder = async (req, res, next) => {
     `;
 
     await sendEmail(order.email, emailSubject, emailHtml);
-
+// delete order  
     await CLubOrder.findByIdAndDelete(orderId);
     // Send response
     res
