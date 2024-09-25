@@ -309,11 +309,7 @@ exports.refuseOrder = async (req, res, next) => {
     }
 
     // Optionally update order status instead of deleting
-    await CLubOrder.findByIdAndUpdate(
-      orderId,
-      { status: "refused" },
-      { new: true }
-    );
+
 
     // Send refusal email
     const emailSubject = "Your Club Application Has Been Refused";
@@ -351,6 +347,7 @@ exports.refuseOrder = async (req, res, next) => {
 
     await sendEmail(order.email, emailSubject, emailHtml);
 
+    await CLubOrder.findByIdAndDelete(orderId);
     // Send response
     res
       .status(200)
