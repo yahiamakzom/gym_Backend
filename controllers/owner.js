@@ -284,7 +284,11 @@ exports.acceptOrder = async (req, res, next) => {
     // Send response
     res
       .status(200)
-      .json({ message: "Order accepted and club created", club: newClub });
+      .json({
+        status: true,
+        message: "Order accepted and club created",
+        club: newClub,
+      });
   } catch (error) {
     next(error);
   }
@@ -348,7 +352,9 @@ exports.refuseOrder = async (req, res, next) => {
     await sendEmail(order.email, emailSubject, emailHtml);
 
     // Send response
-    res.status(200).json({ message: "Order refused and email sent" });
+    res
+      .status(200)
+      .json({ status: true, message: "Order refused and email sent" });
   } catch (error) {
     // Pass errors to the error-handling middleware
     next(error);
@@ -432,13 +438,11 @@ exports.refuseTransfer = asyncHandler(async (req, res, next) => {
 
 exports.getAllGlobalDiscounts = asyncHandler(async (req, res) => {
   const globalDiscounts = await DiscountCode.find({ global: true });
-  res
-    .status(200)
-    .json({
-      success: true,
-      count: globalDiscounts.length,
-      data: globalDiscounts,
-    });
+  res.status(200).json({
+    success: true,
+    count: globalDiscounts.length,
+    data: globalDiscounts,
+  });
 });
 
 exports.getGlobalDiscountById = asyncHandler(async (req, res) => {
@@ -494,13 +498,18 @@ exports.updateGlobalDiscount = asyncHandler(async (req, res) => {
   await discountCode.save();
   res.status(200).json({ success: true, data: discountCode });
 });
- 
+
 exports.deleteGlobalDiscount = asyncHandler(async (req, res) => {
-  const discountCode = await DiscountCode.findOneAndDelete({ _id: req.params.id, global: true });
+  const discountCode = await DiscountCode.findOneAndDelete({
+    _id: req.params.id,
+    global: true,
+  });
 
   if (!discountCode) {
     return res.status(404).json({ message: "Global discount code not found" });
   }
 
-  res.status(200).json({ success: true, message: "Global discount code deleted" });
+  res
+    .status(200)
+    .json({ success: true, message: "Global discount code deleted" });
 });
