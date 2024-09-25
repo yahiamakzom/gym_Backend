@@ -456,7 +456,7 @@ router.post("/accept-order/:orderId", acceptOrder);
 /**
  * @swagger
  * /owner/refuse-order/{orderId}:
- *   patch:
+ *   delete:
  *     summary: Refuse an order and notify the user via email
  *     tags:
  *       - Owner
@@ -499,7 +499,7 @@ router.post("/accept-order/:orderId", acceptOrder);
  *                   type: string
  *                   example: "An unexpected error occurred"
  */
-router.patch("/refuse-order/:orderId", refuseOrder);
+router.delete("/refuse-order/:orderId", refuseOrder);
 
 /**
  * @swagger
