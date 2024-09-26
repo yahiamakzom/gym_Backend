@@ -861,8 +861,8 @@ exports.addBankAccount = asyncHandler(async (req, res) => {
 
 exports.getBankAccountById = asyncHandler(async (req, res) => {
   const { id } = req.params;
-console.log(id)
-  const bankAccount = await Bank.findOne({ club:id });
+  console.log(id);
+  const bankAccount = await Bank.findOne({ club: id });
 
   if (!bankAccount) {
     return res
@@ -882,9 +882,8 @@ exports.updateBankAccount = asyncHandler(async (req, res) => {
   const { ownerName, iban, bankName } = req.body;
 
   // Find the bank account by ID and update it
-  const updatedBankAccount = await Bank.findByIdAndUpdate(
-    id,
-    { ownerName, iban, bankName },
+  const updatedBankAccount = await Bank.findOneAndUpdate(
+    { club: id, ownerName, iban, bankName },
     { new: true, runValidators: true }
   );
 
