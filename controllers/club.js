@@ -882,10 +882,9 @@ exports.updateBankAccount = asyncHandler(async (req, res) => {
   const { ownerName, iban, bankName } = req.body;
 
   // Find the bank account by ID and update it
-  const updatedBankAccount = await Bank.findOneAndUpdate(
-    { club: id, ownerName, iban, bankName },
-    { new: true, runValidators: true }
-  );
+  const updatedBankAccount = await Bank.findOne({
+    club: id,
+  });
 
   if (!updatedBankAccount) {
     return res
@@ -893,6 +892,11 @@ exports.updateBankAccount = asyncHandler(async (req, res) => {
       .json({ success: false, message: "Bank account not found" });
   }
 
+  updatedBankAccount.ownerName = ownerName || updatedBankAccount.ownerName;
+  updatedBankAccount.iban = iban || updatedBankAccount.iban;
+  updatedBankAccount.bankName = bankName || updatedBankAccount.bankName;
+
+  await updatedBankAccount.save();
   res.status(200).json({
     success: true,
     message: "Bank account updated successfully",
