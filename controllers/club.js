@@ -861,8 +861,8 @@ exports.addBankAccount = asyncHandler(async (req, res) => {
 
 exports.getBankAccountById = asyncHandler(async (req, res) => {
   const { id } = req.params;
-
-  const bankAccount = await Bank.findById(id);
+console.log(id)
+  const bankAccount = await Bank.findOne({ club:id });
 
   if (!bankAccount) {
     return res
