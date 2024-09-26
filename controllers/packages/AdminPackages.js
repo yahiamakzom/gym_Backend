@@ -168,13 +168,18 @@ const createYogaPackage = asyncHandler(async (req, res) => {
     daysOfWeek,
     sessionsPerDay, // Expect an array of sessions, each with its own price, seats, and discount
     description,
-
   } = req.body;
 
   // Validate sessionsPerDay array and ensure each session contains price, numberOfSeats, and discount
-  if (!sessionsPerDay || !Array.isArray(sessionsPerDay) || sessionsPerDay.length === 0) {
+  if (
+    !sessionsPerDay ||
+    !Array.isArray(sessionsPerDay) ||
+    sessionsPerDay.length === 0
+  ) {
     res.status(400);
-    throw new Error("Please provide at least one session with price, seats, and discount information.");
+    throw new Error(
+      "Please provide at least one session with price, seats, and discount information."
+    );
   }
 
   // Check if the package already exists for the club with the same name and type
@@ -193,27 +198,20 @@ const createYogaPackage = asyncHandler(async (req, res) => {
 
   // Prepare the sessions with their specific prices, seats, and discount objects
   const preparedSessions = sessionsPerDay.map((session) => {
-    const {
-      startTime,
-      endTime,
-      price,
-      numberOfSeats,
-      discountForAll,
-      discountFrom,
-      discountTo,
-      priceAfterDiscount,
-      discountApplicableToNewMembersOnly,
-      discountStopDays,
-    } = session;
+    const { startTime, endTime, price, numberOfSeats, discount } = session;
 
-    const discount = {
-      discountForAll: discountForAll || false,
-      discountFrom: discountFrom ? new Date(discountFrom) : undefined,
-      discountTo: discountTo ? new Date(discountTo) : undefined,
-      priceAfterDiscount: priceAfterDiscount || undefined,
+    const discountData = {
+      discountForAll: discount.discountForAll || false,
+      discountFrom: discount.discountFrom
+        ? new Date(discount.discountFrom)
+        : undefined,
+      discountTo: discount.discountdiscountTo
+        ? new Date(discount.discountTo)
+        : undefined,
+      priceAfterDiscount: discount.priceAfterDiscount || undefined,
       discountApplicableToNewMembersOnly:
-        discountApplicableToNewMembersOnly || false,
-      discountStopDays: discountStopDays || undefined,
+        discount.discountApplicableToNewMembersOnly || false,
+      discountStopDays: discount.discountStopDays || undefined,
     };
 
     return {
@@ -221,7 +219,7 @@ const createYogaPackage = asyncHandler(async (req, res) => {
       endTime,
       price,
       numberOfSeats,
-      discount, // Assign the constructed discount object for each session
+      discount: discountData, // Assign the constructed discount object for each session
     };
   });
 
@@ -233,7 +231,6 @@ const createYogaPackage = asyncHandler(async (req, res) => {
     daysOfWeek,
     sessionsPerDay: preparedSessions, // Pass the prepared sessions with their respective details
     description,
-  
   });
 
   await newPackage.save();
@@ -241,7 +238,6 @@ const createYogaPackage = asyncHandler(async (req, res) => {
     .status(201)
     .json({ message: "Yoga package created successfully", data: newPackage });
 });
-
 
 // Update an existing Yoga package by ID
 const updateYogaPackage = asyncHandler(async (req, res) => {
@@ -325,7 +321,6 @@ const updateYogaPackage = asyncHandler(async (req, res) => {
     .status(200)
     .json({ message: "Yoga package updated successfully", data: package });
 });
-
 
 const deleteYogaPackageById = async (req, res) => {
   try {
@@ -466,12 +461,12 @@ const deletePaddlePackage = asyncHandler(async (req, res) => {
 
   const package = await PaddlePackage.findById(id);
   if (!package) {
-    res.status(404).json({ message: 'Paddle package not found' });
+    res.status(404).json({ message: "Paddle package not found" });
     return;
   }
 
   await package.remove();
-  res.status(200).json({ message: 'Paddle package deleted successfully' });
+  res.status(200).json({ message: "Paddle package deleted successfully" });
 });
 
 const getAllPaddlePackagesForClub = asyncHandler(async (req, res) => {
@@ -479,38 +474,46 @@ const getAllPaddlePackagesForClub = asyncHandler(async (req, res) => {
 
   const packages = await PaddlePackage.find({ club: clubId });
   if (!packages.length) {
-    res.status(404).json({ message: 'No paddle packages found for this club' });
+    res.status(404).json({ message: "No paddle packages found for this club" });
   } else {
     res.status(200).json(packages);
   }
 });
 
-
 const updatePaddlePackage = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { packageName, sessionDuration, price, discount, description } = req.body;
+  const { packageName, sessionDuration, price, discount, description } =
+    req.body;
 
   // Find the paddle package by ID
   const paddlePackage = await PaddlePackage.findById(id);
   if (!paddlePackage) {
-      res.status(404);
-      throw new Error("Paddle package not found");
+    res.status(404);
+    throw new Error("Paddle package not found");
   }
 
   // Update the package fields except availableSlots
   if (packageName !== undefined) paddlePackage.packageName = packageName;
-  if (sessionDuration !== undefined) paddlePackage.sessionDuration = sessionDuration;
+  if (sessionDuration !== undefined)
+    paddlePackage.sessionDuration = sessionDuration;
   if (price !== undefined) paddlePackage.price = price;
   if (discount !== undefined) {
-      const { discountForAll, discountFrom, discountTo, priceAfterDiscount, discountApplicableToNewMembersOnly, discountStopDays } = discount;
-      paddlePackage.discount = {
-          discountForAll,
-          discountFrom,
-          discountTo,
-          priceAfterDiscount,
-          discountApplicableToNewMembersOnly,
-          discountStopDays
-      };
+    const {
+      discountForAll,
+      discountFrom,
+      discountTo,
+      priceAfterDiscount,
+      discountApplicableToNewMembersOnly,
+      discountStopDays,
+    } = discount;
+    paddlePackage.discount = {
+      discountForAll,
+      discountFrom,
+      discountTo,
+      priceAfterDiscount,
+      discountApplicableToNewMembersOnly,
+      discountStopDays,
+    };
   }
   if (description !== undefined) paddlePackage.description = description;
 
@@ -518,8 +521,8 @@ const updatePaddlePackage = asyncHandler(async (req, res) => {
   await paddlePackage.save();
 
   res.status(200).json({
-      message: "Paddle package updated successfully",
-      data: paddlePackage
+    message: "Paddle package updated successfully",
+    data: paddlePackage,
   });
 });
 module.exports = {
@@ -533,10 +536,9 @@ module.exports = {
   updateYogaPackage,
   getYogaPackagesByClub,
   deleteYogaPackageById,
-  //  paddle 
-  createPaddlePackage ,
+  //  paddle
+  createPaddlePackage,
   deletePaddlePackage,
-  getAllPaddlePackagesForClub ,
-  updatePaddlePackage
-
+  getAllPaddlePackagesForClub,
+  updatePaddlePackage,
 };
