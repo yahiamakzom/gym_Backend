@@ -364,7 +364,7 @@ const createPaddlePackage = asyncHandler(async (req, res) => {
     price,
     discount,
     description,
-    availableSlots,
+    availableSeats,
   } = req.body;
 
   // Create a new paddle package
@@ -375,81 +375,82 @@ const createPaddlePackage = asyncHandler(async (req, res) => {
     price,
     discount,
     description,
+    
     availableSlots: [],
   });
 
   await newPackage.save();
 
-  const createSlotsForDay = async (
-    packageId,
-    clubId,
-    day,
-    sessionDuration,
-    numberOfSeats
-  ) => {
-    const hours = await ClubHours.findOne({ club: clubId, day });
-    if (!hours || !hours.isOpen) {
-      return;
-    }
+  // const createSlotsForDay = async (
+  //   packageId,
+  //   clubId,
+  //   day,
+  //   sessionDuration,
+  //   numberOfSeats
+  // ) => {
+  //   const hours = await ClubHours.findOne({ club: clubId, day });
+  //   if (!hours || !hours.isOpen) {
+  //     return;
+  //   }
 
-    const startTime = hours.openTime;
-    const endTime = hours.closeTime;
+  //   const startTime = hours.openTime;
+  //   const endTime = hours.closeTime;
 
-    const createDailySlots = (startTime, endTime, duration, numberOfSeats) => {
-      const slots = [];
-      let currentTime = new Date(startTime);
+  //   const createDailySlots = (startTime, endTime, duration, numberOfSeats) => {
+  //     const slots = [];
+  //     let currentTime = new Date(startTime);
 
-      while (currentTime < endTime) {
-        const slotStart = new Date(currentTime);
-        const slotEnd = new Date(currentTime.getTime() + duration * 60000);
+  //     while (currentTime < endTime) {
+  //       const slotStart = new Date(currentTime);
+  //       const slotEnd = new Date(currentTime.getTime() + duration * 60000);
 
-        slots.push({
-          startTime: slotStart,
-          endTime: slotEnd,
-          numberOfSeats,
-          availableSeats: numberOfSeats,
-        });
+  //       slots.push({
+  //         startTime: slotStart,
+  //         endTime: slotEnd,
+  //         numberOfSeats,
+  //         availableSeats: numberOfSeats,
+  //       });
 
-        currentTime = new Date(currentTime.getTime() + duration * 60000);
-      }
+  //       currentTime = new Date(currentTime.getTime() + duration * 60000);
+  //     }
 
-      return slots;
-    };
+  //     return slots;
+  //   };
 
-    const slots = createDailySlots(
-      startTime,
-      endTime,
-      sessionDuration,
-      numberOfSeats
-    );
+  //   const slots = createDailySlots(
+  //     startTime,
+  //     endTime,
+  //     sessionDuration,
+  //     numberOfSeats
+  //   );
 
-    const package = await PaddlePackage.findById(packageId);
-    if (!package) {
-      throw new Error("Package not found");
-    }
+  //   const package = await PaddlePackage.findById(packageId);
+  //   if (!package) {
+  //     throw new Error("Package not found");
+  //   }
 
-    const existingDay = package.availableSlots.find(
-      (slot) => slot.date.toDateString() === new Date(day).toDateString()
-    );
-    if (existingDay) {
-      existingDay.slots = slots;
-    } else {
-      package.availableSlots.push({ date: new Date(day), slots });
-    }
+  //   const existingDay = package.availableSlots.find(
+  //     (slot) => slot.date.toDateString() === new Date(day).toDateString()
+  //   );
+  //   if (existingDay) {
+  //     existingDay.slots = slots;
+  //   } else {
+  //     package.availableSlots.push({ date: new Date(day), slots });
+  //   }
 
-    await package.save();
-  };
+  //   await package.save();
+  // };
 
-  // Create slots for each day based on the club’s operational hours
-  for (const slot of availableSlots) {
-    await createSlotsForDay(
-      newPackage._id,
-      club,
-      slot.date,
-      sessionDuration,
-      slot.numberOfSeats
-    );
-  }
+  // // Create slots for each day based on the club’s operational hours
+  // for (const slot of availableSlots) {
+  //   await createSlotsForDay(
+  //     newPackage._id,
+  //     club,
+  //     slot.date,
+  //     sessionDuration,
+  //     slot.numberOfSeats
+  //   );
+  // }
 
   res
     .status(201)
