@@ -516,6 +516,26 @@ exports.deleteGlobalDiscount = asyncHandler(async (req, res) => {
 exports.getClubForPackages = asyncHandler(async (req, res) => {
   try {
     const clubs = await Club.find({});
+    const { sport } = req.params;
+    let filterCondition = "";
+
+    switch (sport) {
+      case "paddle":
+        filterCondition = "بادل";
+        break;
+      case "yoga":
+        filterCondition = "يوغا";
+        break;
+      case "weight":
+        filterCondition = "اثقال ولياقه";
+        break;
+      case "another":
+        filterCondition = "انشطه اخري";
+        break;
+      default:
+        filterCondition = "بوكسينغ و كروس فيت";
+        break;
+    }
 
     const response = await Promise.all(
       clubs.map(async (club) => {
@@ -533,8 +553,8 @@ exports.getClubForPackages = asyncHandler(async (req, res) => {
           AnotherPackages.find({ club }).countDocuments(),
         ]);
 
-        return { 
-          id:club._id ,
+        return {
+          id: club._id,
           sports: club.sports,
           club: club.name,
           subscriptionCount: clubSubsLength,
@@ -545,7 +565,10 @@ exports.getClubForPackages = asyncHandler(async (req, res) => {
       })
     );
 
-    res.status(200).json({ success: true, data: response });
+    res.status(200).json({
+      success: true,
+      data: response.filter((club) => club.sports.includes(filterCondition)),
+    });
   } catch (e) {
     res.status(500).json({ success: false, error: e.message });
   }

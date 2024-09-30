@@ -1181,7 +1181,7 @@ router.delete("/delete-discount/:id", deleteGlobalDiscount);
 
 /**
  * @swagger
- * /owner/get_clubs_for_packages:
+ * /owner/get_clubs_for_packages/{sportsType}:
  *   get:
  *     summary: Get package and subscription details for all clubs
  *     description: Retrieve the number of subscriptions and packages (paddle, yoga, weight fitness, and another) for each club.
@@ -1225,5 +1225,5 @@ router.delete("/delete-discount/:id", deleteGlobalDiscount);
  *                   description: Error message explaining the failure
  *                   example: "Internal server error."
  */
-router.get("/get_clubs_for_packages", getClubForPackages);
+router.get("/get_clubs_for_packages/:sport", getClubForPackages);
 module.exports = router;
