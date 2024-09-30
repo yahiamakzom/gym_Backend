@@ -27,11 +27,11 @@ app.use(validateSub);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // Call the function to schedule subscription refreshing
 app.use("/auth", require("./routes/auth"));
-app.use(
-  "/admin",
-  // require("./middlewares/verifyRoles")("admin"),
-  require("./routes/admin")
-);
+// app.use(
+//   "/admin",
+//   // require("./middlewares/verifyRoles")("admin"),
+//   require("./routes/admin")
+// );
 app.use("/representative", require("./routes/representative"));
 app.use("/user", require("./routes/user"));
 app.use("/club", verifyRoles("club"), require("./routes/club"));

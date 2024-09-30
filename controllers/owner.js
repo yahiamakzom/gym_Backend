@@ -10,6 +10,11 @@ const bcrypt = require("bcrypt");
 const Transfers = require("../models/Transafers.js");
 const TransferOrder = require("../models/TransferOrder.js");
 const DiscountCode = require("../models/DiscountCode.js");
+const userSubs = require("../models/userSub");
+const AnotherPackages = require("../models/package/anotherActivity.js");
+const PaddlePackages = require("../models/package/paddle");
+const WeightFitnessPackages = require("../models/package/weightFitness");
+const YogaPackages = require("../models/package/yoga");
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.CLOUD_API_KEY,
@@ -282,13 +287,11 @@ exports.acceptOrder = async (req, res, next) => {
     await sendEmail(order.email, emailSubject, emailHtml);
     await CLubOrder.findByIdAndDelete(orderId);
     // Send response
-    res
-      .status(200)
-      .json({
-        status: true,
-        message: "Order accepted and club created",
-        club: newClub,
-      });
+    res.status(200).json({
+      status: true,
+      message: "Order accepted and club created",
+      club: newClub,
+    });
   } catch (error) {
     next(error);
   }
@@ -309,7 +312,6 @@ exports.refuseOrder = async (req, res, next) => {
     }
 
     // Optionally update order status instead of deleting
-
 
     // Send refusal email
     const emailSubject = "Your Club Application Has Been Refused";
@@ -346,7 +348,7 @@ exports.refuseOrder = async (req, res, next) => {
     `;
 
     await sendEmail(order.email, emailSubject, emailHtml);
-// delete order  
+    // delete order
     await CLubOrder.findByIdAndDelete(orderId);
     // Send response
     res
@@ -509,4 +511,41 @@ exports.deleteGlobalDiscount = asyncHandler(async (req, res) => {
   res
     .status(200)
     .json({ success: true, message: "Global discount code deleted" });
+});
+
+exports.getClubForPackages = asyncHandler(async (req, res) => {
+  try {
+    const clubs = await Club.find({});
+
+    const response = await Promise.all(
+      clubs.map(async (club) => {
+        const [
+          clubSubsLength,
+          paddlePackages,
+          yogaPackages,
+          weightPackages,
+          anotherPackages,
+        ] = await Promise.all([
+          userSubs.find({ club }).countDocuments(),
+          PaddlePackages.find({ club }).countDocuments(),
+          YogaPackages.find({ club }).countDocuments(),
+          WeightFitnessPackages.find({ club }).countDocuments(),
+          AnotherPackages.find({ club }).countDocuments(),
+        ]);
+
+        return {
+          sports: club.sports,
+          club: club.name,
+          subscriptionCount: clubSubsLength,
+          type: club.type,
+          packagesCount:
+            paddlePackages + yogaPackages + weightPackages + anotherPackages,
+        };
+      })
+    );
+
+    res.status(200).json({ success: true, data: response });
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
 });

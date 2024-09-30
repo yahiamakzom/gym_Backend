@@ -19,6 +19,7 @@ const {
   getGlobalDiscountById,
   createGlobalDiscount,
   updateGlobalDiscount,
+  getClubForPackages,
 } = require("../controllers/owner");
 
 /**
@@ -1177,4 +1178,52 @@ router.put("/update-discount/:id", updateGlobalDiscount);
  *                   example: "Error deleting global discount"
  */
 router.delete("/delete-discount/:id", deleteGlobalDiscount);
+
+/**
+ * @swagger
+ * /owner/get_clubs_for_packages:
+ *   get:
+ *     summary: Get package and subscription details for all clubs
+ *     description: Retrieve the number of subscriptions and packages (paddle, yoga, weight fitness, and another) for each club.
+ *     tags:
+ *       - Owner
+ *     responses:
+ *       200:
+ *         description: Success - returns an array with club details including package and subscription counts
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   club:
+ *                     type: string
+ *                     description: Name of the club
+ *                     example: "Fitness Club"
+ *                   subscriptionCount:
+ *                     type: integer
+ *                     description: Number of active subscriptions for the club
+ *                     example: 120
+ *                   type:
+ *                     type: string
+ *                     description: Type of club (e.g., gym, yoga studio, etc.)
+ *                     example: "gym"
+ *                   packagesCount:
+ *                     type: integer
+ *                     description: Total number of packages (paddle, yoga, weight fitness, and another) offered by the club
+ *                     example: 15
+ *       500:
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message explaining the failure
+ *                   example: "Internal server error."
+ */
+router.get("/get_clubs_for_packages", getClubForPackages);
 module.exports = router;
