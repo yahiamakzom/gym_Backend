@@ -533,7 +533,8 @@ exports.getClubForPackages = asyncHandler(async (req, res) => {
           AnotherPackages.find({ club }).countDocuments(),
         ]);
 
-        return {
+        return { 
+          id:club._id ,
           sports: club.sports,
           club: club.name,
           subscriptionCount: clubSubsLength,
