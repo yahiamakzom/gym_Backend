@@ -1604,7 +1604,7 @@ router.get("/suberadmin-get-subs/:id", getSuberAdminSubs);
  *     summary: Get package and subscription details for all clubs
  *     description: Retrieve the number of subscriptions and packages (paddle, yoga, weight fitness, and another) for each club.
  *     tags:
- *       - Owner
+ *       - Suber Admin
  *     responses:
  *       200:
  *         description: Success - returns an array with club details including package and subscription counts

@@ -465,7 +465,7 @@ const deletePaddlePackage = asyncHandler(async (req, res) => {
     return;
   }
 
-  await package.remove();
+  await PaddlePackage.findByIdAndDelete(id);
   res.status(200).json({ message: "Paddle package deleted successfully" });
 });
 
