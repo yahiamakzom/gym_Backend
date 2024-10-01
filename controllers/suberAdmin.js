@@ -9,6 +9,7 @@ const AnotherPackages = require("../models/package/anotherActivity.js");
 const PaddlePackages = require("../models/package/paddle");
 const WeightFitnessPackages = require("../models/package/weightFitness");
 const YogaPackages = require("../models/package/yoga");
+const ClubUser = require("../models/ClubUser.js");
 exports.addSubClub = asyncHandler(async (req, res, next) => {
   const {
     suberAdminId,
@@ -389,69 +390,12 @@ exports.getSuberAdminSubs = asyncHandler(async (req, res, next) => {
   });
 });
 
-exports.getClubForPackages = asyncHandler(async (req, res) => {
-  try {
-    const clubs = await Club.find({});
-    const { sport } = req.params;
-    let filterCondition = "";
-
-    switch (sport) {
-      case "paddle":
-        filterCondition = "بادل";
-        break;
-      case "yoga":
-        filterCondition = "يوغا";
-        break;
-      case "weight":
-        filterCondition = "اثقال ولياقه";
-        break;
-      case "another":
-        filterCondition = "انشطه اخري";
-        break;
-      default:
-        filterCondition = "بوكسينغ و كروس فيت";
-        break;
-    }
-
-    const response = await Promise.all(
-      clubs.map(async (club) => {
-        const [
-          clubSubsLength,
-          paddlePackages,
-          yogaPackages,
-          weightPackages,
-          anotherPackages,
-        ] = await Promise.all([
-          userSubs.find({ club }).countDocuments(),
-          PaddlePackages.find({ club }).countDocuments(),
-          YogaPackages.find({ club }).countDocuments(),
-          WeightFitnessPackages.find({ club }).countDocuments(),
-          AnotherPackages.find({ club }).countDocuments(),
-        ]);
-
-        return {
-          id: club._id,
-          sports: club.sports,
-          club: club.name,
-          subscriptionCount: clubSubsLength,
-          type: club.type,
-          packagesCount:
-            paddlePackages + yogaPackages + weightPackages + anotherPackages,
-        };
-      })
-    );
-
-    res.status(200).json({
-      success: true,
-      data: response.filter((club) => club.sports.includes(filterCondition)),
-    });
-  } catch (e) {
-    res.status(500).json({ success: false, error: e.message });
-  }
-});
-
 exports.getSubsForPackages = asyncHandler(async (req, res) => {
   try {
+    const club = await Clubs.findOne({ _id: req.params.id });
+    const user = await ClubUser.findOne({ club: req.params.id });
+    console.log(user);
+    console.log(club);
     const clubs = await Clubs.find({
       $or: [{ parentClub: req.params.id }, { _id: req.params.id }],
     });
@@ -507,7 +451,7 @@ exports.getSubsForPackages = asyncHandler(async (req, res) => {
 
     res.status(200).json({
       success: true,
-      data: response.filter((club) => club.sports.includes(filterCondition)),
+      data: response.filter((club) => club.sports.includes(filterCondition.trim())),
     });
   } catch (e) {
     res.status(500).json({ success: false, error: e.message });
