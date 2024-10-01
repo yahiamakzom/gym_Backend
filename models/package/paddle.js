@@ -31,10 +31,7 @@ const paddleSchema = new mongoose.Schema(
         required: [true, "Please enter the number of seats"],
         min: 1, // Ensure at least one seat is available
       },
-      availableSeats: {
-        type: Number,
-        default: function() { return this.numberOfSeats; },
-      },
+  
     }],
     price: {
       type: Number,

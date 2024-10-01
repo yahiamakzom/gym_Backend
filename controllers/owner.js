@@ -527,10 +527,10 @@ exports.getClubForPackages = asyncHandler(async (req, res) => {
         filterCondition = "يوغا";
         break;
       case "weight":
-        filterCondition = "اثقال ولياقه";
+        filterCondition = "أثقال و لياقة";
         break;
       case "another":
-        filterCondition = "انشطه اخري";
+        filterCondition = "انشطة اخرى";
         break;
       default:
         filterCondition = "بوكسينغ و كروس فيت";
