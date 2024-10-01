@@ -453,8 +453,9 @@ exports.getClubForPackages = asyncHandler(async (req, res) => {
 exports.getSubsForPackages = asyncHandler(async (req, res) => {
   try {
     const clubs = await Clubs.find({
-      parentClub: req.params.id,
+      $or: [{ parentClub: req.params.id }, { _id: req.params.id }],
     });
+
     const { sport } = req.params;
     let filterCondition = "";
 
