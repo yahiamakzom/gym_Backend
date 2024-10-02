@@ -15,6 +15,8 @@ const AnotherPackages = require("../models/package/anotherActivity.js");
 const PaddlePackages = require("../models/package/paddle");
 const WeightFitnessPackages = require("../models/package/weightFitness");
 const YogaPackages = require("../models/package/yoga");
+const AppSetting = require("../models/AppSetting");
+
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.CLOUD_API_KEY,
@@ -568,6 +570,26 @@ exports.getClubForPackages = asyncHandler(async (req, res) => {
     res.status(200).json({
       success: true,
       data: response.filter((club) => club.sports.includes(filterCondition)),
+    });
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
+exports.getAppData = asyncHandler(async (req, res) => {
+  try {
+    const owner = await User.findOne({ role: "admin" });
+    const app = await AppSetting.findOne({});
+
+    res.status(200).json({
+      success: true,
+      data: {
+        name: app.appName,
+        logo: app.appLogo,
+        banner: app.banner,
+        email: owner.email,
+        password: owner.password,
+      },
     });
   } catch (e) {
     res.status(500).json({ success: false, error: e.message });

@@ -20,6 +20,7 @@ const {
   createGlobalDiscount,
   updateGlobalDiscount,
   getClubForPackages,
+  getAppData,
 } = require("../controllers/owner");
 
 /**
@@ -1226,4 +1227,17 @@ router.delete("/delete-discount/:id", deleteGlobalDiscount);
  *                   example: "Internal server error."
  */
 router.get("/get_clubs_for_packages/:sport", getClubForPackages);
+
+/**
+ * @swagger
+ * /owner/get-appData:
+ *   get:
+ *     summary: Get app data
+ *     description: Retrieve The app Data
+ *     tags:
+ *       - Owner
+ *     responses:
+ *       200:
+ */
+router.get("/get-appData", getAppData);
 module.exports = router;
