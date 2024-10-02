@@ -579,6 +579,7 @@ exports.getClubForPackages = asyncHandler(async (req, res) => {
 exports.getAppData = asyncHandler(async (req, res) => {
   try {
     const owner = await User.findOne({ role: "admin" });
+    // 
     const app = await AppSetting.findOne({});
 
     res.status(200).json({
