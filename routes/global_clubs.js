@@ -30,6 +30,11 @@ const {
   deletePaddlePackage,
   getAllPaddlePackagesForClub,
   updatePaddlePackage,
+  createAnotherPackage,
+  getAllPackages,
+  getPackageById,
+  updatePackage,
+  deletePackage,
 } = require("../controllers/packages/AdminPackages");
 /**
  * @swagger
@@ -2266,4 +2271,211 @@ router.post("/validate-code/:id", isCodeValid);
 
 router.post("/add-support-message", createCompliant);
 
+/**
+ * @swagger
+ * /clubs/get-another-packages:
+ *   get:
+ *     summary: Get all activity packages
+ *     tags:
+ *       - Club
+ *     description: Retrieve a list of all activity packages.
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved all packages
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/AnotherActivityPackage'
+ *       500:
+ *         description: Server error
+ */
+
+router.get("/get-anorther-packages", getAllPackages);
+
+/**
+ * @swagger
+ * /clubs/another-package/{id}:
+ *   get:
+ *     summary: Get an activity package by ID
+ *     tags:
+ *       - Club
+ *     description: Retrieve the details of a specific activity package by its ID.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: "60c72b2f9fd99b34d8e8fcb3"
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved the package
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AnotherActivityPackage'
+ *       404:
+ *         description: Package not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Package not found"
+ *       500:
+ *         description: Server error
+ */
+
+router.get("/another-package/:id", getPackageById);
+/**
+ * @swagger
+ * /clubs/update-another-package/{id}:
+ *   put:
+ *     summary: Update an existing package
+ *     tags:
+ *       - Club
+ *     description: Update the details of an existing package by its ID.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: "60c72b2f9fd99b34d8e8fcb3"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               packageName:
+ *                 type: string
+ *                 example: "Premium Paddle Package"
+ *               price:
+ *                 type: number
+ *                 example: 120.0
+ *               discount:
+ *                 type: number
+ *                 example: 15
+ *               description:
+ *                 type: string
+ *                 example: "Updated package description"
+ *     responses:
+ *       200:
+ *         description: Package updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AnotherActivityPackage'
+ *       404:
+ *         description: Package not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Package not found"
+ *       500:
+ *         description: Server error
+ */
+
+router.put("/update-another-package/:id", updatePackage);
+
+/**
+ * @swagger
+ * /clubs/delete-another-package/{id}:
+ *   delete:
+ *     summary: Delete an activity package
+ *     tags:
+ *       - Club
+ *     description: Delete a specific activity package by its ID.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: "60c72b2f9fd99b34d8e8fcb3"
+ *     responses:
+ *       200:
+ *         description: Package deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Package deleted successfully"
+ *       404:
+ *         description: Package not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Package not found"
+ *       500:
+ *         description: Server error
+ */
+
+router.delete("/delete-another-package/:id", deletePackage);
+
+/**
+ * @swagger
+ * /clubs/create-another-package:
+ *   post:
+ *     summary: Create a new activity package
+ *     tags:
+ *       - Club
+ *     description: Creates a new package with the provided details for a specific club and activity.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               club:
+ *                 type: string
+ *                 example: "60c72b2f9fd99b34d8e8fcb3"
+ *               packageName:
+ *                 type: string
+ *                 example: "Premium Yoga Package"
+ *               activityName:
+ *                 type: string
+ *                 example: "Yoga"
+ *               packageType:
+ *                 type: string
+ *                 example: "Fitness"
+ *               price:
+ *                 type: number
+ *                 example: 100.00
+ *               discount:
+ *                 type: number
+ *                 example: 10
+ *               description:
+ *                 type: string
+ *                 example: "This is a premium yoga package"
+ *     responses:
+ *       201:
+ *         description: Package created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AnotherActivityPackage'
+ *       500:
+ *         description: Server error
+ */
+
+router.post("/creat-another-package", createAnotherPackage);
 module.exports = router;

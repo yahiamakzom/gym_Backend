@@ -3,7 +3,8 @@ const asyncHandler = require("express-async-handler");
 const WeightFitnessPackage = require("../../models/package/weightFitness");
 const YogaPackage = require("../../models/package/yoga");
 const PaddlePackage = require("../../models/package/paddle");
-const ClubHours = require("../../models/clubHours");
+const ClubHours = require("../../models/clubHours"); 
+const AnotherActivityPackage =require('../../models/package/anotherActivity')
 // Create a new weight and fitness package for a specific club
 const createWeightFitnessPackage = asyncHandler(async (req, res) => {
   const {
@@ -526,6 +527,95 @@ const updatePaddlePackage = asyncHandler(async (req, res) => {
     data: paddlePackage,
   });
 });
+  
+//another package  
+
+
+
+
+// Create a new package
+const createAnotherPackage = asyncHandler(async (req, res) => {
+  const {
+    club,
+    packageName,
+    activityName,
+    packageType,
+    price,
+    discount,
+    description,
+  } = req.body;
+
+  const newPackage = new AnotherActivityPackage({
+    club,
+    packageName,
+    activityName,
+    packageType,
+    price,
+    discount,
+    description,
+    availableSlots: [],
+  });
+
+  await newPackage.save();
+  res
+    .status(201)
+    .json({ message: "Package created successfully", data: newPackage });
+});
+
+// Get all packages
+const getAllPackages = asyncHandler(async (req, res) => {
+  const packages = await AnotherActivityPackage.find({});
+  res.status(200).json({ success: true, data: packages });
+});
+
+// Get a single package by ID
+const getPackageById = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const package = await AnotherActivityPackage.findById(id);
+
+  if (!package) {
+    return res.status(404).json({ message: "Package not found" });
+  }
+
+  res.status(200).json({ success: true, data: package });
+});
+
+// Update an existing package
+const updatePackage = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const updateData = req.body;
+
+  const updatedPackage = await AnotherActivityPackage.findByIdAndUpdate(
+    id,
+    updateData,
+    { new: true }
+  );
+
+  if (!updatedPackage) {
+    return res.status(404).json({ message: "Package not found" });
+  }
+
+  res.status(200).json({ success: true, data: updatedPackage });
+});
+
+// Delete a package by ID
+const deletePackage = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const package = await AnotherActivityPackage.findById(id);
+
+  if (!package) {
+    return res.status(404).json({ message: "Package not found" });
+  }
+
+  await package.remove();
+  res.status(200).json({ message: "Package deleted successfully" });
+});
+
+
+
+
+
+
 module.exports = {
   createWeightFitnessPackage,
   getWeightFitnessPackagesForClub,
@@ -541,5 +631,14 @@ module.exports = {
   createPaddlePackage,
   deletePaddlePackage,
   getAllPaddlePackagesForClub,
-  updatePaddlePackage,
-};
+  updatePaddlePackage, 
+  // another packages 
+
+
+
+  createAnotherPackage,
+  getAllPackages,
+  getPackageById,
+  updatePackage,
+  deletePackage,
+}

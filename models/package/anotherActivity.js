@@ -56,9 +56,7 @@ const anotherActivitySchema = new mongoose.Schema(
       type: String,
       default: "",
     },
-    superadminId: {
-  type:String
-  },
+
   },
   {
     timestamps: true,
