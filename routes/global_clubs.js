@@ -2292,7 +2292,7 @@ router.post("/add-support-message", createCompliant);
  *         description: Server error
  */
 
-router.get("/get-anorther-packages", getAllPackages);
+router.get("/get-another-packages", getAllPackages);
 
 /**
  * @swagger
@@ -2461,6 +2461,9 @@ router.delete("/delete-another-package/:id", deletePackage);
  *                 type: number
  *                 example: 100.00
  *               discount:
+ *                 type: number
+ *                 example: 10
+ *               seetsCount:
  *                 type: number
  *                 example: 10
  *               description:

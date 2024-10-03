@@ -543,6 +543,7 @@ const createAnotherPackage = asyncHandler(async (req, res) => {
     price,
     discount,
     description,
+    seetsCount
   } = req.body;
 
   const newPackage = new AnotherActivityPackage({
@@ -553,6 +554,7 @@ const createAnotherPackage = asyncHandler(async (req, res) => {
     price,
     discount,
     description,
+    seetsCount ,
     availableSlots: [],
   });
 

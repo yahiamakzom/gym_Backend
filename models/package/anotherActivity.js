@@ -55,7 +55,11 @@ const anotherActivitySchema = new mongoose.Schema(
     description: {
       type: String,
       default: "",
-    },
+    }, 
+    seetsCount:{ 
+      type: Number,
+      
+    }
 
   },
   {
