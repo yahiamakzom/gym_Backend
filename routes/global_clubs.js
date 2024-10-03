@@ -14,6 +14,7 @@ const {
   updateClubHours,
   createTransferOrder,
   isCodeValid,
+  createCompliant,
 } = require("../controllers/club");
 const {
   createWeightFitnessPackage,
@@ -2210,6 +2211,59 @@ router.post("/transfer-order/:clubId", createTransferOrder);
  *                   type: string
  *                   example: "Detailed error message"
  */
-
 router.post("/validate-code/:id", isCodeValid);
+
+/**
+ * @swagger
+ * /clubs/add-support-message:
+ *   post:
+ *     summary: Submit a support complaint
+ *     tags:
+ *       - Club
+ *     description: Creates a support complaint by submitting the name, email, cause, and message fields.
+ *     parameters:
+ *       - in: query
+ *         name: name
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Name of the person filing the complaint
+ *         example: "John Doe"
+ *       - in: query
+ *         name: email
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Email of the person filing the complaint
+ *         example: "user@example.com"
+ *       - in: query
+ *         name: cause
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The cause/reason for the complaint
+ *         example: "Service issue"
+ *       - in: query
+ *         name: message
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The content of the complaint message
+ *         example: "I am having issues with my service."
+ *
+ *     responses:
+ *       201:
+ *         description: Complaint successfully submitted
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ */
+
+router.post("/add-support-message", createCompliant);
+
 module.exports = router;

@@ -21,6 +21,8 @@ const {
   updateGlobalDiscount,
   getClubForPackages,
   getAppData,
+  deleteSupportMessage,
+  getSupportMessage,
 } = require("../controllers/owner");
 
 /**
@@ -1240,4 +1242,108 @@ router.get("/get_clubs_for_packages/:sport", getClubForPackages);
  *       200:
  */
 router.get("/get-appData", getAppData);
+
+/**
+ * @swagger
+ * /owner/delete-support-message{id}:
+ *   delete:
+ *     summary: Delete a Paddle package by ID
+ *     tags:
+ *       - Owner
+ *     description: Deletes the Paddle package with the specified ID.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The ID of the Paddle package to delete
+ *     responses:
+ *       200:
+ *         description: Paddle package deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Paddle package deleted successfully"
+ *       404:
+ *         description: Paddle package not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Paddle package not found"
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
+ */
+router.delete("/delete-support-message/:id", deleteSupportMessage); 
+/**
+ * @swagger
+ * /owner/get-support-messages:
+ *   get:
+ *     summary: Retrieve all support messages
+ *     tags: 
+ *       - Owner
+ *     description: Fetches all support messages from the database.
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved all support messages
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       _id:
+ *                         type: string
+ *                         example: "607f1f77bcf86cd799439011"
+ *                       name:
+ *                         type: string
+ *                         example: "John Doe"
+ *                       email:
+ *                         type: string
+ *                         example: "johndoe@example.com"
+ *                       message:
+ *                         type: string
+ *                         example: "I need help with my account."
+ *                       createdAt:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2023-09-30T12:34:56.789Z"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 error:
+ *                   type: string
+ *                  
+ */ 
+router.get('/get-support-messages' , getSupportMessage) ;
 module.exports = router;

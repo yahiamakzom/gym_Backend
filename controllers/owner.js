@@ -16,6 +16,7 @@ const PaddlePackages = require("../models/package/paddle");
 const WeightFitnessPackages = require("../models/package/weightFitness");
 const YogaPackages = require("../models/package/yoga");
 const AppSetting = require("../models/AppSetting");
+const Support = require("../models/support.js");
 
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
@@ -579,7 +580,7 @@ exports.getClubForPackages = asyncHandler(async (req, res) => {
 exports.getAppData = asyncHandler(async (req, res) => {
   try {
     const owner = await User.findOne({ role: "admin" });
-    // 
+    //
     const app = await AppSetting.findOne({});
 
     res.status(200).json({
@@ -591,6 +592,34 @@ exports.getAppData = asyncHandler(async (req, res) => {
         email: owner.email,
         password: owner.password,
       },
+    });
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
+exports.getSupportMessage = asyncHandler(async (req, res) => {
+  try { 
+
+    const suportMessage = await Support.find({});
+    res.status(200).json({
+      success: true,
+      data: suportMessage,
+    });
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+ 
+
+exports.deleteSupportMessage = asyncHandler(async (req, res) => {
+  try {         
+    const id = req.params.id 
+
+    const suportMessage = await Support.findByIdAndDelete(id);
+    res.status(200).json({
+      success: true,
+      data: 'تم حذف الرسالة بنجاح',
     });
   } catch (e) {
     res.status(500).json({ success: false, error: e.message });

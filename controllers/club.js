@@ -13,6 +13,7 @@ const DiscountCode = require("../models/DiscountCode");
 const CLubOrder = require("../models/ClubOrder");
 const ClubHours = require("../models/clubHours");
 const TransferOrder = require("../models/TransferOrder");
+const Support = require("../models/support");
 
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
@@ -1056,6 +1057,26 @@ exports.isCodeValid = async (req, res) => {
           status: false,
           data: { message: "Code is not valid", isValid: false },
         });
+  } catch (error) {
+    console.error("Error creating transfer order:", error.message);
+    return res
+      .status(500)
+      .json({ message: "Server error", error: error.message });
+  }
+};
+exports.createCompliant = async (req, res) => {
+  try {
+    const { email, message, couse, name } = req.body;
+    await Support.create({
+      email,
+      couse,
+      name,
+      message,
+    });
+    res.status(201).json({
+      data: "message sent to support",
+      success: true,
+    });
   } catch (error) {
     console.error("Error creating transfer order:", error.message);
     return res
