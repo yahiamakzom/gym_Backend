@@ -15,6 +15,7 @@ const createWeightFitnessPackage = asyncHandler(async (req, res) => {
     description,
     freezeTime,
     freezeCountTime,
+    sportType ,
     // Discount fields directly from the body
     discountForAll,
     discountFrom,
@@ -43,6 +44,7 @@ const createWeightFitnessPackage = asyncHandler(async (req, res) => {
     packageType,
     price,
     description,
+    sportType ,
     freezeTime,
     freezeCountTime,
     // Embed the discount details directly

@@ -10,6 +10,11 @@ const weightFitnessSchema = new mongoose.Schema(
       ref: "Club",
       required: true,
     },
+    sportType: {
+      type: String,
+      enum: ["weight", "boxing"],
+      default: "weight",
+    },
     packageName: {
       type: String,
       required: [true, "Please enter the package name"],
