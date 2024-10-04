@@ -601,10 +601,16 @@ exports.getAppData = asyncHandler(async (req, res) => {
 exports.getSupportMessage = asyncHandler(async (req, res) => {
   try { 
 
-    const suportMessage = await Support.find({});
+    const supportMessages = await Support.find({
+      name: { $exists: true, $ne: null },
+      email: { $exists: true, $ne: null },
+      couse: { $exists: true, $ne: null },
+      message: { $exists: true, $ne: null },
+    });
+    
     res.status(200).json({
       success: true,
-      data: suportMessage,
+      data: supportMessages,
     });
   } catch (e) {
     res.status(500).json({ success: false, error: e.message });
