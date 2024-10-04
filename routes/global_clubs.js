@@ -2480,5 +2480,5 @@ router.delete("/delete-another-package/:id", deletePackage);
  *         description: Server error
  */
 
-router.post("/creat-another-package", createAnotherPackage);
+router.post("/create-another-package", createAnotherPackage);
 module.exports = router;
