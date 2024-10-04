@@ -23,6 +23,10 @@ const {
   getAppData,
   deleteSupportMessage,
   getSupportMessage,
+  updateCommonQuestion,
+  getAllCommonQuestions,
+  deleteCommonQuestion,
+  createCommonQuestion,
 } = require("../controllers/owner");
 
 /**
@@ -1290,13 +1294,13 @@ router.get("/get-appData", getAppData);
  *                   type: string
  *                   example: "Internal server error"
  */
-router.delete("/delete-support-message/:id", deleteSupportMessage); 
+router.delete("/delete-support-message/:id", deleteSupportMessage);
 /**
  * @swagger
  * /owner/get-support-messages:
  *   get:
  *     summary: Retrieve all support messages
- *     tags: 
+ *     tags:
  *       - Owner
  *     description: Fetches all support messages from the database.
  *     responses:
@@ -1343,7 +1347,181 @@ router.delete("/delete-support-message/:id", deleteSupportMessage);
  *                   example: false
  *                 error:
  *                   type: string
- *                  
- */ 
-router.get('/get-support-messages' , getSupportMessage) ;
+ *
+ */
+router.get("/get-support-messages", getSupportMessage);
+
+/**
+ * @swagger
+ * /owner/create-common-question:
+ *   post:
+ *     summary: Create a new common question
+ *     tags:
+ *       - Owner
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               question:
+ *                 type: string
+ *                 example: "What is the refund policy?"
+ *               answer:
+ *                 type: string
+ *                 example: "Our refund policy is..."
+ *     responses:
+ *       201:
+ *         description: Common question created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   $ref: '#/components/schemas/CommonQuestions'
+ *       500:
+ *         description: Server error
+ */
+router.post("/create-common-question", createCommonQuestion);
+
+/**
+ * @swagger
+ * /owner/update-common-question/{id}:
+ *   put:
+ *     summary: Update an existing common question
+ *     tags:
+ *       - Owner
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: "60c72b2f9fd99b34d8e8fcb3"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               question:
+ *                 type: string
+ *                 example: "What is the updated refund policy?"
+ *               answer:
+ *                 type: string
+ *                 example: "Our updated refund policy is..."
+ *     responses:
+ *       200:
+ *         description: Common question updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   $ref: '#/components/schemas/CommonQuestions'
+ *       404:
+ *         description: Common question not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Common question not found"
+ *       500:
+ *         description: Server error
+ */
+router.put("/update-common-question/:id", updateCommonQuestion); 
+
+
+
+
+/**
+ * @swagger
+ * /owner/get-all-questions:
+ *   get:
+ *     summary: Get all common questions
+ *     tags:
+ *       - Owner 
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved all common questions
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/CommonQuestions'
+ *       500:
+ *         description: Server error
+ */
+router.get('/get-all-questions', getAllCommonQuestions) 
+
+
+
+/**
+ * @swagger
+ * /owner/delete-common-question/{id}:
+ *   delete:
+ *     summary: Delete a common question by ID
+ *     tags:
+ *       - Owner
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: "60c72b2f9fd99b34d8e8fcb3"
+ *     responses:
+ *       200:
+ *         description: Common question deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Common question deleted successfully"
+ *       404:
+ *         description: Common question not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Common question not found"
+ *       500:
+ *         description: Server error
+ */
+router.delete('/delete-common-question/:id' ,deleteCommonQuestion)
 module.exports = router;

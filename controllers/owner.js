@@ -17,6 +17,7 @@ const WeightFitnessPackages = require("../models/package/weightFitness");
 const YogaPackages = require("../models/package/yoga");
 const AppSetting = require("../models/AppSetting");
 const Support = require("../models/support.js");
+const CommonQuestions = require("../models/CommonQuestions.js");
 
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
@@ -599,15 +600,14 @@ exports.getAppData = asyncHandler(async (req, res) => {
 });
 
 exports.getSupportMessage = asyncHandler(async (req, res) => {
-  try { 
-
+  try {
     const supportMessages = await Support.find({
       name: { $exists: true, $ne: null },
       email: { $exists: true, $ne: null },
       couse: { $exists: true, $ne: null },
       message: { $exists: true, $ne: null },
     });
-    
+
     res.status(200).json({
       success: true,
       data: supportMessages,
@@ -616,18 +616,104 @@ exports.getSupportMessage = asyncHandler(async (req, res) => {
     res.status(500).json({ success: false, error: e.message });
   }
 });
- 
 
 exports.deleteSupportMessage = asyncHandler(async (req, res) => {
-  try {         
-    const id = req.params.id 
+  try {
+    const id = req.params.id;
 
     const suportMessage = await Support.findByIdAndDelete(id);
     res.status(200).json({
       success: true,
-      data: 'تم حذف الرسالة بنجاح',
+      data: "تم حذف الرسالة بنجاح",
     });
   } catch (e) {
     res.status(500).json({ success: false, error: e.message });
   }
 });
+
+// Adjust the path as necessary
+
+// Create a new common question
+exports.createCommonQuestion = asyncHandler(async (req, res) => {
+  const { question, answer } = req.body;
+
+  const newQuestion = await CommonQuestions.create({
+    question,
+    answer,
+  });
+
+  res.status(201).json({
+    success: true,
+    data: newQuestion,
+  });
+});
+
+
+// Update an existing common question by ID
+exports.updateCommonQuestion = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { question, answer } = req.body;
+
+  const updatedQuestion = await CommonQuestions.findByIdAndUpdate(
+    id,
+    { question, answer },
+    { new: true, runValidators: true } // Returns the updated document
+  );
+
+  if (!updatedQuestion) {
+    res.status(404);
+    throw new Error('Common question not found');
+  }
+
+  res.status(200).json({
+    success: true,
+    data: updatedQuestion,
+  });
+}); 
+
+
+
+// Get all common questions
+exports.getAllCommonQuestions = asyncHandler(async (req, res) => {
+  const questions = await CommonQuestions.find({});
+  res.status(200).json({
+    success: true,
+    data: questions,
+  });
+});
+
+// Get a common question by ID
+exports.getCommonQuestionById = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  const question = await CommonQuestions.findById(id);
+
+  if (!question) {
+    res.status(404);
+    throw new Error('Common question not found');
+  }
+
+  res.status(200).json({
+    success: true,
+    data: question,
+  });
+});
+
+
+// Delete a common question by ID
+exports.deleteCommonQuestion = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  const question = await CommonQuestions.findByIdAndDelete(id);
+
+  if (!question) {
+    res.status(404);
+    throw new Error('Common question not found');
+  }
+
+  res.status(200).json({
+    success: true,
+    message: 'Common question deleted successfully',
+  });
+});
+
