@@ -568,7 +568,7 @@ const createAnotherPackage = asyncHandler(async (req, res) => {
 
 // Get all packages
 const getAllPackages = asyncHandler(async (req, res) => {
-  const packages = await AnotherActivityPackage.find({});
+  const packages = await AnotherActivityPackage.find({club: req.params.clubId});
   res.status(200).json({ success: true, data: packages });
 });
 

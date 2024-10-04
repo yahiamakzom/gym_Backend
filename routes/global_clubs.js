@@ -2273,7 +2273,7 @@ router.post("/add-support-message", createCompliant);
 
 /**
  * @swagger
- * /clubs/get-another-packages:
+ * /clubs/get-another-packages{clubId}:
  *   get:
  *     summary: Get all activity packages
  *     tags:
@@ -2292,7 +2292,7 @@ router.post("/add-support-message", createCompliant);
  *         description: Server error
  */
 
-router.get("/get-another-packages", getAllPackages);
+router.get("/get-another-packages/:clubId", getAllPackages);
 
 /**
  * @swagger
