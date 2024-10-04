@@ -3,8 +3,8 @@ const asyncHandler = require("express-async-handler");
 const WeightFitnessPackage = require("../../models/package/weightFitness");
 const YogaPackage = require("../../models/package/yoga");
 const PaddlePackage = require("../../models/package/paddle");
-const ClubHours = require("../../models/clubHours"); 
-const AnotherActivityPackage =require('../../models/package/anotherActivity')
+const ClubHours = require("../../models/clubHours");
+const AnotherActivityPackage = require("../../models/package/anotherActivity");
 // Create a new weight and fitness package for a specific club
 const createWeightFitnessPackage = asyncHandler(async (req, res) => {
   const {
@@ -15,7 +15,7 @@ const createWeightFitnessPackage = asyncHandler(async (req, res) => {
     description,
     freezeTime,
     freezeCountTime,
-    sportType ,
+    sportType,
     // Discount fields directly from the body
     discountForAll,
     discountFrom,
@@ -44,7 +44,7 @@ const createWeightFitnessPackage = asyncHandler(async (req, res) => {
     packageType,
     price,
     description,
-    sportType ,
+    sportType,
     freezeTime,
     freezeCountTime,
     // Embed the discount details directly
@@ -378,7 +378,7 @@ const createPaddlePackage = asyncHandler(async (req, res) => {
     price,
     discount,
     description,
-    
+
     availableSlots: [],
   });
 
@@ -529,11 +529,8 @@ const updatePaddlePackage = asyncHandler(async (req, res) => {
     data: paddlePackage,
   });
 });
-  
-//another package  
 
-
-
+//another package
 
 // Create a new package
 const createAnotherPackage = asyncHandler(async (req, res) => {
@@ -545,7 +542,7 @@ const createAnotherPackage = asyncHandler(async (req, res) => {
     price,
     discount,
     description,
-    seetsCount
+    seetsCount,
   } = req.body;
 
   const newPackage = new AnotherActivityPackage({
@@ -556,7 +553,7 @@ const createAnotherPackage = asyncHandler(async (req, res) => {
     price,
     discount,
     description,
-    seetsCount ,
+    seetsCount,
     availableSlots: [],
   });
 
@@ -568,7 +565,9 @@ const createAnotherPackage = asyncHandler(async (req, res) => {
 
 // Get all packages
 const getAllPackages = asyncHandler(async (req, res) => {
-  const packages = await AnotherActivityPackage.find({club: req.params.clubId});
+  const packages = await AnotherActivityPackage.find({
+    club: req.params.clubId,
+  });
   res.status(200).json({ success: true, data: packages });
 });
 
@@ -611,14 +610,9 @@ const deletePackage = asyncHandler(async (req, res) => {
     return res.status(404).json({ message: "Package not found" });
   }
 
-  await package.remove();
+  await AnotherActivityPackage.findByIdAndDelete(id);
   res.status(200).json({ message: "Package deleted successfully" });
 });
-
-
-
-
-
 
 module.exports = {
   createWeightFitnessPackage,
@@ -635,14 +629,12 @@ module.exports = {
   createPaddlePackage,
   deletePaddlePackage,
   getAllPaddlePackagesForClub,
-  updatePaddlePackage, 
-  // another packages 
-
-
+  updatePaddlePackage,
+  // another packages
 
   createAnotherPackage,
   getAllPackages,
   getPackageById,
   updatePackage,
   deletePackage,
-}
+};
