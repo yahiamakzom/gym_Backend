@@ -38,11 +38,11 @@ exports.addClubOrder = async (req, res, next) => {
     const logoBuffer = req.files.logo ? req.files.logo[0].buffer : null;
     const logoUrl = logoBuffer ? await uploadToCloudinary(logoBuffer) : null;
 
-    const imgs_path = await Promise.all(
-      req.files.clubImg.map(async (img) => {
-        return await uploadToCloudinary(img.buffer);
-      })
-    );
+    // const imgs_path = await Promise.all(
+    //   req.files.clubImg.map(async (img) => {
+    //     return await uploadToCloudinary(img.buffer);
+    //   })
+    // );
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -63,7 +63,7 @@ exports.addClubOrder = async (req, res, next) => {
       gender,
       email,
       password,
-      images: imgs_path,
+      images: [],
       lat: Number(lat),
       long: Number(long),
       logo: logoUrl,
