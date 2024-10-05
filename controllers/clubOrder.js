@@ -68,7 +68,7 @@ console.log('#################################################################')
       gender,
       email,
       password,
-      images: [],
+      images: imgs_path|| [],
       lat: Number(lat),
       long: Number(long),
       logo: logoUrl,
