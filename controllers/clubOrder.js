@@ -38,15 +38,16 @@ console.log()
     const logoBuffer = req.files.logo[0].buffer 
     console.log(logoBuffer)
     console.log('#################################################################')
-    console.log(req.files.logo.buffer)
+console.log(req.files.clubImg)
+console.log('#################################################################')
     console.log(req.files.logo)
     const logoUrl = logoBuffer ? await uploadToCloudinary(logoBuffer) : null;
 
-    // const imgs_path = await Promise.all(
-    //   req.files.clubImg.map(async (img) => {
-    //     return await uploadToCloudinary(img.buffer);
-    //   })
-    // );
+    const imgs_path = await Promise.all(
+      req.files.clubImg.map(async (img) => {
+        return await uploadToCloudinary(img.buffer);
+      })
+    );
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
