@@ -411,7 +411,7 @@ exports.getSubsForPackages = asyncHandler(async (req, res) => {
         filterCondition = "يوغا";
         break;
       case "weight":
-        filterCondition = "أثقال و لياقة";
+        filterCondition = "أثقال ولياقه";
         break;
       case "another":
         filterCondition = "انشطة اخرى";
@@ -451,7 +451,9 @@ exports.getSubsForPackages = asyncHandler(async (req, res) => {
 
     res.status(200).json({
       success: true,
-      data: response.filter((club) => club.sports.includes(filterCondition.trim())),
+      data: response.filter((club) =>
+        club.sports.includes(filterCondition.trim())
+      ),
     });
   } catch (e) {
     res.status(500).json({ success: false, error: e.message });
