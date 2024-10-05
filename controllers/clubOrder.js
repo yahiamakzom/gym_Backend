@@ -35,16 +35,15 @@ exports.addClubOrder = async (req, res, next) => {
     console.log(place_name);
     if (!place_name) return next(new ApiError("Location Not Found", 404));
 
-    // const imgs_path = await Promise.all(
-    //   req.files.clubImg.map(async (img) => {
-    //     const uploadImg = await cloudinary.uploader.upload(img.path);
-    //     return uploadImg.secure_url;
-    //   })
-    // );
-
     const logoBuffer = req.files.logo ? req.files.logo[0].buffer : null;
     const logoUrl = logoBuffer ? await uploadToCloudinary(logoBuffer) : null;
- 
+
+    const imgs_path = await Promise.all(
+      req.files.clubImg.map(async (img) => {
+        return await uploadToCloudinary(img.buffer);
+      })
+    );
+
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return next(new ApiError("Club  With This Email Already Exists", 409));
@@ -67,7 +66,7 @@ exports.addClubOrder = async (req, res, next) => {
       images: [],
       lat: Number(lat),
       long: Number(long),
-      logo: logoUrl.secure_url,
+      logo: logoUrl,
       mapUrl,
       commission,
       sports: [...SportData],
