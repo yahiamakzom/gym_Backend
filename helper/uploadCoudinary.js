@@ -4,19 +4,22 @@ const bufferToStream = require("./buffer"); // Assuming the utility is in the sa
 // Helper function to upload from buffer to Cloudinary
 const uploadToCloudinary = (buffer) => {
   return new Promise((resolve, reject) => {
-    const uploadStream = cloudinary.uploader.upload_stream({
-      resource_type: "image",
-      folder: "images",
-    },(error, result) => {
-      if (error) {
-        return reject(error);
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        resource_type: "image",
+        folder: "images",
+        timeout: 320000,
+      },
+      (error, result) => {
+        if (error) {
+          return reject(error);
+        }
+        resolve(result.secure_url);
       }
-      resolve(result.secure_url);
-    });
+    );
 
-    bufferToStream(buffer).pipe(uploadStream);  // Use bufferToStream here
+    bufferToStream(buffer).pipe(uploadStream); // Use bufferToStream here
   });
 };
- 
-module.exports = uploadToCloudinary;
 
+module.exports = uploadToCloudinary;
