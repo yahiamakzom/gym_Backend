@@ -33,8 +33,12 @@ exports.addClubOrder = async (req, res, next) => {
     console.log("error");
     console.log(place_name);
     if (!place_name) return next(new ApiError("Location Not Found", 404));
-
-    const logoBuffer = req.files.logo ? req.files.logo[0].buffer : null;
+console.log('bufffer') 
+console.log()
+    const logoBuffer = req.files.logo.buffer ? req.files.logo[0].buffer : null;
+    console.log(logoBuffer)
+    console.log('#################################################################')
+    console.log(req.files.logo.buffer)
     const logoUrl = logoBuffer ? await uploadToCloudinary(logoBuffer) : null;
 
     // const imgs_path = await Promise.all(
