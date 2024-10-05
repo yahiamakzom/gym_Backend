@@ -39,6 +39,7 @@ console.log()
     console.log(logoBuffer)
     console.log('#################################################################')
     console.log(req.files.logo.buffer)
+    console.log(req.files.logo)
     const logoUrl = logoBuffer ? await uploadToCloudinary(logoBuffer) : null;
 
     // const imgs_path = await Promise.all(
@@ -76,7 +77,7 @@ console.log()
       clubMemberCode: clubMemberCode,
     });
 
-    res.status(201).json({ success: true, data: {} });
+    res.status(201).json({ success: true, data: clubOrder });
   } catch (e) {
     console.log("error");
     console.log(e);
