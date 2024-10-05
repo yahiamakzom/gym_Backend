@@ -6,72 +6,71 @@ const User = require("../models/User");
 const uploadToCloudinary = require("../helper/uploadCoudinary");
 exports.addClubOrder = async (req, res, next) => {
   try {
-    // const {
-    //   name,
-    //   email,
-    //   password,
-    //   lat,
-    //   long,
-    //   description,
-    //   gender,
-    //   commission,
-    //   sports,
-    //   mapUrl,
-    //   clubMemberCode,
-    // } = req.body;
-    // console.log(req.body);
-    // console.log(req.files);
-    // let SportData = sports.split(",");
+    const {
+      name,
+      email,
+      password,
+      lat,
+      long,
+      description,
+      gender,
+      commission,
+      sports,
+      mapUrl,
+      clubMemberCode,
+    } = req.body;
 
-    // if (!req.files.logo) {
-    //   return next(new ApiError("Please Add Club Images and Logo", 409));
-    // }
-    // console.log(lat, long);
-    // // const place_name = await getLocationName(Number(lat), Number(long));
-    // const place_name =
-    //   "Awlad Nijm Bahjurah, Nag Hammadi, Qena Governorate, Egypt";
+    let SportData = sports.split(",");
 
-    // console.log("error");
-    // console.log(place_name);
-    // if (!place_name) return next(new ApiError("Location Not Found", 404));
+    if (!req.files.logo) {
+      return next(new ApiError("Please Add Club Images and Logo", 409));
+    }
+    console.log(lat, long);
+    // const place_name = await getLocationName(Number(lat), Number(long));
+    const place_name =
+      "Awlad Nijm Bahjurah, Nag Hammadi, Qena Governorate, Egypt";
 
-    // const logoBuffer = req.files.logo ? req.files.logo[0].buffer : null;
-    // const logoUrl = logoBuffer ? await uploadToCloudinary(logoBuffer) : null;
+    console.log("error");
+    console.log(place_name);
+    if (!place_name) return next(new ApiError("Location Not Found", 404));
 
-    // // const imgs_path = await Promise.all(
-    // //   req.files.clubImg.map(async (img) => {
-    // //     return await uploadToCloudinary(img.buffer);
-    // //   })
-    // // );
+    const logoBuffer = req.files.logo ? req.files.logo[0].buffer : null;
+    const logoUrl = logoBuffer ? await uploadToCloudinary(logoBuffer) : null;
 
-    // const existingUser = await User.findOne({ email });
-    // if (existingUser) {
-    //   return next(new ApiError("Club  With This Email Already Exists", 409));
-    // }
+    // const imgs_path = await Promise.all(
+    //   req.files.clubImg.map(async (img) => {
+    //     return await uploadToCloudinary(img.buffer);
+    //   })
+    // );
 
-    // const existingClub = await CLubOrder.findOne({ email });
-    // if (existingClub) {
-    //   return next(new ApiError("Club  With This Email Already Exists", 409));
-    // }
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return next(new ApiError("Club  With This Email Already Exists", 409));
+    }
 
-    // const clubOrder = await CLubOrder.create({
-    //   name,
-    //   country: `${place_name.split(",").pop()}`,
-    //   city: `${place_name.split(",").slice(-2, -1)[0]}`,
-    //   location: place_name,
-    //   description,
-    //   gender,
-    //   email,
-    //   password,
-    //   images: [],
-    //   lat: Number(lat),
-    //   long: Number(long),
-    //   logo: logoUrl,
-    //   mapUrl,
-    //   commission,
-    //   sports: [...SportData],
-    //   clubMemberCode: clubMemberCode,
-    // });
+    const existingClub = await CLubOrder.findOne({ email });
+    if (existingClub) {
+      return next(new ApiError("Club  With This Email Already Exists", 409));
+    }
+
+    const clubOrder = await CLubOrder.create({
+      name,
+      country: `${place_name.split(",").pop()}`,
+      city: `${place_name.split(",").slice(-2, -1)[0]}`,
+      location: place_name,
+      description,
+      gender,
+      email,
+      password,
+      images: [],
+      lat: Number(lat),
+      long: Number(long),
+      logo: logoUrl,
+      mapUrl,
+      commission,
+      sports: [...SportData],
+      clubMemberCode: clubMemberCode,
+    });
 
     res.status(201).json({ success: true, data: {} });
   } catch (e) {
