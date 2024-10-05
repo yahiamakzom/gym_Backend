@@ -1,7 +1,9 @@
 const router = require("express").Router(); 
 const imgUploader = require("../middlewares/imgUploader");
-
+const multer = require("multer");
 const {addClubOrder} = require("../controllers/clubOrder");
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 /**
  * @swagger
  * /orders/add-club-order:
@@ -148,10 +150,10 @@ const {addClubOrder} = require("../controllers/clubOrder");
  */
 
 router.post(
-  "/add-club-order",
-  imgUploader.fields([, { name: "logo", maxCount: 1 }]),
+  "/add-sub",
+  upload.fields([{ name: "clubImg" }, { name: "logo", maxCount: 1 }]), // For multiple fields
   addClubOrder
-); 
+);
 
 
 module.exports = router

@@ -3,6 +3,7 @@ const asyncHandler = require("express-async-handler");
 const ApiError = require("../utils/ApiError");
 const cloudinary = require("cloudinary").v2;
 const User = require("../models/User");
+const uploadToCloudinary = require("../helper/uploadCoudinary");
 exports.addClubOrder = async (req, res, next) => {
   try {
     const {
@@ -22,7 +23,7 @@ exports.addClubOrder = async (req, res, next) => {
     console.log(req.files);
     let SportData = sports.split(",");
 
-    if ( !req.files.logo) {
+    if (!req.files.logo) {
       return next(new ApiError("Please Add Club Images and Logo", 409));
     }
     console.log(lat, long);
@@ -41,22 +42,18 @@ exports.addClubOrder = async (req, res, next) => {
     //   })
     // );
 
-    const logo = (await cloudinary.uploader.upload(req.files.logo[0].path))
-      .secure_url;
-
+    const logoBuffer = req.files.logo ? req.files.logo[0].buffer : null;
+    const logoUrl = logoBuffer ? await uploadToCloudinary(logoBuffer) : null;
+ 
     const existingUser = await User.findOne({ email });
-    if (existingUser){ 
-      return next(new ApiError("Club  With This Email Already Exists", 409)); 
-
-    }
-    
-
-    const existingClub = await CLubOrder.findOne({ email });
-    if (existingClub){  
-
+    if (existingUser) {
       return next(new ApiError("Club  With This Email Already Exists", 409));
     }
-  
+
+    const existingClub = await CLubOrder.findOne({ email });
+    if (existingClub) {
+      return next(new ApiError("Club  With This Email Already Exists", 409));
+    }
 
     const clubOrder = await CLubOrder.create({
       name,
@@ -70,7 +67,7 @@ exports.addClubOrder = async (req, res, next) => {
       images: [],
       lat: Number(lat),
       long: Number(long),
-      logo,
+      logo: logoUrl.secure_url,
       mapUrl,
       commission,
       sports: [...SportData],
