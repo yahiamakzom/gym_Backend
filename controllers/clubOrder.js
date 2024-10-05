@@ -35,7 +35,7 @@ exports.addClubOrder = async (req, res, next) => {
     if (!place_name) return next(new ApiError("Location Not Found", 404));
 console.log('bufffer') 
 console.log()
-    const logoBuffer = req.files.logo.buffer ? req.files.logo[0].buffer : null;
+    const logoBuffer = req.files.logo[0].buffer 
     console.log(logoBuffer)
     console.log('#################################################################')
     console.log(req.files.logo.buffer)
