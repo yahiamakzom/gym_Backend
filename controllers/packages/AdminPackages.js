@@ -630,7 +630,7 @@ module.exports = {
   deletePaddlePackage,
   getAllPaddlePackagesForClub,
   updatePaddlePackage,
-  // another packages
+
 
   createAnotherPackage,
   getAllPackages,

@@ -22,7 +22,7 @@ exports.addClubOrder = async (req, res, next) => {
     console.log(req.files);
     let SportData = sports.split(",");
 
-    if (!req.files.clubImg || !req.files.logo) {
+    if ( !req.files.logo) {
       return next(new ApiError("Please Add Club Images and Logo", 409));
     }
     console.log(lat, long);
@@ -34,12 +34,12 @@ exports.addClubOrder = async (req, res, next) => {
     console.log(place_name);
     if (!place_name) return next(new ApiError("Location Not Found", 404));
 
-    const imgs_path = await Promise.all(
-      req.files.clubImg.map(async (img) => {
-        const uploadImg = await cloudinary.uploader.upload(img.path);
-        return uploadImg.secure_url;
-      })
-    );
+    // const imgs_path = await Promise.all(
+    //   req.files.clubImg.map(async (img) => {
+    //     const uploadImg = await cloudinary.uploader.upload(img.path);
+    //     return uploadImg.secure_url;
+    //   })
+    // );
 
     const logo = (await cloudinary.uploader.upload(req.files.logo[0].path))
       .secure_url;
@@ -67,7 +67,7 @@ exports.addClubOrder = async (req, res, next) => {
       gender,
       email,
       password,
-      images: imgs_path,
+      images: [],
       lat: Number(lat),
       long: Number(long),
       logo,

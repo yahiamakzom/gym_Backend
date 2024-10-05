@@ -149,7 +149,7 @@ const {addClubOrder} = require("../controllers/clubOrder");
 
 router.post(
   "/add-club-order",
-  imgUploader.fields([{ name: "clubImg" }, { name: "logo", maxCount: 1 }]),
+  imgUploader.fields([, { name: "logo", maxCount: 1 }]),
   addClubOrder
 ); 
 
