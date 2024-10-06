@@ -411,7 +411,7 @@ exports.getSubsForPackages = asyncHandler(async (req, res) => {
         filterCondition = "يوغا";
         break;
       case "weight":
-        filterCondition = "أثقال و لياقة";
+        filterCondition = "أثقال ولياقة  ";
         break;
       case "another":
         filterCondition = "انشطة اخرى";
@@ -443,6 +443,7 @@ exports.getSubsForPackages = asyncHandler(async (req, res) => {
           club: club.name,
           subscriptionCount: clubSubsLength,
           type: club.type,
+          logo: club.logo,
           packagesCount:
             paddlePackages + yogaPackages + weightPackages + anotherPackages,
         };
