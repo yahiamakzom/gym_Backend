@@ -719,35 +719,43 @@ exports.DeterminePackageCommission = asyncHandler(async (req, res) => {
     return;
   }
   switch (type) {
-    case "weight": {
-      const packages = await WeightFitnessPackages.find({});
-      for (const package of packages) {
-        package.commission = commission;
-        await package.save();
+    case "weight":
+      {
+        const packages = await WeightFitnessPackages.find({});
+        for (const package of packages) {
+          package.commission = commission;
+          await package.save();
+        }
       }
-    }
+      break;
 
-    case "yoga": {
-      const packages = await YogaPackages.find({});
-      for (const package of packages) {
-        package.commission = commission;
-        await package.save();
+    case "yoga":
+      {
+        const packages = await YogaPackages.find({});
+        for (const package of packages) {
+          package.commission = commission;
+          await package.save();
+        }
       }
-    }
-    case "paddle": {
-      const packages = await PaddlePackages.find({});
-      for (const package of packages) {
-        package.commission = commission;
-        await package.save();
+      break;
+    case "paddle":
+      {
+        const packages = await PaddlePackages.find({});
+        for (const package of packages) {
+          package.commission = commission;
+          await package.save();
+        }
       }
-    }
-    case "another": {
-      const packages = await AnotherPackages.find({});
-      for (const package of packages) {
-        package.commission = commission;
-        await package.save();
+      break;
+    case "another":
+      {
+        const packages = await AnotherPackages.find({});
+        for (const package of packages) {
+          package.commission = commission;
+          await package.save();
+        }
       }
-    }
+      break;
 
     default: {
       return res.status(400).json({ message: "Invalid type" });

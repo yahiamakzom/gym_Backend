@@ -5,19 +5,19 @@ const discountSchema = require("../PackageDiscount"); // Import the discount sch
 const sessionSchema = new mongoose.Schema({
   startTime: {
     type: String,
-    required: [true, "Start time is required"],
+  
   },
   endTime: {
     type: String,
-    required: [true, "End time is required"],
+
   },
   price: {
     type: Number,
-    required: [true, "Please enter the session price"], // Moved from package to session
+   // Moved from package to session
   },
   numberOfSeats: {
     type: Number,
-    required: [true, "Please enter the number of seats for the session"], // Moved from package to session
+ // Moved from package to session
     min: 1, // Ensure at least one seat is available
   },
   discount: {
