@@ -10,6 +10,7 @@ const PaddlePackages = require("../models/package/paddle");
 const WeightFitnessPackages = require("../models/package/weightFitness");
 const YogaPackages = require("../models/package/yoga");
 const ClubUser = require("../models/ClubUser.js");
+const uploadToCloudinary = require("../helper/buffer.js");
 exports.addSubClub = asyncHandler(async (req, res, next) => {
   const {
     suberAdminId,
@@ -42,17 +43,15 @@ exports.addSubClub = asyncHandler(async (req, res, next) => {
   }
 
   // Upload club images to Cloudinary
+  const logoBuffer = req.files.logo[0].buffer;
+
+  const logoUrl = logoBuffer ? await uploadToCloudinary(logoBuffer) : null;
+
   const imgs_path = await Promise.all(
     req.files.clubImg.map(async (img) => {
-      const uploadImg = await cloudinary.uploader.upload(img.path);
-      return uploadImg.secure_url;
+      return await uploadToCloudinary(img.buffer);
     })
   );
-
-  // Upload logo to Cloudinary
-  const logo = (await cloudinary.uploader.upload(req.files.logo[0].path))
-    .secure_url;
-
   // Find the club admin by ID
   const clubSuberAdmin = await Clubs.findOne({ _id: suberAdminId });
   console.log("club", clubSuberAdmin);
@@ -84,7 +83,7 @@ exports.addSubClub = asyncHandler(async (req, res, next) => {
     images: imgs_path,
     lat: Number(lat),
     long: Number(long),
-    logo,
+    logo: logoUrl,
     mapUrl,
     type: "admin",
     commission,
@@ -193,18 +192,19 @@ exports.editSubClub = asyncHandler(async (req, res, next) => {
 
   let imgs_path = subClub.images;
   if (req.files.clubImg) {
-    imgs_path = await Promise.all(
+     imgs_path = await Promise.all(
       req.files.clubImg.map(async (img) => {
-        const uploadImg = await cloudinary.uploader.upload(img.path);
-        return uploadImg.secure_url;
+        return await uploadToCloudinary(img.buffer);
       })
     );
   }
 
   let logo = subClub.logo; // Keep existing logo if no new logo is provided
   if (req.files.logo) {
-    logo = (await cloudinary.uploader.upload(req.files.logo[0].path))
-      .secure_url;
+    const logoBuffer = req.files.logo[0].buffer;
+     logo = logoBuffer ? await uploadToCloudinary(logoBuffer) : null;
+
+
   }
 
   // Update sub-club properties

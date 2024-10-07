@@ -1,6 +1,8 @@
 const router = require("express").Router();
 const imgUploader = require("../middlewares/imgUploader");
-
+const multer = require("multer");
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 const {
   addClub,
   getOrders,
@@ -27,6 +29,7 @@ const {
   getAllCommonQuestions,
   deleteCommonQuestion,
   createCommonQuestion,
+  DeterminePackageCommission,
 } = require("../controllers/owner");
 
 /**
@@ -122,7 +125,7 @@ const {
 
 router.post(
   "/add-suberadmin",
-  imgUploader.fields([{ name: "clubImg" }, { name: "logo", maxCount: 1 }]),
+  upload.fields([{ name: "clubImg" }, { name: "logo", maxCount: 1 }]),
   addClub
 );
 
@@ -1445,10 +1448,7 @@ router.post("/create-common-question", createCommonQuestion);
  *       500:
  *         description: Server error
  */
-router.put("/update-common-question/:id", updateCommonQuestion); 
-
-
-
+router.put("/update-common-question/:id", updateCommonQuestion);
 
 /**
  * @swagger
@@ -1456,7 +1456,7 @@ router.put("/update-common-question/:id", updateCommonQuestion);
  *   get:
  *     summary: Get all common questions
  *     tags:
- *       - Owner 
+ *       - Owner
  *     responses:
  *       200:
  *         description: Successfully retrieved all common questions
@@ -1475,9 +1475,7 @@ router.put("/update-common-question/:id", updateCommonQuestion);
  *       500:
  *         description: Server error
  */
-router.get('/get-all-questions', getAllCommonQuestions) 
-
-
+router.get("/get-all-questions", getAllCommonQuestions);
 
 /**
  * @swagger
@@ -1523,5 +1521,72 @@ router.get('/get-all-questions', getAllCommonQuestions)
  *       500:
  *         description: Server error
  */
-router.delete('/delete-common-question/:id' ,deleteCommonQuestion)
+router.delete("/delete-common-question/:id", deleteCommonQuestion);
+
+/**
+ * @swagger
+ * /owner/update-commission-package:
+ *   post:
+ *     summary: Update the commission for different types of fitness packages
+ *     description: This endpoint allows the admin to update the commission for different package types such as weight fitness, yoga, paddle, and others.
+ *     tags:
+ *       - Owner
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - commission
+ *               - type
+ *             properties:
+ *               commission:
+ *                 type: number
+ *                 example: 5.5
+ *                 description: The new commission rate to be applied to the packages.
+ *               type:
+ *                 type: string
+ *                 enum: [weight, yoga, paddle, another]
+ *                 example: "weight"
+ *                 description: The type of packages for which the commission will be updated.
+ *     responses:
+ *       200:
+ *         description: Commission updated successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Commission updated successfully for weight packages.
+ *       400:
+ *         description: Bad request, missing fields or invalid package type.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Missing commission or type.
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Server error.
+ *                 error:
+ *                   type: object
+ *                   description: Details about the server error.
+ */
+router.post("/update-commission-package", DeterminePackageCommission);
 module.exports = router;

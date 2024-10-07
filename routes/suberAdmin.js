@@ -1,5 +1,8 @@
 const router = require("express").Router();
 const imgUploader = require("../middlewares/imgUploader");
+const multer = require("multer");
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
 const {
   addSubClub,
@@ -28,6 +31,7 @@ const {
   getAllPaddlePackagesForClub,
   updatePaddlePackage,
 } = require("../controllers/packages/SuberAdminPackages");
+
 /**
  * @swagger
  * suberadmin/add-sub:
@@ -177,7 +181,7 @@ const {
 
 router.post(
   "/add-sub",
-  imgUploader.fields([{ name: "clubImg" }, { name: "logo", maxCount: 1 }]),
+  upload.fields([{ name: "clubImg" }, { name: "logo", maxCount: 1 }]),
   addSubClub
 );
 
@@ -528,7 +532,7 @@ router.get("/get-sub/:id", getSubClub);
 
 router.put(
   "/edit-sub/:id",
-  imgUploader.fields([{ name: "clubImg" }, { name: "logo", maxCount: 1 }]),
+  upload.fields([{ name: "clubImg" }, { name: "logo", maxCount: 1 }]),
   editSubClub
 );
 

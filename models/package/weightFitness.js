@@ -5,6 +5,10 @@ const discountSchema = require("../PackageDiscount"); // Import the discount sch
 // Weight and Fitness package schema
 const weightFitnessSchema = new mongoose.Schema(
   {
+    commission:{ 
+      type: Number, 
+      default: 0
+    } ,
     club: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Club",

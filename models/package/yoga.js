@@ -29,6 +29,10 @@ const sessionSchema = new mongoose.Schema({
 // Yoga package schema
 const yogaSchema = new mongoose.Schema(
   {
+    commission: {
+      type: Number,
+      default: 0,
+    },
     club: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Club",
@@ -44,7 +48,15 @@ const yogaSchema = new mongoose.Schema(
     },
     daysOfWeek: {
       type: [String],
-      enum: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+      enum: [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday",
+      ],
       required: [true, "Please enter the days of the week for sessions"],
     },
     sessionsPerDay: [sessionSchema], // Array of session objects, with price, seats, and discount now in sessionSchema

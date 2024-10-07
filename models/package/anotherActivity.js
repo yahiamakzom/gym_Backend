@@ -2,7 +2,11 @@ const mongoose = require("mongoose");
 const discountSchema = require("../PackageDiscount"); // Import the discount schema
 
 const anotherActivitySchema = new mongoose.Schema(
-  {
+  { 
+    commission:{ 
+      type: Number, 
+      default: 0
+    } ,
     club: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Club",

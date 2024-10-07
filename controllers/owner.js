@@ -18,7 +18,7 @@ const YogaPackages = require("../models/package/yoga");
 const AppSetting = require("../models/AppSetting");
 const Support = require("../models/support.js");
 const CommonQuestions = require("../models/CommonQuestions.js");
-
+const uploadToCloudinary = require("../helper/buffer.js");
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.CLOUD_API_KEY,
@@ -57,13 +57,12 @@ exports.addClub = asyncHandler(async (req, res, next) => {
 
   const imgs_path = await Promise.all(
     req.files.clubImg.map(async (img) => {
-      const uploadImg = await cloudinary.uploader.upload(img.path);
-      return uploadImg.secure_url;
+      return await uploadToCloudinary(img.buffer);
     })
   );
 
-  const logo = (await cloudinary.uploader.upload(req.files.logo[0].path))
-    .secure_url;
+  const logoBuffer = req.files.logo[0].buffer;
+  const logo = logoBuffer ? await uploadToCloudinary(logoBuffer) : null;
 
   const existingUser = await User.findOne({ email });
   if (existingUser)
@@ -648,7 +647,6 @@ exports.createCommonQuestion = asyncHandler(async (req, res) => {
   });
 });
 
-
 // Update an existing common question by ID
 exports.updateCommonQuestion = asyncHandler(async (req, res) => {
   const { id } = req.params;
@@ -662,16 +660,14 @@ exports.updateCommonQuestion = asyncHandler(async (req, res) => {
 
   if (!updatedQuestion) {
     res.status(404);
-    throw new Error('Common question not found');
+    throw new Error("Common question not found");
   }
 
   res.status(200).json({
     success: true,
     data: updatedQuestion,
   });
-}); 
-
-
+});
 
 // Get all common questions
 exports.getAllCommonQuestions = asyncHandler(async (req, res) => {
@@ -690,7 +686,7 @@ exports.getCommonQuestionById = asyncHandler(async (req, res) => {
 
   if (!question) {
     res.status(404);
-    throw new Error('Common question not found');
+    throw new Error("Common question not found");
   }
 
   res.status(200).json({
@@ -698,7 +694,6 @@ exports.getCommonQuestionById = asyncHandler(async (req, res) => {
     data: question,
   });
 });
-
 
 // Delete a common question by ID
 exports.deleteCommonQuestion = asyncHandler(async (req, res) => {
@@ -708,12 +703,59 @@ exports.deleteCommonQuestion = asyncHandler(async (req, res) => {
 
   if (!question) {
     res.status(404);
-    throw new Error('Common question not found');
+    throw new Error("Common question not found");
   }
 
   res.status(200).json({
     success: true,
-    message: 'Common question deleted successfully',
+    message: "Common question deleted successfully",
   });
 });
 
+exports.DeterminePackageCommission = asyncHandler(async (req, res) => {
+  const { commission, type } = req.body;
+  if (!commission || !type) {
+    res.status(400).json({ message: "Missing commission or type" });
+    return;
+  }
+  switch (type) {
+    case "weight": {
+      const packages = await WeightFitnessPackages.find({});
+      for (const package of packages) {
+        package.commission = commission;
+        await package.save();
+      }
+    }
+
+    case "yoga": {
+      const packages = await YogaPackages.find({});
+      for (const package of packages) {
+        package.commission = commission;
+        await package.save();
+      }
+    }
+    case "paddle": {
+      const packages = await PaddlePackages.find({});
+      for (const package of packages) {
+        package.commission = commission;
+        await package.save();
+      }
+    }
+    case "another": {
+      const packages = await AnotherPackages.find({});
+      for (const package of packages) {
+        package.commission = commission;
+        await package.save();
+      }
+    }
+
+    default: {
+      return res.status(400).json({ message: "Invalid type" });
+    }
+  }
+
+  res.status(200).json({
+    success: true,
+    message: "Commission updated successfully",
+  });
+});

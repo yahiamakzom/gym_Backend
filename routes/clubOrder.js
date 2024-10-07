@@ -1,9 +1,11 @@
 const router = require("express").Router();
 const imgUploader = require("../middlewares/imgUploader");
-const multer = require("multer");
+
 const { addClubOrder } = require("../controllers/clubOrder");
+const multer = require("multer");
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
+
 /**
  * @swagger
  * /orders/add-club-order:
