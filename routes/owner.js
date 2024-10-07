@@ -30,6 +30,7 @@ const {
   deleteCommonQuestion,
   createCommonQuestion,
   DeterminePackageCommission,
+  getPackagesCommission,
 } = require("../controllers/owner");
 
 /**
@@ -1589,4 +1590,17 @@ router.delete("/delete-common-question/:id", deleteCommonQuestion);
  *                   description: Details about the server error.
  */
 router.post("/update-commission-package", DeterminePackageCommission);
+
+/**
+ * @swagger
+ * /owner/get-commission-packages:
+ *   get:
+ *     summary: Get all Packages Commission and Yoga Type
+ *     description: This endpoint allows the admin to update the commission for different package types such as weight fitness, yoga, paddle, and others.
+ *     tags:
+ *       - Owner
+ */
+
+router.get("/get-commission-packages", getPackagesCommission);
+
 module.exports = router;

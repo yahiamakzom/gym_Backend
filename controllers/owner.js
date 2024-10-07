@@ -718,6 +718,12 @@ exports.DeterminePackageCommission = asyncHandler(async (req, res) => {
     res.status(400).json({ message: "Missing commission or type" });
     return;
   }
+  if (commission < 0 || commission > 100) {
+    return res
+      .status(400)
+      .json({ message: "Commission must be between 0 and 100" });
+  }
+  const appSetting = await AppSetting.findOne({});
   switch (type) {
     case "weight":
       {
@@ -726,6 +732,8 @@ exports.DeterminePackageCommission = asyncHandler(async (req, res) => {
           package.commission = commission;
           await package.save();
         }
+        appSetting.weightFitnessCommission = commission;
+        await appSetting.save();
       }
       break;
 
@@ -736,6 +744,8 @@ exports.DeterminePackageCommission = asyncHandler(async (req, res) => {
           package.commission = commission;
           await package.save();
         }
+        appSetting.yogaCommission = commission;
+        await appSetting.save();
       }
       break;
     case "paddle":
@@ -745,6 +755,8 @@ exports.DeterminePackageCommission = asyncHandler(async (req, res) => {
           package.commission = commission;
           await package.save();
         }
+        appSetting.paddelCommission = commission;
+        await appSetting.save();
       }
       break;
     case "another":
@@ -754,6 +766,8 @@ exports.DeterminePackageCommission = asyncHandler(async (req, res) => {
           package.commission = commission;
           await package.save();
         }
+        appSetting.another = commission;
+        await appSetting.save();
       }
       break;
 
@@ -765,5 +779,19 @@ exports.DeterminePackageCommission = asyncHandler(async (req, res) => {
   res.status(200).json({
     success: true,
     message: "Commission updated successfully",
+  });
+});
+
+exports.getPackagesCommission = asyncHandler(async (req, res) => {
+  const appSetting = await AppSetting.findOne({});
+  res.status(200).json({
+    success: true,
+    data: {
+      weight: appSetting.weightFitnessCommission,
+      yoga: appSetting.yogaCommission,
+      paddle: appSetting.paddelCommission,
+      another: appSetting.another,
+      yogTypes: appSetting.yogaTypes,
+    },
   });
 });

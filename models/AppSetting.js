@@ -12,6 +12,24 @@ const AppSetting = new mongoose.Schema(
       default: "",
     },
     banner: [],
+    paddelCommission: {
+      type: Number,
+      default: 0,
+    },  
+  
+    weightFitnessCommission: {
+      type: Number,
+      default: 0,
+    }, 
+    yogaCommission: {
+      type: Number,
+      default: 0,
+    }, 
+    another:{ 
+      type: Number, 
+      default: 0
+    }  ,
+    yogaTypes:[]
   },
   {
     timestamps: true,
