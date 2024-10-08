@@ -31,6 +31,7 @@ const {
   createCommonQuestion,
   DeterminePackageCommission,
   getPackagesCommission,
+  updateAppBanner,
 } = require("../controllers/owner");
 
 /**
@@ -1603,4 +1604,84 @@ router.post("/update-commission-package", DeterminePackageCommission);
 
 router.get("/get-commission-packages", getPackagesCommission);
 
+/**
+ * @swagger
+ * /owner/update-app-banners:
+ *   post:
+ *     summary: Upload and update app banners
+ *     description: This endpoint allows the admin to upload and update the banners for the app. Images are uploaded to Cloudinary, and the URLs are saved in the app settings.
+ *     tags:
+ *       - Owner
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               banners:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *                 description: Array of image files to be uploaded as app banners.
+ *     responses:
+ *       200:
+ *         description: App banners uploaded and updated successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: [
+ *                     "https://cloudinary.com/example1.jpg",
+ *                     "https://cloudinary.com/example2.jpg"
+ *                   ]
+ *       400:
+ *         description: No banners provided in the request.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Please Add AppBanners"
+ *       409:
+ *         description: Conflict or validation error in processing banners.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Please Add AppBanners"
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Server error.
+ *                 error:
+ *                   type: object
+ *                   description: Details about the server error.
+ */
+
+router.post(
+  "/update-app-banners",
+  upload.fields([{ name: "banners" }]),
+  updateAppBanner
+);
 module.exports = router;

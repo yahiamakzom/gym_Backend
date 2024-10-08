@@ -11,7 +11,7 @@ const AppSetting = new mongoose.Schema(
       type: String,
       default: "",
     },
-    banner: [],
+    banners: [],
     paddelCommission: {
       type: Number,
       default: 0,

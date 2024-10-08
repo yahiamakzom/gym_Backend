@@ -795,3 +795,22 @@ exports.getPackagesCommission = asyncHandler(async (req, res) => {
     },
   });
 });
+
+exports.updateAppBanner = asyncHandler(async (req, res) => {
+  const appSetting = await AppSetting.findOne({});
+  if (!req.files.banners) {
+    return next(new ApiError("Please Add AppBanners", 409));
+  }
+  const appBanners = await Promise.all(
+    req.files.banners.map(async (img) => {
+      return await uploadToCloudinary(img.buffer);
+    })
+  );
+
+  appSetting.banners = appBanners;
+  await appSetting.save();
+  res.status(200).json({
+    success: true,
+    data: appBanners,
+  });
+});
