@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
-// Define the schema for the bank account
-const AppSetting = new mongoose.Schema(
+// Define the schema for the app settings
+const AppSettingSchema = new mongoose.Schema(
   {
     appName: {
       type: String,
@@ -11,12 +11,26 @@ const AppSetting = new mongoose.Schema(
       type: String,
       default: "",
     },
-    banners: [],
+    banners: [
+      {
+        imageUrl: {
+          type: String,
+          required: true,
+        },
+        value: {
+          type: String,
+          required: true,
+        },
+        isUrl: {
+          type: Boolean,
+          default: false, // Assuming the default is false
+        },
+      },
+    ],
     paddelCommission: {
       type: Number,
       default: 0,
     },  
-  
     weightFitnessCommission: {
       type: Number,
       default: 0,
@@ -25,11 +39,11 @@ const AppSetting = new mongoose.Schema(
       type: Number,
       default: 0,
     }, 
-    another:{ 
+    another: { 
       type: Number, 
       default: 0
-    }  ,
-    yogaTypes:[]
+    },
+    yogaTypes: [],
   },
   {
     timestamps: true,
@@ -37,6 +51,6 @@ const AppSetting = new mongoose.Schema(
 );
 
 // Create the model from the schema
-const appSetting = mongoose.model("AppSetting", AppSetting);
+const AppSetting = mongoose.model("AppSetting", AppSettingSchema);
 
-module.exports = appSetting;
+module.exports = AppSetting;

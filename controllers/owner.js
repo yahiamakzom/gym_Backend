@@ -797,7 +797,7 @@ exports.getPackagesCommission = asyncHandler(async (req, res) => {
 });
 
 exports.updateAppBanner = asyncHandler(async (req, res) => {
-  const { email, password, appName } = req.body;
+  const { email, password, appName, banners } = req.body;
 
   // Find existing app settings and admin
   const appSetting = await AppSetting.findOne({});
@@ -816,17 +816,38 @@ exports.updateAppBanner = asyncHandler(async (req, res) => {
     ? await uploadToCloudinary(req.files.logo[0].buffer)
     : null;
 
-  // Upload banners if provided
-  const appBanners = req.files?.banners
-    ? await Promise.all(
-        req.files.banners.map(async (img) => {
-          return await uploadToCloudinary(img.buffer);
-        })
-      )
-    : null;
+  // Initialize the appBanners array
+  const appBanners = [];
 
-  // Update app settings
-  if (appBanners) {
+  // Upload banners if provided
+  if (req.files?.banners && banners) {
+    // Ensure banners array matches the uploaded images
+    if (req.files.banners.length !== banners.length) {
+      return res.status(400).json({
+        success: false,
+        message: "The number of banners must match the number of uploaded images.",
+      });
+    }
+
+    // Process each banner upload and map to the provided banner data
+    for (let i = 0; i < req.files.banners.length; i++) {
+      const img = req.files.banners[i];
+      const bannerInfo = banners[i];
+
+      // Upload the image to Cloudinary
+      const imageUrl = await uploadToCloudinary(img.buffer);
+      
+      // Add the image URL along with value and isUrl to the appBanners array
+      appBanners.push({
+        imageUrl,
+        value: bannerInfo.value,  // Get value from request body
+        isUrl: bannerInfo.isUrl,   // Get isUrl from request body
+      });
+    }
+  }
+
+  // Update app settings with new banners, logo, and app name
+  if (appBanners.length > 0) {
     appSetting.banners = appBanners;
   }
   if (appLogo) {
@@ -858,3 +879,4 @@ exports.updateAppBanner = asyncHandler(async (req, res) => {
     },
   });
 });
+

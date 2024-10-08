@@ -1622,9 +1622,19 @@ router.get("/get-commission-packages", getPackagesCommission);
  *               banners:
  *                 type: array
  *                 items:
- *                   type: string
- *                   format: binary
- *                 description: Array of image files to be uploaded as app banners.
+ *                   type: object
+ *                   properties:
+ *                     value:
+ *                       type: string
+ *                       description: Description or title for the banner.
+ *                     isUrl:
+ *                       type: boolean
+ *                       description: Boolean flag indicating if the banner is a URL.
+ *                     image:
+ *                       type: string
+ *                       format: binary
+ *                       description: The image file to be uploaded as a banner.
+ *                 description: Array of banner objects to be uploaded.
  *               logo:
  *                 type: string
  *                 format: binary
@@ -1655,11 +1665,17 @@ router.get("/get-commission-packages", getPackagesCommission);
  *                     appBanners:
  *                       type: array
  *                       items:
- *                         type: string
- *                       example: [
- *                         "https://cloudinary.com/example1.jpg",
- *                         "https://cloudinary.com/example2.jpg"
- *                       ]
+ *                         type: object
+ *                         properties:
+ *                           imageUrl:
+ *                             type: string
+ *                             example: "https://cloudinary.com/example1.jpg"
+ *                           value:
+ *                             type: string
+ *                             example: "Banner 1 Description"
+ *                           isUrl:
+ *                             type: boolean
+ *                             example: false
  *                     appLogo:
  *                       type: string
  *                       example: "https://cloudinary.com/logo.jpg"
