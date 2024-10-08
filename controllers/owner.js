@@ -797,20 +797,64 @@ exports.getPackagesCommission = asyncHandler(async (req, res) => {
 });
 
 exports.updateAppBanner = asyncHandler(async (req, res) => {
-  const appSetting = await AppSetting.findOne({});
-  if (!req.files.banners) {
-    return next(new ApiError("Please Add AppBanners", 409));
-  }
-  const appBanners = await Promise.all(
-    req.files.banners.map(async (img) => {
-      return await uploadToCloudinary(img.buffer);
-    })
-  );
+  const { email, password, appName } = req.body;
 
-  appSetting.banners = appBanners;
+  // Find existing app settings and admin
+  const appSetting = await AppSetting.findOne({});
+  const admin = await User.findOne({ role: "admin" });
+
+  // Validate if app settings and admin exist
+  if (!appSetting || !admin) {
+    return res.status(404).json({
+      success: false,
+      message: "App settings or admin not found.",
+    });
+  }
+
+  // Upload logo if provided
+  const appLogo = req.files?.logo
+    ? await uploadToCloudinary(req.files.logo[0].buffer)
+    : null;
+
+  // Upload banners if provided
+  const appBanners = req.files?.banners
+    ? await Promise.all(
+        req.files.banners.map(async (img) => {
+          return await uploadToCloudinary(img.buffer);
+        })
+      )
+    : null;
+
+  // Update app settings
+  if (appBanners) {
+    appSetting.banners = appBanners;
+  }
+  if (appLogo) {
+    appSetting.appLogo = appLogo;
+  }
+  if (appName) {
+    appSetting.appName = appName;
+  }
+
+  // Update admin details if provided
+  if (email) {
+    admin.email = email;
+  }
+  if (password) {
+    admin.password = password;
+  }
+
+  // Save the updated data
+  await admin.save();
   await appSetting.save();
+
+  // Respond with success
   res.status(200).json({
     success: true,
-    data: appBanners,
+    data: {
+      appBanners: appSetting.banners,
+      appLogo: appSetting.appLogo,
+      appName: appSetting.appName,
+    },
   });
 });

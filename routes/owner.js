@@ -1608,8 +1608,8 @@ router.get("/get-commission-packages", getPackagesCommission);
  * @swagger
  * /owner/update-app-banners:
  *   post:
- *     summary: Upload and update app banners
- *     description: This endpoint allows the admin to upload and update the banners for the app. Images are uploaded to Cloudinary, and the URLs are saved in the app settings.
+ *     summary: Upload and update app banners and settings
+ *     description: This endpoint allows the admin to upload and update the app banners, logo, and app details like the app name and admin email/password. Images are uploaded to Cloudinary, and the URLs are saved in the app settings.
  *     tags:
  *       - Owner
  *     requestBody:
@@ -1625,9 +1625,22 @@ router.get("/get-commission-packages", getPackagesCommission);
  *                   type: string
  *                   format: binary
  *                 description: Array of image files to be uploaded as app banners.
+ *               logo:
+ *                 type: string
+ *                 format: binary
+ *                 description: The logo image file for the app.
+ *               appName:
+ *                 type: string
+ *                 description: The new name for the app.
+ *               email:
+ *                 type: string
+ *                 description: The new email for the admin.
+ *               password:
+ *                 type: string
+ *                 description: The new password for the admin.
  *     responses:
  *       200:
- *         description: App banners uploaded and updated successfully.
+ *         description: App banners and settings uploaded and updated successfully.
  *         content:
  *           application/json:
  *             schema:
@@ -1637,15 +1650,24 @@ router.get("/get-commission-packages", getPackagesCommission);
  *                   type: boolean
  *                   example: true
  *                 data:
- *                   type: array
- *                   items:
- *                     type: string
- *                   example: [
- *                     "https://cloudinary.com/example1.jpg",
- *                     "https://cloudinary.com/example2.jpg"
- *                   ]
+ *                   type: object
+ *                   properties:
+ *                     appBanners:
+ *                       type: array
+ *                       items:
+ *                         type: string
+ *                       example: [
+ *                         "https://cloudinary.com/example1.jpg",
+ *                         "https://cloudinary.com/example2.jpg"
+ *                       ]
+ *                     appLogo:
+ *                       type: string
+ *                       example: "https://cloudinary.com/logo.jpg"
+ *                     appName:
+ *                       type: string
+ *                       example: "My Awesome App"
  *       400:
- *         description: No banners provided in the request.
+ *         description: No banners or required data provided in the request.
  *         content:
  *           application/json:
  *             schema:
@@ -1653,9 +1675,9 @@ router.get("/get-commission-packages", getPackagesCommission);
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Please Add AppBanners"
- *       409:
- *         description: Conflict or validation error in processing banners.
+ *                   example: "Please provide valid banners or app data."
+ *       404:
+ *         description: App settings or admin not found.
  *         content:
  *           application/json:
  *             schema:
@@ -1663,7 +1685,7 @@ router.get("/get-commission-packages", getPackagesCommission);
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Please Add AppBanners"
+ *                   example: "App settings or admin not found."
  *       500:
  *         description: Internal server error.
  *         content:
@@ -1673,7 +1695,7 @@ router.get("/get-commission-packages", getPackagesCommission);
  *               properties:
  *                 message:
  *                   type: string
- *                   example: Server error.
+ *                   example: "Server error."
  *                 error:
  *                   type: object
  *                   description: Details about the server error.
@@ -1681,7 +1703,7 @@ router.get("/get-commission-packages", getPackagesCommission);
 
 router.post(
   "/update-app-banners",
-  upload.fields([{ name: "banners" }]),
+  upload.fields([{ name: "banners" }, { name: "logo" }]),
   updateAppBanner
 );
 module.exports = router;
