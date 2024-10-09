@@ -214,13 +214,6 @@ exports.LoginControlPanel = asyncHandler(async (req, res, next) => {
     // Find the user by email
     const user = await User.findOne({ email });
     if (user) {
-      const isPasswordValid = await bcrypt.compare(password, user.password);
-      if (!isPasswordValid) {
-        return res
-          .status(400)
-          .json({ error: "Invalid password", success: false });
-      }
-
       // Generate JWT token
       const token = sign({ id: user.id }, process.env.TOKEN);
 
@@ -229,6 +222,12 @@ exports.LoginControlPanel = asyncHandler(async (req, res, next) => {
       delete userResponse.password;
 
       if (user.role === "admin") {
+        if (user.password !== password) {
+          return res.status(400).json({
+            error: "Invalid password",
+            success: false,
+          });
+        }
         return res.status(200).json({
           role: "owner",
           id: user.id,
