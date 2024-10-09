@@ -713,17 +713,17 @@ exports.deleteCommonQuestion = asyncHandler(async (req, res) => {
 });
 
 exports.DeterminePackageCommission = asyncHandler(async (req, res) => {
-  const { commission, type } = req.body;
+  const { commission, type, yogaTypes } = req.body;
   if (!commission || !type) {
     res.status(400).json({ message: "Missing commission or type" });
     return;
   }
-  if (commission < 0 
-     || commission > 100) {
+  if (commission < 0 || commission > 100) {
     return res
       .status(400)
       .json({ message: "Commission must be between 0 and 100" });
   }
+
   const appSetting = await AppSetting.findOne({});
   switch (type) {
     case "weight":
@@ -776,6 +776,9 @@ exports.DeterminePackageCommission = asyncHandler(async (req, res) => {
       return res.status(400).json({ message: "Invalid type" });
     }
   }
+  appSetting.yogaTypes = yogaTypes || []
+  ;
+  await appSetting.save();
 
   res.status(200).json({
     success: true,
@@ -824,7 +827,6 @@ exports.updateAppBanner = asyncHandler(async (req, res) => {
   if (req.files?.bannersImages && banners) {
     // Ensure banners array matches the uploaded images
 
-
     // Process each banner upload and map to the provided banner data
     for (let i = 0; i < req.files.bannersImages.length; i++) {
       const img = req.files.bannersImages[i];
@@ -832,12 +834,12 @@ exports.updateAppBanner = asyncHandler(async (req, res) => {
 
       // Upload the image to Cloudinary
       const imageUrl = await uploadToCloudinary(img.buffer);
-      
+
       // Add the image URL along with value and isUrl to the appBanners array
       appBanners.push({
         imageUrl,
-        value: bannerInfo.value,  // Get value from request body
-        isUrl: bannerInfo.isUrl,   // Get isUrl from request body
+        value: bannerInfo.value, // Get value from request body
+        isUrl: bannerInfo.isUrl, // Get isUrl from request body
       });
     }
   }
@@ -875,4 +877,3 @@ exports.updateAppBanner = asyncHandler(async (req, res) => {
     },
   });
 });
-
