@@ -820,14 +820,14 @@ exports.updateAppBanner = asyncHandler(async (req, res) => {
   const appBanners = [];
 
   // Upload banners if provided
-  if (req.files?.banners && banners) {
+  if (req.files?.bannersImages && banners) {
     // Ensure banners array matches the uploaded images
 
 
     // Process each banner upload and map to the provided banner data
-    for (let i = 0; i < req.files.banners.length; i++) {
-      const img = req.files.banners[i];
-      const bannerInfo = banners[i];
+    for (let i = 0; i < req.files.bannersImages.length; i++) {
+      const img = req.files.bannersImages[i];
+      const bannerInfo = bannersImages[i];
 
       // Upload the image to Cloudinary
       const imageUrl = await uploadToCloudinary(img.buffer);

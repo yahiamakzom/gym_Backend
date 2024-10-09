@@ -1719,7 +1719,7 @@ router.get("/get-commission-packages", getPackagesCommission);
 
 router.post(
   "/update-app-banners",
-  upload.fields([{ name: "banners" }, { name: "logo" }]),
+  upload.fields([{ name: "bannersImages" }, { name: "logo" }]),
   updateAppBanner
 );
 module.exports = router;
