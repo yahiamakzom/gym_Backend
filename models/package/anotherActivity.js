@@ -28,15 +28,15 @@ const anotherActivitySchema = new mongoose.Schema(
     availableSlots: [{
       startTime: {
         type: Date,
-        required: true,
+
       },
       endTime: {
         type: Date,
-        required: true,
+  
       },
       numberOfSeats: {
         type: Number,
-        required: [true, "Please enter the number of seats"],
+
         min: 1, // Ensure at least one seat is available
       },
       availableSeats: {
