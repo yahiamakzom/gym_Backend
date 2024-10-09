@@ -18,7 +18,7 @@ const YogaPackages = require("../models/package/yoga");
 const AppSetting = require("../models/AppSetting");
 const Support = require("../models/support.js");
 const CommonQuestions = require("../models/CommonQuestions.js");
-const uploadToCloudinary = require("../helper/buffer.js");
+const uploadToCloudinary = require("../helper/uploadCoudinary.js");
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.CLOUD_API_KEY,
