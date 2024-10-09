@@ -588,7 +588,7 @@ exports.getAppData = asyncHandler(async (req, res) => {
       data: {
         name: app.appName,
         logo: app.appLogo,
-        banner: app.banner,
+        banner: app.banners,
         email: owner.email,
         password: owner.password,
       },
