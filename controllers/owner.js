@@ -718,7 +718,8 @@ exports.DeterminePackageCommission = asyncHandler(async (req, res) => {
     res.status(400).json({ message: "Missing commission or type" });
     return;
   }
-  if (commission < 0 || commission > 100) {
+  if (commission < 0 
+     || commission > 100) {
     return res
       .status(400)
       .json({ message: "Commission must be between 0 and 100" });
@@ -827,7 +828,7 @@ exports.updateAppBanner = asyncHandler(async (req, res) => {
     // Process each banner upload and map to the provided banner data
     for (let i = 0; i < req.files.bannersImages.length; i++) {
       const img = req.files.bannersImages[i];
-      const bannerInfo = bannersImages[i];
+      const bannerInfo = banners[i];
 
       // Upload the image to Cloudinary
       const imageUrl = await uploadToCloudinary(img.buffer);
