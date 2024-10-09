@@ -822,12 +822,7 @@ exports.updateAppBanner = asyncHandler(async (req, res) => {
   // Upload banners if provided
   if (req.files?.banners && banners) {
     // Ensure banners array matches the uploaded images
-    if (req.files.banners.length !== banners.length) {
-      return res.status(400).json({
-        success: false,
-        message: "The number of banners must match the number of uploaded images.",
-      });
-    }
+
 
     // Process each banner upload and map to the provided banner data
     for (let i = 0; i < req.files.banners.length; i++) {
