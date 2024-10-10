@@ -411,7 +411,7 @@ exports.getSubsForPackages = asyncHandler(async (req, res) => {
         filterCondition = "يوغا";
         break;
       case "weight":
-        filterCondition = "أثقال ولياقة  ";
+        filterCondition = "أثقال ولياقة";
         break;
       case "another":
         filterCondition = "انشطة اخرى";
