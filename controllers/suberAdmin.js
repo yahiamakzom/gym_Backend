@@ -10,7 +10,7 @@ const PaddlePackages = require("../models/package/paddle");
 const WeightFitnessPackages = require("../models/package/weightFitness");
 const YogaPackages = require("../models/package/yoga");
 const ClubUser = require("../models/ClubUser.js");
-const uploadToCloudinary = require("../helper/buffer.js");
+const uploadToCloudinary = require("../helper/uploadCoudinary");
 exports.addSubClub = asyncHandler(async (req, res, next) => {
   const {
     suberAdminId,
