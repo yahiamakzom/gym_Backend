@@ -251,43 +251,43 @@ exports.acceptOrder = async (req, res, next) => {
     });
     await clubUser.save();
 
-    // Send acceptance email with the dynamic message
-    const emailSubject = "Your Club Application Has Been Accepted";
-    const emailHtml = `
-      <html>
-        <head>
-          <style>
-            body { font-family: Arial, sans-serif; color: #333; }
-            .container { width: 100%; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
-            .header { background: #f4f4f4; padding: 10px; border-bottom: 1px solid #ddd; text-align: center; }
-            .header h1 { margin: 0; color: #4CAF50; }
-            .content { padding: 20px; }
-            .footer { text-align: center; margin-top: 20px; font-size: 0.9em; color: #777; }
-            .button { display: inline-block; padding: 10px 20px; font-size: 16px; color: #fff; background: #4CAF50; text-decoration: none; border-radius: 5px; }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <div class="header">
-              <h1>Congratulations!</h1>
-            </div>
-            <div class="content">
-              <p>Your application to create the club <strong>"${
-                newClub.name
-              }"</strong> has been accepted.</p>
-              <p>${
-                message || "We look forward to your successful journey with us!"
-              }</p>
+    // // Send acceptance email with the dynamic message
+    // const emailSubject = "Your Club Application Has Been Accepted";
+    // const emailHtml = `
+    //   <html>
+    //     <head>
+    //       <style>
+    //         body { font-family: Arial, sans-serif; color: #333; }
+    //         .container { width: 100%; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+    //         .header { background: #f4f4f4; padding: 10px; border-bottom: 1px solid #ddd; text-align: center; }
+    //         .header h1 { margin: 0; color: #4CAF50; }
+    //         .content { padding: 20px; }
+    //         .footer { text-align: center; margin-top: 20px; font-size: 0.9em; color: #777; }
+    //         .button { display: inline-block; padding: 10px 20px; font-size: 16px; color: #fff; background: #4CAF50; text-decoration: none; border-radius: 5px; }
+    //       </style>
+    //     </head>
+    //     <body>
+    //       <div class="container">
+    //         <div class="header">
+    //           <h1>Congratulations!</h1>
+    //         </div>
+    //         <div class="content">
+    //           <p>Your application to create the club <strong>"${
+    //             newClub.name
+    //           }"</strong> has been accepted.</p>
+    //           <p>${
+    //             message || "We look forward to your successful journey with us!"
+    //           }</p>
         
-            </div>
-            <div class="footer">
-              <p>Thank you for being part of our community.</p>
-            </div>
-          </div>
-        </body>
-      </html>
-    `;
-    await sendEmail(order.email, emailSubject, emailHtml);
+    //         </div>
+    //         <div class="footer">
+    //           <p>Thank you for being part of our community.</p>
+    //         </div>
+    //       </div>
+    //     </body>
+    //   </html>
+    // `;
+    // await sendEmail(order.email, emailSubject, emailHtml);
     await CLubOrder.findByIdAndDelete(orderId);
     // Send response
     res.status(200).json({
@@ -314,43 +314,43 @@ exports.refuseOrder = async (req, res, next) => {
       return res.status(404).json({ message: "Order not found" });
     }
 
-    // Optionally update order status instead of deleting
+    // // Optionally update order status instead of deleting
 
-    // Send refusal email
-    const emailSubject = "Your Club Application Has Been Refused";
-    const emailHtml = `
-      <html>
-        <head>
-          <style>
-            body { font-family: Arial, sans-serif; color: #333; }
-            .container { width: 80%; margin: 0 auto; padding: 20px; }
-            .header { background-color: #f8f9fa; padding: 10px; border-radius: 5px; }
-            .content { padding: 20px; }
-            .footer { margin-top: 20px; font-size: 0.9em; color: #777; }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <div class="header">
-              <h1>Club Application Status</h1>
-            </div>
-            <div class="content">
-              <p>Dear ${order.email},</p>
-              <p>We regret to inform you that your application to create the club "<strong>${
-                order.name
-              }</strong>" has been <strong>refused</strong>.</p>
-              <p>${message || "We are sorry to see you go!"}</p>
-            </div>
-            <div class="footer">
-              <p>Best regards,</p>
-              <p>The Club Management Team</p>
-            </div>
-          </div>
-        </body>
-      </html>
-    `;
+    // // Send refusal email
+    // const emailSubject = "Your Club Application Has Been Refused";
+    // const emailHtml = `
+    //   <html>
+    //     <head>
+    //       <style>
+    //         body { font-family: Arial, sans-serif; color: #333; }
+    //         .container { width: 80%; margin: 0 auto; padding: 20px; }
+    //         .header { background-color: #f8f9fa; padding: 10px; border-radius: 5px; }
+    //         .content { padding: 20px; }
+    //         .footer { margin-top: 20px; font-size: 0.9em; color: #777; }
+    //       </style>
+    //     </head>
+    //     <body>
+    //       <div class="container">
+    //         <div class="header">
+    //           <h1>Club Application Status</h1>
+    //         </div>
+    //         <div class="content">
+    //           <p>Dear ${order.email},</p>
+    //           <p>We regret to inform you that your application to create the club "<strong>${
+    //             order.name
+    //           }</strong>" has been <strong>refused</strong>.</p>
+    //           <p>${message || "We are sorry to see you go!"}</p>
+    //         </div>
+    //         <div class="footer">
+    //           <p>Best regards,</p>
+    //           <p>The Club Management Team</p>
+    //         </div>
+    //       </div>
+    //     </body>
+    //   </html>
+    // `;
 
-    await sendEmail(order.email, emailSubject, emailHtml);
+    // await sendEmail(order.email, emailSubject, emailHtml);
     // delete order
     await CLubOrder.findByIdAndDelete(orderId);
     // Send response

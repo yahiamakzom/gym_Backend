@@ -6,12 +6,12 @@ module.exports = mongoose.model(
     {
       email: {
         type: String,
-        required: [true, "Please Enter Your Email Address "],
+
       },
       password: {
         type: String,
-        min: 6,
-        required: [true, "Please Enter Your Password With Minmum length 6"],
+
+      
       },
       type: {
         type: String,
