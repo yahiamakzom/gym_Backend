@@ -13,7 +13,97 @@ const {
   RegisterValidator,
 } = require("../utils/validators/auth");
 
-router.post("/login", LoginValidator, Login);
+router.post("/login", LoginValidator, Login); 
+
+/**
+ * @swagger
+ * /auth/register:
+ *   post:
+ *     summary: Register a new user
+ *     description: Register a new user by providing user details such as email, username, phone, password, and other optional information like location and gender. It also returns a JWT token upon successful registration.
+ *     tags:
+ *       - User
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - username
+ *               - phone
+ *               - password
+ *               - email
+ *               - role
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 example: johndoe
+ *               phone:
+ *                 type: string
+ *                 example: "1234567890"
+ *               password:
+ *                 type: string
+ *                 example: StrongPassword123
+ *               role:
+ *                 type: string
+ *                 example: user
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: johndoe@example.com
+ *               gender:
+ *                 type: string
+ *                 enum: [male, female, other]
+ *                 example: male
+ *               home_location:
+ *                 type: string
+ *                 example: 123 Main St, Springfield
+ *               lat:
+ *                 type: number
+ *                 example: 37.7749
+ *               long:
+ *                 type: number
+ *                 example: -122.4194
+ *     responses:
+ *       201:
+ *         description: User successfully registered
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       example: 61234abcde56789fghij1234
+ *                     email:
+ *                       type: string
+ *                       example: johndoe@example.com
+ *                     username:
+ *                       type: string
+ *                       example: johndoe
+ *                     token:
+ *                       type: string
+ *                       example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+ *       409:
+ *         description: Email or phone already exists
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Email Or Phone Already Exists
+ *       400:
+ *         description: Bad Request - Invalid or missing fields
+ *       500:
+ *         description: Internal Server Error
+ */
+
 router.post("/register", RegisterValidator, Register);
 // router.post("/club-login", ClubLogin);
 // router.post("/club-member", ClubMemberLogin);

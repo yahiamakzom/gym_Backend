@@ -32,6 +32,7 @@ const {
   DeterminePackageCommission,
   getPackagesCommission,
   updateAppBanner,
+  getAllUser,
 } = require("../controllers/owner");
 
 /**
@@ -1721,5 +1722,64 @@ router.post(
   "/update-app-banners",
   upload.fields([{ name: "bannersImages" }, { name: "logo" }]),
   updateAppBanner
-);
+); 
+
+/**
+ * @swagger
+ * /owner/get-users:
+ *   get:
+ *     summary: Get all users
+ *     description: Retrieve a list of all registered users. The password field will be removed from the response.
+ *     tags:
+ *       - Owner
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved list of users
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       _id:
+ *                         type: string
+ *                         example: 61234abcde56789fghij1234
+ *                       username:
+ *                         type: string
+ *                         example: johndoe
+ *                       email:
+ *                         type: string
+ *                         format: email
+ *                         example: johndoe@example.com
+ *                       phone:
+ *                         type: string
+ *                         example: "1234567890"
+ *                       role:
+ *                         type: string
+ *                         example: user
+ *                       gender:
+ *                         type: string
+ *                         example: male
+ *                       home_location:
+ *                         type: string
+ *                         example: 123 Main St, Springfield
+ *                       lat:
+ *                         type: number
+ *                         example: 37.7749
+ *                       long:
+ *                         type: number
+ *                         example: -122.4194
+ *       500:
+ *         description: Internal Server Error
+ */
+
+
+router.get("/get-users"  , getAllUser);
 module.exports = router;

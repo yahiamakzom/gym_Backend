@@ -278,7 +278,7 @@ exports.acceptOrder = async (req, res, next) => {
     //           <p>${
     //             message || "We look forward to your successful journey with us!"
     //           }</p>
-        
+
     //         </div>
     //         <div class="footer">
     //           <p>Thank you for being part of our community.</p>
@@ -776,8 +776,7 @@ exports.DeterminePackageCommission = asyncHandler(async (req, res) => {
       return res.status(400).json({ message: "Invalid type" });
     }
   }
-  appSetting.yogaTypes = yogaTypes || []
-  ;
+  appSetting.yogaTypes = yogaTypes || [];
   await appSetting.save();
 
   res.status(200).json({
@@ -875,5 +874,20 @@ exports.updateAppBanner = asyncHandler(async (req, res) => {
       appLogo: appSetting.appLogo,
       appName: appSetting.appName,
     },
+  });
+});
+
+exports.getAllUser = asyncHandler(async (req, res) => {
+  const users = await User.find({});
+  for (const user of users) {
+    user.password = undefined;
+    if (user.role === "admin") {
+      users.splice(users.indexOf(user), 1);
+    }
+
+  }
+  res.status(200).json({
+    success: true,
+    data: users,
   });
 });
