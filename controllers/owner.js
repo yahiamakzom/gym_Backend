@@ -881,7 +881,7 @@ exports.getAllUser = asyncHandler(async (req, res) => {
   const users = await User.find({});
   for (const user of users) {
     user.password = undefined;
-    if (user.role === "admin") {
+    if (user.role === "admin" || user.role =='club' || user.role == 'clubManger') {
       users.splice(users.indexOf(user), 1);
     }
 

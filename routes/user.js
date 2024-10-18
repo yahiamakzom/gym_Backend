@@ -78,7 +78,56 @@ router.get("/fav", verifyToken, getUserFav);
 router.get("/profile", verifyToken, getprofile);
 router.post("/freeze", verifyToken, userFreezing);
 router.post("/unfreeze", verifyToken, userUnfreeze);
-router.delete("/delet-user", verifyToken, deleteUser);
+/**
+ * @swagger
+ * user/delete-user/{userId}:
+ *   delete:
+ *     summary: Delete a user
+ *     description: Deletes a user by ID along with their associated subscriptions and favorites. Returns a success message upon successful deletion.
+ *     tags:
+ *       - User
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: The ID of the user to delete.
+ *         schema:
+ *           type: string
+ *           example: 61234abcde56789fghij1234
+ *     responses:
+ *       200:
+ *         description: User and associated data deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: User and associated data deleted successfully
+ *       404:
+ *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: User not found
+ *       500:
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Internal server error
+ */
+
+router.delete("/delete-user/:userId", deleteUser);
 router.patch(
   "/profile",
   [verifyToken, imgUploader.fields([{ name: "photo", maxCount: 1 }])],

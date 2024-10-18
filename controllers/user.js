@@ -2045,7 +2045,7 @@ exports.filterClubsBySubscriptionType = asyncHandler(async (req, res, next) => {
 // DELETE route to delete user along with their subscriptions and favorites
 exports.deleteUser = asyncHandler(async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.params.userId;
 
     // Delete user's subscriptions
     await userSub.deleteMany({ user: userId });
