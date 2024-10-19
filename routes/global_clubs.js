@@ -15,6 +15,7 @@ const {
   createTransferOrder,
   isCodeValid,
   createCompliant,
+  updateDiscount,
 } = require("../controllers/club");
 const {
   createWeightFitnessPackage,
@@ -458,7 +459,7 @@ router.get("/get-discounts/:id", getAllDiscounts);
 
 /**
  * @swagger
- * /club/delete-discount/{id}:
+ * /clubs/delete-discount/{id}:
  *   delete:
  *     summary: Delete a discount code
  *     description: Deletes a discount code from the database by its ID.
@@ -514,7 +515,101 @@ router.get("/get-discounts/:id", getAllDiscounts);
  */
 
 router.delete("/delete-discount/:id", deleteDiscount);
+/**
+ * @swagger
+ * /clubs/update-discount/{id}:
+ *   put:
+ *     summary: Update a global discount code
+ *     description: Updates an existing global discount code by ID. You can update the code, discount percentage, valid from, and valid to dates. Only fields provided in the request body will be updated.
+ *     tags:
+ *       - Club
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: The ID of the discount code to update.
+ *         schema:
+ *           type: string
+ *           example: "60c72b2f9b7f4a5f3c8b4567"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               code:
+ *                 type: string
+ *                 description: The discount code.
+ *                 example: "SAVE10"
+ *               discountPercentage:
+ *                 type: number
+ *                 description: The percentage discount offered by the code.
+ *                 example: 10
+ *               validFrom:
+ *                 type: string
+ *                 format: date-time
+ *                 description: The start date from when the discount is valid.
+ *                 example: "2024-10-01T00:00:00Z"
+ *               validTo:
+ *                 type: string
+ *                 format: date-time
+ *                 description: The end date until when the discount is valid.
+ *                 example: "2024-12-31T23:59:59Z"
+ *     responses:
+ *       200:
+ *         description: Successfully updated the discount code.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                       example: "60c72b2f9b7f4a5f3c8b4567"
+ *                     code:
+ *                       type: string
+ *                       example: "SAVE10"
+ *                     discountPercentage:
+ *                       type: number
+ *                       example: 10
+ *                     validFrom:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2024-10-01T00:00:00Z"
+ *                     validTo:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2024-12-31T23:59:59Z"
+ *       404:
+ *         description: Discount code not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Global discount code not found"
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
+ */
 
+router.put("/update-discount/:id", updateDiscount);
 /**
  * @swagger
  * /clubs/add-bankAccount:

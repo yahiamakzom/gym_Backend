@@ -858,6 +858,27 @@ exports.addBankAccount = asyncHandler(async (req, res) => {
     message: "Bank account added successfully",
     data: newBankAccount,
   });
+}); 
+exports.updateDiscount = asyncHandler(async (req, res) => {
+  const { code, discountPercentage, validFrom, validTo } = req.body;
+
+  let discountCode = await DiscountCode.findOne({
+    _id: req.params.id,
+
+  });
+  if (!discountCode) {
+    return res.status(404).json({ message: "Global discount code not found" });
+  }
+
+  // Update fields only if they are provided in the request
+  discountCode.code = code || discountCode.code;
+  discountCode.discountPercentage =
+    discountPercentage || discountCode.discountPercentage;
+  discountCode.validFrom = validFrom || discountCode.validFrom;
+  discountCode.validTo = validTo || discountCode.validTo;
+
+  await discountCode.save();
+  res.status(200).json({ success: true, data: discountCode });
 });
 
 exports.getBankAccountById = asyncHandler(async (req, res) => {
