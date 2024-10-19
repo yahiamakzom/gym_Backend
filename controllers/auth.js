@@ -16,7 +16,10 @@ exports.Register = asyncHandler(async (req, res, next) => {
     home_location,
     email,
     gender,
+    weight,
+    height,
     lat,
+    age,
     long,
   } = req.body;
 
@@ -41,12 +44,17 @@ exports.Register = asyncHandler(async (req, res, next) => {
     password: hashedPassword,
     home_location,
     code,
+    age,
     gender,
     wallet: 0,
   };
 
   // Update lat and long if provided in the request body
   if (lat !== undefined && long !== undefined) {
+    userObject.weight = weight;
+    userObject.height = height;
+  }
+  if (height !== undefined && weight !== undefined) {
     userObject.lat = lat;
     userObject.long = long;
   }
@@ -59,7 +67,7 @@ exports.Register = asyncHandler(async (req, res, next) => {
   newUser.token = token;
 
   res.status(201).json({ user: newUser });
-}); 
+});
 
 exports.Login = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body;

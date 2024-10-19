@@ -20,7 +20,7 @@ router.post("/login", LoginValidator, Login);
  * /auth/register:
  *   post:
  *     summary: Register a new user
- *     description: Register a new user by providing user details such as email, username, phone, password, and other optional information like location and gender. It also returns a JWT token upon successful registration.
+ *     description: Creates a new user with the provided email, phone, username, role, and optional details such as gender, weight, height, latitude, and longitude.
  *     tags:
  *       - User
  *     requestBody:
@@ -29,45 +29,58 @@ router.post("/login", LoginValidator, Login);
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - username
- *               - phone
- *               - password
- *               - email
- *               - role
  *             properties:
  *               username:
  *                 type: string
- *                 example: johndoe
+ *                 description: The username of the user.
+ *                 example: "john_doe"
  *               phone:
  *                 type: string
- *                 example: "1234567890"
+ *                 description: The phone number of the user.
+ *                 example: "+1234567890"
  *               password:
  *                 type: string
- *                 example: StrongPassword123
+ *                 description: The password of the user.
+ *                 example: "strongPassword123!"
  *               role:
  *                 type: string
- *                 example: user
- *               email:
- *                 type: string
- *                 format: email
- *                 example: johndoe@example.com
- *               gender:
- *                 type: string
- *                 enum: [male, female, other]
- *                 example: male
+ *                 description: The role of the user.
+ *                 example: "client"
  *               home_location:
  *                 type: string
- *                 example: 123 Main St, Springfield
+ *                 description: The home location of the user.
+ *                 example: "123 Main St"
+ *               email:
+ *                 type: string
+ *                 description: The email of the user.
+ *                 example: "user@example.com"
+ *               gender:
+ *                 type: string
+ *                 description: The gender of the user.
+ *                 example: "male"
+ *               weight:
+ *                 type: number
+ *                 description: The weight of the user in kilograms.
+ *                 example: 70
+ *               age:
+ *                 type: number
+ *                 description: The age of the user in years.
+ *                 example: 25 
+ *               height:
+ *                 type: number
+ *                 description: The height of the user in centimeters.
+ *                 example: 175
  *               lat:
  *                 type: number
- *                 example: 37.7749
+ *                 description: The latitude of the user's location.
+ *                 example: 40.7128
  *               long:
  *                 type: number
- *                 example: -122.4194
+ *                 description: The longitude of the user's location.
+ *                 example: -74.0060
  *     responses:
  *       201:
- *         description: User successfully registered
+ *         description: User created successfully.
  *         content:
  *           application/json:
  *             schema:
@@ -75,34 +88,49 @@ router.post("/login", LoginValidator, Login);
  *               properties:
  *                 user:
  *                   type: object
+ *                   description: The newly created user object.
  *                   properties:
  *                     id:
  *                       type: string
- *                       example: 61234abcde56789fghij1234
+ *                       example: "61234abcde56789fghij1234"
  *                     email:
  *                       type: string
- *                       example: johndoe@example.com
+ *                       example: "user@example.com"
  *                     username:
  *                       type: string
- *                       example: johndoe
+ *                       example: "john_doe"
+ *                     phone:
+ *                       type: string
+ *                       example: "+1234567890"
+ *                     role:
+ *                       type: string
+ *                       example: "user"
  *                     token:
  *                       type: string
- *                       example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+ *                       description: JWT token for the user.
+ *                       example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
  *       409:
- *         description: Email or phone already exists
+ *         description: Email or phone already exists.
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 error:
+ *                 message:
  *                   type: string
- *                   example: Email Or Phone Already Exists
- *       400:
- *         description: Bad Request - Invalid or missing fields
+ *                   example: "Email Or Phone Already Exists"
  *       500:
- *         description: Internal Server Error
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
  */
+
 
 router.post("/register", RegisterValidator, Register);
 // router.post("/club-login", ClubLogin);

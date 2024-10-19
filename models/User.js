@@ -18,7 +18,7 @@ module.exports = mongoose.model(
     role: {
       type: String,
       default: "client",
-      enum: ["admin", "club", "client" ,"clubManger"],
+      enum: ["admin", "club", "client", "clubManger"],
     },
 
     code: Number,
@@ -29,6 +29,9 @@ module.exports = mongoose.model(
     otp: {
       type: Number,
     },
+    height: Number,
+    weight: Number,
+    age: Number,
 
     wallet: Number,
     token: String,
