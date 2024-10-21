@@ -380,33 +380,35 @@ exports.acceptTransfer = asyncHandler(async (req, res, next) => {
   }
 
   if (!req.file) {
-    return res.status(400).json({ message: "Please provide a PDF" });
+    return res.status(400).json({ message: "Please provide a PDF file" });
   }
-  console.log(req.file);
 
   try {
     // Upload PDF to Cloudinary
-    const result = await cloudinary.uploader.upload(req.file.path, {
-      resource_type: "auto",
-    });
+    const pdfBuffer = req.file.buffer;
+    const result = await uploadToCloudinary(pdfBuffer, "pdf");
 
-    // Create new transfer
+    if (!result) {
+      return res.status(500).json({ message: "Failed to upload PDF" });
+    }
+
+    // Create new transfer with the uploaded PDF URL
     const transfer = await Transfers.create({
       amount,
-      pdf: result.secure_url,
+      pdf: result, // Secure URL from Cloudinary
       status: "accepted",
       club: transferOrder.club,
     });
 
-    await TransferOrder.findByIdAndDelete(req.params.id); // Remove original transfer order
+    // Delete the original transfer order
+    await TransferOrder.findByIdAndDelete(req.params.id);
 
     res.json({ success: true, data: transfer });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error processing transfer", error: error.message });
+    res.status(500).json({ message: "Error processing transfer", error: error.message });
   }
 });
+
 
 exports.refuseTransfer = asyncHandler(async (req, res, next) => {
   const transferOrderId = req.params.id;
@@ -881,10 +883,13 @@ exports.getAllUser = asyncHandler(async (req, res) => {
   const users = await User.find({});
   for (const user of users) {
     user.password = undefined;
-    if (user.role === "admin" || user.role =='club' || user.role == 'clubManger') {
+    if (
+      user.role === "admin" ||
+      user.role == "club" ||
+      user.role == "clubManger"
+    ) {
       users.splice(users.indexOf(user), 1);
     }
-
   }
   res.status(200).json({
     success: true,

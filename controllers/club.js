@@ -13,6 +13,7 @@ const DiscountCode = require("../models/DiscountCode");
 const CLubOrder = require("../models/ClubOrder");
 const ClubHours = require("../models/clubHours");
 const TransferOrder = require("../models/TransferOrder");
+const Transfer = require("../models/Transafers");
 const Support = require("../models/support");
 
 cloudinary.config({
@@ -1105,4 +1106,27 @@ exports.createCompliant = async (req, res) => {
       .json({ message: "Server error", error: error.message });
   }
 };
+
+
+exports.getTransfersByClub = asyncHandler(async (req, res) => {
+  const { clubId } = req.params;
+
+  try {
+    // Find all transfers related to the specific club
+    const transfers = await Transfer.find({ club: clubId });
+
+
+
+    res.status(200).json({
+      success: true,
+      data: transfers,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error retrieving transfers.',
+      error: error.message,
+    });
+  }
+});
 exports.clubReports;

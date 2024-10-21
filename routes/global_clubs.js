@@ -15,6 +15,7 @@ const {
   createTransferOrder,
   isCodeValid,
   createCompliant,
+  getTransfersByClub,
   updateDiscount,
 } = require("../controllers/club");
 const {
@@ -2575,5 +2576,97 @@ router.delete("/delete-another-package/:id", deletePackage);
  *         description: Server error
  */
 
-router.post("/create-another-package", createAnotherPackage);
+router.post("/create-another-package", createAnotherPackage); 
+
+
+
+
+/**
+ * @swagger
+ * clubs/club-transfers/{clubId}:
+ *   get:
+ *     summary: Get all transfers for a specific club
+ *     description: Retrieves all transfers related to a specific club by the club ID.
+ *     tags:
+ *       - Club
+ *     parameters:
+ *       - in: path
+ *         name: clubId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The ID of the club
+ *     responses:
+ *       200:
+ *         description: A list of transfers for the specified club.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       _id:
+ *                         type: string
+ *                         example: "60b5b8c1a6d17c12345c9f73"
+ *                       amount:
+ *                         type: number
+ *                         example: 1000
+ *                       pdf:
+ *                         type: string
+ *                         example: "http://example.com/transfer.pdf"
+ *                       refusedReason:
+ *                         type: string
+ *                         example: "Insufficient funds"
+ *                       status:
+ *                         type: string
+ *                         example: "accepted"
+ *                       club:
+ *                         type: string
+ *                         example: "60b5b8c1a6d17c12345c9f74"
+ *                       createdAt:
+ *                         type: string
+ *                         example: "2021-06-01T12:00:00.000Z"
+ *                       updatedAt:
+ *                         type: string
+ *                         example: "2021-06-01T12:00:00.000Z"
+ *       404:
+ *         description: No transfers found for the specified club.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "No transfers found for the specified club."
+ *       500:
+ *         description: Error retrieving transfers.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Error retrieving transfers."
+ *                 error:
+ *                   type: string
+ *                   example: "Server error message"
+ */ 
+
+router.get("/club-transfers/:clubId", getTransfersByClub);
+
 module.exports = router;

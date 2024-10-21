@@ -742,11 +742,7 @@ router.get("/transfers", getAllTransfers);
  *                   example: "Error processing transfer"
  */
 
-router.post(
-  "/accept-transfer-order/:id",
-  imgUploader.single("pdf"),
-  acceptTransfer
-);
+router.post("/accept-transfer-order/:id", upload.single("pdf"), acceptTransfer);
 
 /**
  * @swagger
@@ -1722,7 +1718,7 @@ router.post(
   "/update-app-banners",
   upload.fields([{ name: "bannersImages" }, { name: "logo" }]),
   updateAppBanner
-); 
+);
 
 /**
  * @swagger
@@ -1780,6 +1776,5 @@ router.post(
  *         description: Internal Server Error
  */
 
-
-router.get("/get-users"  , getAllUser);
+router.get("/get-users", getAllUser);
 module.exports = router;
