@@ -893,3 +893,35 @@ exports.getAllUser = asyncHandler(async (req, res) => {
     data: users,
   });
 });
+
+
+exports.stopAppTemporarily = asyncHandler(async (req, res, next) => {
+  const { start, end, isTemporarilyStopped } = req.body;
+
+  // Fetch the app settings
+  const appSetting = await AppSetting.findOne({});
+  if (!appSetting) {
+    return next(new ApiError("App settings not found", 404));
+  }
+
+  // If start and end dates are provided and valid
+  if (start && end && new Date(start) <= new Date(end)) {
+    appSetting.stopSchedule.start = new Date(start);
+    appSetting.stopSchedule.end = new Date(end);
+    appSetting.isTemporarilyStopped = false;
+    appSetting.isActive = false; // Mark the app as inactive
+  } else {
+    // If no valid dates are provided, just set the app to temporarily stopped
+    appSetting.isTemporarilyStopped = true;
+    appSetting.isActive = false; // Mark the app as inactive
+  }
+
+  // Save the updated app settings
+  await appSetting.save();
+
+  res.status(200).json({
+    success: true,
+    message: "App status updated",
+    data: appSetting,
+  });
+});

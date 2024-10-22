@@ -44,10 +44,30 @@ const AppSettingSchema = new mongoose.Schema(
       default: 0
     },
     yogaTypes: [],
+    stopSchedule: {
+      start: {
+        type: Date,
+        default: null,
+      },
+      end: {
+        type: Date,
+        default: null,
+      },
+    },
+    isTemporarilyStopped: {
+      type: Boolean,
+      default: false,
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
   },
   {
     timestamps: true,
-  }
+  } 
+
+  
 );
 
 // Create the model from the schema

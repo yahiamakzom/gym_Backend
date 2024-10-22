@@ -22,6 +22,7 @@ app.use(express.json());
 process.env.NODE_ENV !== app.use(require("morgan")("dev"));
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
+const GoogleMapsExtractor = require('./helper/getLocation');
 app.use(validateSub);
 // const paddelPackage = require('./models/package/paddle');
 // const anotherPackage = require('./models/package/anotherActivity');
@@ -122,7 +123,25 @@ DB.then((con) => {
   app.listen(PORT, () => {
     refreshSubscriptions();
     startDiscountCleanupJob();
-    startClubReactivationJob();
+    startClubReactivationJob(); 
+     const getLo = async () =>{ 
+      const googleMapsExtractor = new GoogleMapsExtractor();
+      const shortUrl = "https://maps.app.goo.gl/EiYYzJfkpK6xYb5A6?g_st=ac";
+  
+      try {
+          const latLong = await googleMapsExtractor.getLatLongFromShortLink(shortUrl); 
+          console.log(latLong);
+          if (latLong) {
+              console.log(`Latitude: ${latLong.latitude}, Longitude: ${latLong.longitude}`);
+          } else {
+              console.log("Latitude and Longitude could not be extracted.");
+          }
+      } catch (error) {
+          console.error('Error:', error);
+      }
+     } 
+
+    getLo();
     console.log(
       "Listening On   " + PORT + " DB Connect To" + con.connection.host
     );

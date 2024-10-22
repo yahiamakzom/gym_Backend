@@ -33,6 +33,7 @@ const {
   getPackagesCommission,
   updateAppBanner,
   getAllUser,
+  stopAppTemporarily
 } = require("../controllers/owner");
 
 /**
@@ -1776,5 +1777,97 @@ router.post(
  *         description: Internal Server Error
  */
 
-router.get("/get-users", getAllUser);
+router.get("/get-users", getAllUser); 
+
+
+/**
+ * @swagger
+ * /owner/stop-app:
+ *   post:
+ *     summary: Temporarily stop the app or schedule a stop period
+ *     description: This endpoint allows the admin to temporarily stop the app, either immediately or by scheduling a stop period.
+ *     tags:
+ *       - Owner
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               start:
+ *                 type: string
+ *                 format: date-time
+ *                 description: The start date of the stop schedule (optional).
+ *               end:
+ *                 type: string
+ *                 format: date-time
+ *                 description: The end date of the stop schedule (optional).
+ *               isTemporarilyStopped:
+ *                 type: boolean
+ *                 description: Whether to temporarily stop the app immediately.
+ *     responses:
+ *       200:
+ *         description: App status updated successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "App status updated"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     isTemporarilyStopped:
+ *                       type: boolean
+ *                       example: true
+ *                     stopSchedule:
+ *                       type: object
+ *                       properties:
+ *                         start:
+ *                           type: string
+ *                           format: date-time
+ *                           example: "2024-10-10T00:00:00.000Z"
+ *                         end:
+ *                           type: string
+ *                           format: date-time
+ *                           example: "2024-10-15T00:00:00.000Z"
+ *       400:
+ *         description: Invalid dates or data provided.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Invalid request data."
+ *       404:
+ *         description: App settings not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "App settings not found."
+ *       500:
+ *         description: Server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Server error."
+ */
+
+router.post("/stop-app", stopAppTemporarily);
 module.exports = router;
