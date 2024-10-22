@@ -64,7 +64,7 @@ exports.addClub = asyncHandler(async (req, res, next) => {
   const logoBuffer = req.files.logo[0].buffer;
   const logo = logoBuffer ? await uploadToCloudinary(logoBuffer) : null;
 
-  const existingUser = await User.findOne({ email });
+  const existingUser = await ClubUser.findOne({ email });
   if (existingUser)
     return next(new ApiError("User With This Email Already Exists", 409));
 
@@ -86,18 +86,14 @@ exports.addClub = asyncHandler(async (req, res, next) => {
   });
 
   let hashedPassword = await bcrypt.hash(password, 10);
-  if (ClubAdd) {
-    const user = await User.findOne({ club: ClubAdd });
-    hashedPassword = user.password;
-  }
 
-  await User.create({
+  await ClubUser.create({
     email,
     password: hashedPassword,
-    role: "club",
+
     club: club.id,
-    home_location: place_name,
-    username: name,
+
+    name,
   });
 
   res.status(201).json({ club });
@@ -405,10 +401,11 @@ exports.acceptTransfer = asyncHandler(async (req, res, next) => {
 
     res.json({ success: true, data: transfer });
   } catch (error) {
-    res.status(500).json({ message: "Error processing transfer", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error processing transfer", error: error.message });
   }
 });
-
 
 exports.refuseTransfer = asyncHandler(async (req, res, next) => {
   const transferOrderId = req.params.id;
