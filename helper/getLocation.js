@@ -29,12 +29,12 @@ class GoogleMapsExtractor {
 
       
 
-        return  { lat: match[1], long: match[2] } ; // Return null if no match is found
+        return match; // Return null if no match is found
     }
 
     async getLatLongFromShortLink(shortUrl) {
         const fullUrl = await this.getFullUrlFromShortLink(shortUrl); 
-        console.log('url' , fullUrl)
+
         return this.extractLatLongFromUrl(fullUrl);
     }
 } 

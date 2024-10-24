@@ -10,9 +10,6 @@ module.exports = mongoose.model("Fav", new mongoose.Schema({
         ref:"Club"
     },
     club_name:String,
-    price: {
-        type: String,
-        trim: true
-    },
+
     club_logo: String,
 }))

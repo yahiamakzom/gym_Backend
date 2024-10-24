@@ -26,6 +26,10 @@ const { body, validationResult } = require("express-validator");
 const { log } = require("console");
 const Activities = require("../models/Activities.js");
 const cloudinary = require("cloudinary").v2;
+const weightFitnessSchema = require("../models/package/weightFitness");
+const anotherActivityPackage = require("../models/package/anotherActivity");
+const PaddlePackage = require("../models/package/paddle");
+const YogaPackage = require("../models/package/yoga");
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.CLOUD_API_KEY,
@@ -69,43 +73,37 @@ exports.makeReport = asyncHandler(
 );
 
 exports.getClubs = asyncHandler(async (req, res, next) => {
-  const { lat, long, clubId } = req.body;
-  const clubsAddByAdmin = [];
-  let clubs;
-  if (clubId) {
-    const clubAdmin = await Club.findById(clubId);
-
-    if (!clubAdmin) return next(new ApiError("Can't find clubAdmin", 404));
-
-    let allClubs = await Club.find({});
-
-    allClubs.forEach((club) => {
-      if (club.ClubAdd == clubAdmin._id) {
-        clubsAddByAdmin.push(club);
-      }
-    });
-
-    clubs = [...clubsAddByAdmin];
-  } else {
-    clubs = await Club.find({});
-  }
+  const { lat, long } = req.body;
 
   // Retrieve all clubs
+  let clubs = await Club.find({});
 
-  // Retrieve subscription prices for type "يومي" for all clubs
-  const subscriptionPrices = await Promise.all(
+  // Filter clubs that have daily packages in either `weightFitnessSchema` or `anotherActivityPackage`
+  const clubsWithDailyPackagesSet = new Set(); // Using a Set to ensure unique clubs
+
+  await Promise.all(
     clubs.map(async (club) => {
-      const dailySubscription = await Subscriptions.findOne({
+      // Check if this club has any daily package in either schema
+      const hasDailyWeightFitness = await weightFitnessSchema.exists({
         club: club._id,
-        type: "يومي", // Filter by subscription type
+        packageType: "daily",
       });
-      const price = dailySubscription ? dailySubscription.price : null;
-      return { clubId: club._id, price };
+
+      const hasDailyAnotherActivity = await anotherActivityPackage.exists({
+        club: club._id,
+        packageType: "daily",
+      });
+
+      // If the club has daily packages, add it to the Set
+      if (hasDailyWeightFitness || hasDailyAnotherActivity) {
+        clubsWithDailyPackagesSet.add(club);
+      }
     })
   );
 
+  // Organize clubs by country and city
   const countries = {};
-  for (const club of clubs) {
+  for (const club of clubsWithDailyPackagesSet) {
     if (countries[club.country]) {
       countries[club.country].push(club.city);
     } else {
@@ -113,195 +111,36 @@ exports.getClubs = asyncHandler(async (req, res, next) => {
     }
   }
 
+  // If lat and long are provided, calculate distances for each club
   if (lat && long) {
     const clubsWithDistance = [];
-    for (const [index, club] of clubs.entries()) {
+    for (const [index, club] of Array.from(
+      clubsWithDailyPackagesSet
+    ).entries()) {
       const distance = await calcDistance(
         `${club.lat},${club.long}`,
         `${lat},${long}`
       );
       if (!distance) return next(new ApiError("Invalid distance", 400));
+
       clubsWithDistance.push({
         ...club.toObject(),
-        distance: distance && distance,
-        subscriptionPrice: subscriptionPrices[index].price,
+        distance: distance,
       });
     }
 
+    // Return clubs with distance and filtered countries
     res.json({ Clubs: clubsWithDistance, countries });
   } else {
-    const clubsWithPrices = clubs.map((club, index) => ({
-      ...club.toObject(),
-      subscriptionPrice: subscriptionPrices[index].price,
-    }));
-    res.json({ Clubs: clubsWithPrices, countries });
-  }
-});
-exports.getClubsByGet = asyncHandler(async (req, res, next) => {
-  const { lat, long, clubId } = req.body;
-  const clubsAddByAdmin = [];
-  let clubs;
-  if (clubId) {
-    const clubAdmin = await Club.findById(clubId);
-
-    if (!clubAdmin) return next(new ApiError("Can't find clubAdmin", 404));
-
-    let allClubs = await Club.find({});
-
-    allClubs.forEach((club) => {
-      if (club.ClubAdd == clubAdmin._id) {
-        clubsAddByAdmin.push(club);
-      }
-    });
-
-    clubs = [...clubsAddByAdmin];
-  } else {
-    clubs = await Club.find({});
-  }
-
-  // Retrieve all clubs
-
-  // Retrieve subscription prices for type "يومي" for all clubs
-  const subscriptionPrices = await Promise.all(
-    clubs.map(async (club) => {
-      const dailySubscription = await Subscriptions.findOne({
-        club: club._id,
-        type: "يومي", // Filter by subscription type
-      });
-      const price = dailySubscription ? dailySubscription.price : null;
-      return { clubId: club._id, price };
-    })
-  );
-
-  const countries = {};
-  for (const club of clubs) {
-    if (countries[club.country]) {
-      countries[club.country].push(club.city);
-    } else {
-      countries[club.country] = [club.city];
-    }
-  }
-
-  if (lat && long) {
-    const clubsWithDistance = [];
-    for (const [index, club] of clubs.entries()) {
-      const distance = await calcDistance(
-        `${club.lat},${club.long}`,
-        `${lat},${long}`
-      );
-      if (!distance) return next(new ApiError("Invalid distance", 400));
-      clubsWithDistance.push({
+    // Return clubs without distance, only prices and countries
+    const clubsWithPrices = Array.from(clubsWithDailyPackagesSet).map(
+      (club, index) => ({
         ...club.toObject(),
-        distance: distance && distance,
-        subscriptionPrice: subscriptionPrices[index].price,
-      });
-    }
-
-    res.json({ Clubs: clubsWithDistance, countries });
-  } else {
-    let clubsWithPrices = clubs.map((club, index) => ({
-      ...club.toObject(),
-      subscriptionPrice: subscriptionPrices[index].price,
-    }));
-    clubsWithPrices = clubsWithPrices.filter(
-      (club, index) => club.isWork === true
+      })
     );
     res.json({ Clubs: clubsWithPrices, countries });
   }
 });
-// exports.getClubs = asyncHandler(async (req, res, next) => {
-//   const { lat, long } = req.body;
-
-//   // Retrieve all clubs
-//   const clubs = await Club.find({});
-
-//   // Retrieve subscription prices for type "اليومي" for all clubs
-//   const subscriptionPrices = await Promise.all(
-//     clubs.map(async (club) => {
-//       const dailySubscription = await Subscriptions.findOne({
-//         club: club._id,
-//         type: "اليومي", // Filter by subscription type (اليومي)
-//       });
-//       const price = dailySubscription ? dailySubscription.price : null;
-//       return { clubId: club._id, price };
-//     })
-//   );
-
-//   // Create an object to store countries and their cities
-//   const countries = {};
-//   for (const club of clubs) {
-//     if (countries[club.country]) {
-//       countries[club.country].push(club.city);
-//     } else {
-//       countries[club.country] = [club.city];
-//     }
-//   }
-
-//   // Check if lat and long are provided for distance calculation
-//   if (lat && long) {
-//     // Calculate distance for each club
-//     const clubsWithDistance = [];
-//     for (const [index, club] of clubs.entries()) {
-//       const distance = await calcDistance(
-//         `${club.lat},${club.long}`,
-//         `${lat},${long}`
-//       );
-//       if (!distance) return next(new ApiError("Invalid distance", 400));
-//       clubsWithDistance.push({
-//         ...club.toObject(),
-//         distance: distance && distance,
-//         subscriptionPrice: subscriptionPrices[index].price,
-//       });
-//     }
-
-//     res.json({ Clubs: clubsWithDistance, countries });
-//   } else {
-//     // If lat and long are not provided, return clubs with subscription prices
-//     const clubsWithPrices = clubs.map((club, index) => ({
-//       ...club.toObject(),
-//       subscriptionPrice: subscriptionPrices[index].price,
-//     }));
-//     res.json({ Clubs: clubsWithPrices, countries });
-//   }
-// });
-
-// exports.getMinClubs=asyncHandler(async (req, res, next) => {
-//     try {
-//         const minSubscriptions = await Subscriptions.aggregate([
-//             {
-//               $match: { type: 'يومي' }
-//             },
-//             {
-//               $addFields: {
-//                 pricePerDay: { $divide: ['$price', '$numberType'] }
-//               }
-//             },
-//             {
-//               $sort: { pricePerDay: 1 }
-//             },
-//             {
-//               $lookup: {
-//                 from: 'clubs', // Replace 'clubs' with the actual collection name for clubs
-//                 localField: 'club',
-//                 foreignField: '_id',
-//                 as: 'club'
-//               }
-//             },
-//             {
-//               $unwind: '$club'
-//             }
-//           ]);
-
-//         if(minSubscriptions)
-//         return res.json(minSubscriptions);
-//         else
-//         return res.json([]);
-//       } catch (error) {
-//         // Handle error if needed
-//         console.error(error);
-//         throw new Error('Failed to get daily subscriptions.');
-//       }
-// });
 
 exports.getMinClubs = asyncHandler(async (req, res, next) => {
   try {
@@ -393,44 +232,54 @@ exports.getMinClubs = asyncHandler(async (req, res, next) => {
 
 exports.getClub = asyncHandler(async (req, res, next) => {
   const { lat, long } = req.body;
-  await Club.findById(req.params.club_id).then(async (club) => {
-    if (club.sports.length == 1 && club.sports[0].trim() === "يوغا") {
-      let filteredSubs = [];
-      arr = [];
 
-      await Subscriptions.find({ club: req.params.club_id }).then(
-        async (subscriptions) => {
-          filteredSubs = subscriptions.filter(
-            (sub) => sub.name !== "subPersonal"
-          );
-          if (lat && long) {
-            let distance = await calcDistance(
-              `${club.lat},${club.long}`,
-              `${lat},${long}`
-            );
-            if (!distance) return next(new ApiError("Invalid distance", 400));
+  // Find the club by ID
+  const club = await Club.findById(req.params.club_id);
+  if (!club) {
+    return next(new ApiError("Club not found", 404));
+  }
 
-            res.json({ club, distance, subscriptions: filteredSubs });
-          } else res.json({ club, subscriptions: filteredSubs });
-        }
-      );
-      console.log("ues");
-      console.log(arr);
-      return;
-    }
-    await Subscriptions.find({ club: req.params.club_id }).then(
-      async (subscriptions) => {
-        if (lat && long) {
-          let distance = await calcDistance(
-            `${club.lat},${club.long}`,
-            `${lat},${long}`
-          );
-          if (!distance) return next(new ApiError("Invalid distance", 400));
-          res.json({ club, distance, subscriptions });
-        } else res.json({ club, subscriptions });
-      }
-    );
+  // Find packages related to the club for the four types
+  const yogaPackages = await YogaPackage.find({ club: club._id });
+  const paddlePackages = await PaddlePackage.find({ club: club._id });
+  const weightFitnessPackages = await weightFitnessSchema.find({
+    club: club._id,
   });
+  const anotherActivityPackages = await anotherActivityPackage.find({
+    club: club._id,
+  });
+
+  // Calculate distance if lat and long are provided
+  if (lat && long) {
+    const distance = await calcDistance(
+      `${club.lat},${club.long}`,
+      `${lat},${long}`
+    );
+    if (!distance) return next(new ApiError("Invalid distance", 400));
+
+    // Respond with club details, distance, and packages
+    res.json({
+      club,
+      distance,
+      packages: {
+        yoga: yogaPackages,
+        paddle: paddlePackages,
+        weightFitness: weightFitnessPackages,
+        anotherActivity: anotherActivityPackages,
+      },
+    });
+  } else {
+    // Respond without distance
+    res.json({
+      club,
+      packages: {
+        yoga: yogaPackages,
+        paddle: paddlePackages,
+        weightFitness: weightFitnessPackages,
+        anotherActivity: anotherActivityPackages,
+      },
+    });
+  }
 });
 
 exports.getClubAuth = asyncHandler(async (req, res, next) => {
@@ -1237,12 +1086,11 @@ exports.evaluateClub = asyncHandler(async (req, res, next) => {
     // Update user's existing rating
     club.evaluation.evaluators[existingEvaluationIndex].rating = rating;
   } else {
-    // Add a new evaluation entry for the user
     club.evaluation.evaluators.push({ user: userId, rating });
   }
 
   // Recalculate the total rating and average rating
-  let totalRating = 0;
+  let totalRating = 0;   
   club.evaluation.evaluators.forEach((evaluator) => {
     totalRating += evaluator.rating;
   });
@@ -1254,7 +1102,7 @@ exports.evaluateClub = asyncHandler(async (req, res, next) => {
   await club.save();
 
   res.status(200).json({ success: true, data: club.evaluation });
-});
+}); 
 
 exports.getUserWallet = asyncHandler(async (req, res, next) => {
   const { id } = req.user;
@@ -1397,81 +1245,43 @@ exports.searchClubByName = asyncHandler(async (req, res, next) => {
     ],
   }).then((clubs) => res.json({ clubs }));
 });
+
 exports.searchClub = asyncHandler(async (req, res, next) => {
   const { search } = req.query; // User input for searching
-  const Clubs = await Club.find().or([
-    { name: { $regex: search, $options: "i" } },
-    { city: { $regex: search, $options: "i" } },
-    { location: { $regex: search, $options: "i" } },
-  ]);
-  const subscriptionPrices = await Promise.all(
-    Clubs.map(async (club) => {
-      const dailySubscription = await Subscriptions.findOne({
-        club: club._id,
-        type: "يومي", // Filter by subscription type
-      });
-      const price = dailySubscription ? dailySubscription.price : null;
-      return { clubId: club._id, price };
-    })
-  );
-  const clubsWithPrices = [];
-  for (const [index, club] of Clubs.entries()) {
-    Clubs[index] = {
-      ...Clubs[index].toObject(),
-      subscriptionPrice: subscriptionPrices[index].price,
-    };
-    // clubsWithPrices.push({
-    // ...club,
-    // subscriptionPrice: subscriptionPrices[index].price,
-    // });
+
+  if (!search) {
+    return next(new ApiError("Search query is required", 400)); // Handle missing search input
   }
-  res.json({ Clubs });
+
+  try {
+    // Search clubs by name, city, or location (case-insensitive)
+    const clubs = await Club.find().or([
+      { name: { $regex: search, $options: "i" } },
+      { city: { $regex: search, $options: "i" } },
+      { location: { $regex: search, $options: "i" } },
+    ]);
+
+    if (clubs.length === 0) {
+      return next(
+        new ApiError("No clubs found matching the search criteria", 404)
+      ); // Handle no matches found
+    }
+
+    res.json({ success: true, results: clubs.length, clubs }); // Return matched clubs
+  } catch (error) {
+    return next(new ApiError("Error occurred while searching for clubs", 500)); // Handle server error
+  }
 });
-// find clubs  by Activity
-// exports.getClubByActivity = asyncHandler(async (req, res, next) => {
-//   try {
-//     const filterCondition = req.body.filterCondition;
-//     console.log(filterCondition);
-//     const result = await Club.find({
-//       sports: { $elemMatch: { $eq: filterCondition } },
-//     });
-//     res.status(200).json({ result });
 
-//   } catch (e) {
-//     res.status(500).json({ message: e.message });
-//   }
-
-// });
 exports.getClubByActivity = asyncHandler(async (req, res, next) => {
   try {
     const filterCondition = req.body.filterCondition;
-    console.log(filterCondition);
 
-    // Query clubs based on the provided activity
     const clubs = await Club.find({
       sports: { $elemMatch: { $eq: filterCondition } },
     });
 
-    // Retrieve subscription prices for daily subscriptions for each club
-    const subscriptionPrices = await Promise.all(
-      clubs.map(async (club) => {
-        const dailySubscription = await Subscriptions.findOne({
-          club: club._id,
-          type: "يومي", // Filter by subscription type
-        });
-        const price = dailySubscription ? dailySubscription.price : null;
-        return { clubId: club._id, price };
-      })
-    );
-
-    // Combine club details with subscription prices in the response
-    let clubsWithPrices = clubs.map((club, index) => ({
-      ...club.toObject(),
-      subscriptionPrice: subscriptionPrices[index].price,
-    }));
-    clubsWithPrices = clubsWithPrices.filter((club) => club.isWork === true);
-
-    res.status(200).json({ result: clubsWithPrices });
+    res.status(200).json({ result: clubs });
   } catch (e) {
     res.status(500).json({ message: e.message });
   }
@@ -1637,19 +1447,13 @@ exports.getUserFav = asyncHandler(async (req, res, next) => {
         data.map(async (fav) => {
           // Extract relevant club data
           const clubData = fav.club_id;
-          const dailySubscription = await Subscriptions.findOne({
-            club: clubData._id,
-            type: "يومي", // Filter by subscription type
-          });
-          const subPrice = dailySubscription ? dailySubscription.price : 0;
-          console.log(subPrice);
+
           // Modify club data if needed
           // Example: clubData.someField = newValue;
 
           // Add the modified club data to the favorite object
           const modifiedFav = {
             ...fav.toObject(),
-            subscriptionPrice: subPrice,
           };
           return modifiedFav;
         })
@@ -1661,29 +1465,34 @@ exports.getUserFav = asyncHandler(async (req, res, next) => {
 exports.addOrRemoveFav = asyncHandler(async (req, res, next) => {
   const { club_id } = req.params;
   const { id } = req.user;
-  await Favorite.findOne({ club_id, user: id }).then(async (fav) => {
-    console.log(await Favorite.find({}));
-    if (fav)
-      await Favorite.findByIdAndDelete(fav.id).then(() => res.sendStatus(200));
-    else {
-      let price = 0;
-      const club = await Club.findById(club_id);
-      const subs = await Subscriptions.find({ club: club_id }).sort({
-        price: 1,
-      });
-      if (subs.length) {
-        price = subs[0].price;
+
+  try {
+    const favorite = await Favorite.findOne({ club_id, user: id });
+    
+    if (favorite) {
+      // If a favorite already exists, remove it
+      await Favorite.findByIdAndDelete(favorite.id);
+      return res.sendStatus(200); // Return 200 OK for successful removal
+    } else {
+      // If no favorite exists, add it
+      const club = await Club.findById(club_id); // Fetch club details for logo and name
+      if (!club) {
+        return res.status(404).json({ message: "Club not found" });
       }
+
       await Favorite.create({
         club_id,
         user: id,
         club_logo: club.logo,
         club_name: club.name,
-        price,
-      }).then(() => res.sendStatus(200));
+      });
+      return res.sendStatus(200); // Return 200 OK for successful addition
     }
-  });
+  } catch (error) {
+    next(error); // Handle errors centrally
+  }
 });
+
 exports.isFav = asyncHandler(async (req, res, next) => {
   const { club_id } = req.params;
   const { id } = req.user;
@@ -1809,19 +1618,6 @@ exports.getOpinnion = asyncHandler(async (req, res, next) => {
   const opinion = await Opinion.find({});
   return res.json(opinion);
 });
-
-// exports.walletDeposit = asyncHandler(async (req, res, next) => {
-//   const { amount } = req.body;
-//   const { id } = req.user;
-//   const userData = await User.findById(id);
-//   // check if user not found
-//   if (!userData) return next(new ApiError("User Not Found", 404));
-
-//   // we add the amount to the user wallet
-//   userData.wallet += Number(amount);
-//   await userData.save();
-//   res.sendStatus(200);
-// });
 
 exports.walletDeposit = asyncHandler(async (req, res, next) => {
   const { amount, brand } = req.body;
@@ -2155,236 +1951,236 @@ exports.forgetPassowrd = asyncHandler(async (req, res) => {
     .catch((err) => console.error(err));
 });
 
-exports.AddClubOrder = asyncHandler(async (req, res) => {
-  try {
-    const {
-      name,
-      email,
-      password,
-      lat,
-      long,
-      description,
-      gender,
-      from,
-      to,
-      allDay,
-      sports,
-      days,
-      mapUrl,
-    } = req.body;
-    console.log(lat, long);
-    let SportData = sports.split(",");
-    let Days = days.split(",");
-    if (!req.files.clubImg)
-      return next(new ApiError("Please Add Club Imgs", 409));
-    if (!req.files.logo) return next(new ApiError("Please Add Club logo", 409));
-    const place_name = await getLocationName(lat, long);
-    if (!place_name) return next(new ApiError("Location Not Found", 404));
+// exports.AddClubOrder = asyncHandler(async (req, res) => {
+//   try {
+//     const {
+//       name,
+//       email,
+//       password,
+//       lat,
+//       long,
+//       description,
+//       gender,
+//       from,
+//       to,
+//       allDay,
+//       sports,
+//       days,
+//       mapUrl,
+//     } = req.body;
+//     console.log(lat, long);
+//     let SportData = sports.split(",");
+//     let Days = days.split(",");
+//     if (!req.files.clubImg)
+//       return next(new ApiError("Please Add Club Imgs", 409));
+//     if (!req.files.logo) return next(new ApiError("Please Add Club logo", 409));
+//     const place_name = await getLocationName(lat, long);
+//     if (!place_name) return next(new ApiError("Location Not Found", 404));
 
-    const imgs_path = await Promise.all(
-      req.files.clubImg.map(async (img) => {
-        const uploadImg = await cloudinary.uploader.upload(img.path);
-        return uploadImg.secure_url;
-      })
-    );
-    const logo = (await cloudinary.uploader.upload(req.files.logo[0].path))
-      .secure_url;
-    console.log(imgs_path);
-    console.log(logo);
-    await User.findOne({ email }).then(async (user) => {
-      if (user)
-        return next(new ApiError("User With This Email is Exists", 409));
-      console.log(allDay);
-      if (allDay == "false" || allDay == undefined) {
-        await CLubOrder.create({
-          name: name,
-          country: `${place_name.split(",")[place_name.split(",").length - 1]}`,
-          city: `${place_name.split(",")[place_name.split(",").length - 2]}`,
-          location: place_name,
-          logo,
-          description,
-          gender,
-          images: imgs_path,
-          lat: Number(lat),
-          long: Number(long),
-          // logo,
-          from,
-          to,
-          allDay: false,
-          email,
-          password,
-          sports: [...SportData],
-          WorkingDays: [...Days],
-          mapUrl,
-        }).then(async (club) => {
-          console.log(club);
+//     const imgs_path = await Promise.all(
+//       req.files.clubImg.map(async (img) => {
+//         const uploadImg = await cloudinary.uploader.upload(img.path);
+//         return uploadImg.secure_url;
+//       })
+//     );
+//     const logo = (await cloudinary.uploader.upload(req.files.logo[0].path))
+//       .secure_url;
+//     console.log(imgs_path);
+//     console.log(logo);
+//     await User.findOne({ email }).then(async (user) => {
+//       if (user)
+//         return next(new ApiError("User With This Email is Exists", 409));
+//       console.log(allDay);
+//       if (allDay == "false" || allDay == undefined) {
+//         await CLubOrder.create({
+//           name: name,
+//           country: `${place_name.split(",")[place_name.split(",").length - 1]}`,
+//           city: `${place_name.split(",")[place_name.split(",").length - 2]}`,
+//           location: place_name,
+//           logo,
+//           description,
+//           gender,
+//           images: imgs_path,
+//           lat: Number(lat),
+//           long: Number(long),
+//           // logo,
+//           from,
+//           to,
+//           allDay: false,
+//           email,
+//           password,
+//           sports: [...SportData],
+//           WorkingDays: [...Days],
+//           mapUrl,
+//         }).then(async (club) => {
+//           console.log(club);
 
-          res.status(201).json({ club });
-        });
-      } else {
-        await CLubOrder.create({
-          name: name,
-          country: `${place_name.split(",")[place_name.split(",").length - 1]}`,
-          city: `${place_name.split(",")[place_name.split(",").length - 2]}`,
-          location: place_name,
-          // description,
-          gender,
-          images: imgs_path,
-          lat: Number(lat),
-          long: Number(long),
+//           res.status(201).json({ club });
+//         });
+//       } else {
+//         await CLubOrder.create({
+//           name: name,
+//           country: `${place_name.split(",")[place_name.split(",").length - 1]}`,
+//           city: `${place_name.split(",")[place_name.split(",").length - 2]}`,
+//           location: place_name,
+//           // description,
+//           gender,
+//           images: imgs_path,
+//           lat: Number(lat),
+//           long: Number(long),
 
-          description,
-          logo,
-          allDay,
-          from: null,
-          to: null,
-          email,
-          password,
-          mapUrl,
-          sports: [...SportData],
-          WorkingDays: [...Days],
-        }).then(async (club) => {
-          res.status(201).json({ club });
-        });
-      }
-    });
-  } catch (e) {
-    console.log(e);
-    res.status(500).json({ error: e });
-  }
-});
-exports.getOrderClubs = asyncHandler(async (req, res) => {
-  try {
-    // Fetch all orders and select specific fields
-    const orders = await CLubOrder.find().select("createdAt logo name email");
+//           description,
+//           logo,
+//           allDay,
+//           from: null,
+//           to: null,
+//           email,
+//           password,
+//           mapUrl,
+//           sports: [...SportData],
+//           WorkingDays: [...Days],
+//         }).then(async (club) => {
+//           res.status(201).json({ club });
+//         });
+//       }
+//     });
+//   } catch (e) {
+//     console.log(e);
+//     res.status(500).json({ error: e });
+//   }
+// });
+// exports.getOrderClubs = asyncHandler(async (req, res) => {
+//   try {
+//     // Fetch all orders and select specific fields
+//     const orders = await CLubOrder.find().select("createdAt logo name email");
 
-    // Ensure that all required fields are included in the response
-    const formattedOrders = orders.map((order) => ({
-      _id: order._id,
-      name: order.name || "N/A", // Default to "N/A" if name is missing
-      email: order.email || "N/A", // Default to "N/A" if email is missing
-      createdAt: order.createdAt,
-      logo: order.logo || "N/A", // Default to "N/A" if logo is missing
-    }));
+//     // Ensure that all required fields are included in the response
+//     const formattedOrders = orders.map((order) => ({
+//       _id: order._id,
+//       name: order.name || "N/A", // Default to "N/A" if name is missing
+//       email: order.email || "N/A", // Default to "N/A" if email is missing
+//       createdAt: order.createdAt,
+//       logo: order.logo || "N/A", // Default to "N/A" if logo is missing
+//     }));
 
-    // Send the response with the fetched data
-    res.status(200).json({
-      success: true,
-      data: formattedOrders,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Server Error",
-    });
-  }
-});
-exports.getOrderClub = asyncHandler(async (req, res) => {
-  try {
-    const { id } = req.body;
-    const order = await CLubOrder.findOne({ _id: id });
-    if (!order) {
-      return next(new ApiError("Order Not Found", 404));
-    }
+//     // Send the response with the fetched data
+//     res.status(200).json({
+//       success: true,
+//       data: formattedOrders,
+//     });
+//   } catch (error) {
+//     res.status(500).json({
+//       success: false,
+//       message: "Server Error",
+//     });
+//   }
+// });
+// exports.getOrderClub = asyncHandler(async (req, res) => {
+//   try {
+//     const { id } = req.body;
+//     const order = await CLubOrder.findOne({ _id: id });
+//     if (!order) {
+//       return next(new ApiError("Order Not Found", 404));
+//     }
 
-    // Ensure that all required fields are included in the response
+//     // Ensure that all required fields are included in the response
 
-    // Send the response with the fetched data
-    res.status(200).json({
-      success: true,
-      data: order,
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      success: false,
-      message: "Server Error",
-    });
-  }
-});
-exports.AddOrderClub = asyncHandler(async (req, res, next) => {
-  try {
-    const { id, commission } = req.body;
+//     // Send the response with the fetched data
+//     res.status(200).json({
+//       success: true,
+//       data: order,
+//     });
+//   } catch (error) {
+//     console.log(error);
+//     res.status(500).json({
+//       success: false,
+//       message: "Server Error",
+//     });
+//   }
+// });
+// exports.AddOrderClub = asyncHandler(async (req, res, next) => {
+//   try {
+//     const { id, commission } = req.body;
 
-    const order = await CLubOrder.findOne({ _id: id });
-    if (!order) {
-      return next(new ApiError("Order Not Found", 404));
-    }
+//     const order = await CLubOrder.findOne({ _id: id });
+//     if (!order) {
+//       return next(new ApiError("Order Not Found", 404));
+//     }
 
-    await Club.create({
-      name: order.name,
-      country: order.country,
-      city: order.city,
-      location: order.location,
-      description: order.description,
-      gender: order.gender,
-      images: order.images,
-      lat: order.lat,
-      long: order.long,
-      logo: order.logo,
-      allDay: order.allDay,
-      from: order.from,
-      to: order.to,
-      mapUrl: order.mapUrl,
-      commission: commission,
+//     await Club.create({
+//       name: order.name,
+//       country: order.country,
+//       city: order.city,
+//       location: order.location,
+//       description: order.description,
+//       gender: order.gender,
+//       images: order.images,
+//       lat: order.lat,
+//       long: order.long,
+//       logo: order.logo,
+//       allDay: order.allDay,
+//       from: order.from,
+//       to: order.to,
+//       mapUrl: order.mapUrl,
+//       commission: commission,
 
-      sports: [...order.sports],
-      WorkingDays: [...order.WorkingDays],
-    })
-      .then(async (club) => {
-        console.log(club);
+//       sports: [...order.sports],
+//       WorkingDays: [...order.WorkingDays],
+//     })
+//       .then(async (club) => {
+//         console.log(club);
 
-        const hashedPassword = await bcrypt.hash(order.password, 10);
+//         const hashedPassword = await bcrypt.hash(order.password, 10);
 
-        const user = await User.create({
-          email: order.email,
-          password: hashedPassword,
-          role: "club",
-          club: club.id,
-          home_location: order.location,
-          username: order.name,
-        });
-        // await CLubOrder.deleteOne({ _id: id });
-        async function sendOTP() {
-          let transporter = nodemailer.createTransport({
-            service: "gmail",
-            host: "smtp.gmail.com",
-            port: 587,
-            secure: false,
-            auth: {
-              user: "mostafaisa208@gmail.com",
-              pass: "bqzl uyxy lvdu bfbk",
-            },
-          });
+//         const user = await User.create({
+//           email: order.email,
+//           password: hashedPassword,
+//           role: "club",
+//           club: club.id,
+//           home_location: order.location,
+//           username: order.name,
+//         });
+//         // await CLubOrder.deleteOne({ _id: id });
+//         async function sendOTP() {
+//           let transporter = nodemailer.createTransport({
+//             service: "gmail",
+//             host: "smtp.gmail.com",
+//             port: 587,
+//             secure: false,
+//             auth: {
+//               user: "mostafaisa208@gmail.com",
+//               pass: "bqzl uyxy lvdu bfbk",
+//             },
+//           });
 
-          let info = await transporter.sendMail({
-            from: "appgyms.com",
-            to: user.email,
-            subject: "Your code for Password Reset",
-            html: `<h1>Your club order has been successfully added to clubs!</h1>`,
-          });
+//           let info = await transporter.sendMail({
+//             from: "appgyms.com",
+//             to: user.email,
+//             subject: "Your code for Password Reset",
+//             html: `<h1>Your club order has been successfully added to clubs!</h1>`,
+//           });
 
-          console.log("Message sent: %s", info.messageId);
-        }
+//           console.log("Message sent: %s", info.messageId);
+//         }
 
-        sendOTP()
-          .then(async (result) => {
-            await CLubOrder.deleteOne({ _id: id });
-            console.log("Message sent: %s", result);
-            res.status(201).json({ club });
-          })
-          .catch((err) => console.error(err));
-      })
-      .catch((err) => {
-        res.status(500).json({
-          success: false,
-          message: e,
-        });
-      });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Server Error",
-    });
-  }
-});
+//         sendOTP()
+//           .then(async (result) => {
+//             await CLubOrder.deleteOne({ _id: id });
+//             console.log("Message sent: %s", result);
+//             res.status(201).json({ club });
+//           })
+//           .catch((err) => console.error(err));
+//       })
+//       .catch((err) => {
+//         res.status(500).json({
+//           success: false,
+//           message: e,
+//         });
+//       });
+//   } catch (error) {
+//     res.status(500).json({
+//       success: false,
+//       message: "Server Error",
+//     });
+//   }
+// });
