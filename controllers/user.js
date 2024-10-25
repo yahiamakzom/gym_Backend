@@ -957,7 +957,7 @@ exports.confirmPayment = asyncHandler(async (req, res, next) => {
 exports.userFreezing = asyncHandler(async (req, res, next) => {
   const { userSubId, freeze } = req.body;
 
-  // Convert freeze into a number
+
   const freezeDuration = parseInt(freeze);
 
   // Check if freeze is a valid number
@@ -1090,7 +1090,7 @@ exports.evaluateClub = asyncHandler(async (req, res, next) => {
   }
 
   // Recalculate the total rating and average rating
-  let totalRating = 0;   
+  let totalRating = 0;
   club.evaluation.evaluators.forEach((evaluator) => {
     totalRating += evaluator.rating;
   });
@@ -1102,7 +1102,7 @@ exports.evaluateClub = asyncHandler(async (req, res, next) => {
   await club.save();
 
   res.status(200).json({ success: true, data: club.evaluation });
-}); 
+});
 
 exports.getUserWallet = asyncHandler(async (req, res, next) => {
   const { id } = req.user;
@@ -1468,7 +1468,7 @@ exports.addOrRemoveFav = asyncHandler(async (req, res, next) => {
 
   try {
     const favorite = await Favorite.findOne({ club_id, user: id });
-    
+
     if (favorite) {
       // If a favorite already exists, remove it
       await Favorite.findByIdAndDelete(favorite.id);
@@ -1662,9 +1662,7 @@ exports.walletDiscountSubscription = asyncHandler(async (req, res, next) => {
 
 exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
   const yogaDataParsed = req.body;
-  console.log("#######################################");
-  console.log(yogaDataParsed);
-  console.log("#######################################");
+
   const { subId, brand, price, yogaSubscriptionDate, isYoga, clubId } =
     yogaDataParsed;
   const { id } = req.user;
@@ -1811,32 +1809,51 @@ exports.filterClubsBySubscriptionType = asyncHandler(async (req, res, next) => {
       return next(new ApiError("Subscription type is required", 400));
     }
 
-    // Retrieve all clubs with subscriptions of the specified type
+    // Retrieve all clubs
     const clubs = await Club.find({});
-    let clubsWithSubscription = [];
+    let clubsWithSubscription;
 
-    for (const club of clubs) {
-      const subscription = await Subscriptions.findOne({
-        club: club._id,
-        type: subscriptionType,
-      });
-
-      if (subscription) {
-        clubsWithSubscription.push({
-          ...club.toObject(),
-          subscriptionPrice: subscription.price,
-        });
+    // Use switch case to find clubs based on the subscription type
+    switch (subscriptionType) {
+      case "weightFitness": {
+        const packages = await weightFitnessSchema.find({});
+        clubsWithSubscription = clubs.filter((club) => 
+          packages.some((package) => package.club.equals(club._id))
+        );
+        break;
       }
+      case "paddle": {
+        const packages = await PaddlePackage.find({});
+        clubsWithSubscription = clubs.filter((club) => 
+          packages.some((package) => package.club.equals(club._id))
+        );
+        break;
+      }
+      case "yoga": {
+        const packages = await YogaPackage.find({});
+        clubsWithSubscription = clubs.filter((club) => 
+          packages.some((package) => package.club.equals(club._id))
+        );
+        break;
+      }
+      case "another": {
+        const packages = await anotherActivityPackage.find({});
+        clubsWithSubscription = clubs.filter((club) => 
+          packages.some((package) => package.club.equals(club._id))
+        );
+        break;
+      }
+      default:
+        clubsWithSubscription = clubs; // Return all clubs if no valid subscription type is provided
     }
-    clubsWithSubscription = clubsWithSubscription.filter(
-      (club) => club.isWork === true
-    );
+
     res.json({ Clubs: clubsWithSubscription });
   } catch (error) {
     console.error(error);
     next(error);
   }
 });
+
 
 // DELETE route to delete user along with their subscriptions and favorites
 exports.deleteUser = asyncHandler(async (req, res) => {
@@ -1950,6 +1967,9 @@ exports.forgetPassowrd = asyncHandler(async (req, res) => {
     })
     .catch((err) => console.error(err));
 });
+ 
+
+
 
 // exports.AddClubOrder = asyncHandler(async (req, res) => {
 //   try {

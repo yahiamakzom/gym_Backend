@@ -433,6 +433,96 @@ router.get("/clubs/filter", filterClubs);
 router.get("/rules", getRules);
 router.post("/user_reports", makeReport);
 router.post("/renew_club_wallet/:subId", verifyToken, renewClubByWallet);
+/**
+ * @swagger
+ * /user/update-location:
+ *   post:
+ *     summary: Update user location
+ *     description: Updates the user's latitude and longitude based on the provided data.
+ *     tags:
+ *       - User
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - lat
+ *               - long
+ *             properties:
+ *               lat:
+ *                 type: number
+ *                 description: The latitude of the user's location.
+ *                 example: 37.7749
+ *               long:
+ *                 type: number
+ *                 description: The longitude of the user's location.
+ *                 example: -122.4194
+ *     responses:
+ *       '200':
+ *         description: Successfully updated user location.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Success message indicating that the location was updated.
+ *                   example: "User location updated successfully"
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                       description: The unique identifier for the user.
+ *                       example: "60b8d4a3c2f5b34a8cd89c3f"
+ *                     lat:
+ *                       type: number
+ *                       description: The updated latitude of the user.
+ *                       example: 37.7749
+ *                     long:
+ *                       type: number
+ *                       description: The updated longitude of the user.
+ *                       example: -122.4194
+ *       '400':
+ *         description: Bad request, invalid input data.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message indicating bad request.
+ *                   example: "Invalid input data"
+ *       '401':
+ *         description: Unauthorized, token required for authentication.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message indicating unauthorized access.
+ *                   example: "Unauthorized access"
+ *       '500':
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message indicating internal server error.
+ *                   example: "Internal Server Error"
+ */
+
 router.post("/update-location", verifyToken, updateUserLocation);
 
 /**
@@ -506,8 +596,184 @@ router.post("/update-location", verifyToken, updateUserLocation);
 
 router.post("/clubs_by_activity", getClubByActivity);
 // this wallet depost is deprecated and doesn't use real payments
+
+/**
+ * @swagger
+ * /user/wallet_deposit:
+ *   post:
+ *     summary: Deposit an amount into the user's wallet
+ *     description: Allows a user to deposit a specified amount into their wallet and logs the transaction.
+ *     tags:
+ *       - User
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - amount
+ *               - brand
+ *             properties:
+ *               amount:
+ *                 type: number
+ *                 description: The amount to deposit into the user's wallet.
+ *                 example: 100
+ *               brand:
+ *                 type: string
+ *                 description: The payment method or brand used for the deposit.
+ *                 example: "Visa"
+ *     responses:
+ *       '200':
+ *         description: Deposit successful; amount added to the user's wallet.
+ *       '404':
+ *         description: User not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Error message indicating the user was not found.
+ *                   example: "User Not Found"
+ *       '400':
+ *         description: Invalid request parameters.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Error message indicating invalid input.
+ *                   example: "Invalid amount value"
+ *       '401':
+ *         description: Unauthorized, token required for authentication.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Error message indicating unauthorized access.
+ *                   example: "Unauthorized access"
+ */
+
 router.post("/wallet_deposit", verifyToken, walletDeposit);
 router.get("/wallet", verifyToken, getUserWallet);
+
+/**
+ * @swagger
+ * /user/evaluation:
+ *   post:
+ *     summary: Submit or update a user's evaluation for a club
+ *     description: Allows a user to submit a rating for a specific club. If the user has already rated the club, their rating is updated.
+ *     tags:
+ *       - User
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - clubId
+ *               - rating
+ *             properties:
+ *               clubId:
+ *                 type: string
+ *                 description: The unique identifier of the club to evaluate.
+ *                 example: "6123abcd4567efgh8901ijkl"
+ *               rating:
+ *                 type: integer
+ *                 description: The rating given to the club by the user (e.g., between 1 and 5).
+ *                 example: 4
+ *     responses:
+ *       '200':
+ *         description: Rating successfully submitted or updated.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates if the rating was processed successfully.
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   description: Evaluation details including average rating.
+ *                   properties:
+ *                     evaluators:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           user:
+ *                             type: string
+ *                             description: The ID of the user who rated the club.
+ *                             example: "5f8d0d55b54764421b7156c2"
+ *                           rating:
+ *                             type: integer
+ *                             description: The user's rating.
+ *                             example: 4
+ *                     averageRating:
+ *                       type: integer
+ *                       description: The average rating of the club based on all evaluations.
+ *                       example: 4
+ *       '404':
+ *         description: Club not found with the provided clubId.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates failure due to club not found.
+ *                   example: false
+ *                 error:
+ *                   type: string
+ *                   description: Error message indicating the club was not found.
+ *                   example: "Club not found"
+ *       '400':
+ *         description: Missing or invalid parameters in the request.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates failure due to missing or invalid parameters.
+ *                   example: false
+ *                 error:
+ *                   type: string
+ *                   description: Error message indicating the issue with the request.
+ *                   example: "Invalid rating value"
+ *       '401':
+ *         description: Unauthorized, token required for authentication.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates failure due to missing or invalid token.
+ *                   example: false
+ *                 error:
+ *                   type: string
+ *                   description: Error message indicating the user needs to log in.
+ *                   example: "Unauthorized access"
+ */
+
 router.post("/evaluation", verifyToken, evaluateClub);
 router.get("/booking", verifyToken, userBooking);
 
@@ -632,7 +898,7 @@ router.get("/isfav/:club_id", verifyToken, isFav);
  *         description: Server error.
  */
 
-router.get("/fav", verifyToken, getUserFav); 
+router.get("/fav", verifyToken, getUserFav);
 /**
  * @swagger
  * /user/profile:
@@ -842,10 +1108,79 @@ router.post(
   verifyToken,
   subscriptionConfirmation
 );
-// payment methods
-// old
+
 router.post("/wallet", depositWallet);
-// not belong to us
+
+/**
+ * @swagger
+ * /user/pay_wallet:
+ *   post:
+ *     summary: Deduct an amount from the user's wallet for a subscription
+ *     description: Deducts a specified amount from the user's wallet balance if there are sufficient funds.
+ *     tags:
+ *       - User
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - amount
+ *             properties:
+ *               amount:
+ *                 type: number
+ *                 description: The amount to deduct from the user's wallet.
+ *                 example: 50
+ *     responses:
+ *       '200':
+ *         description: Deduction successful; funds have been subtracted from the wallet.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Success message indicating the deduction was successful.
+ *                   example: "Discount successful"
+ *       '404':
+ *         description: User not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Error message indicating the user was not found.
+ *                   example: "User Not Found"
+ *       '400':
+ *         description: Insufficient funds or invalid amount.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Message indicating insufficient funds or invalid amount.
+ *                   example: "Insufficient funds or invalid amount"
+ *       '401':
+ *         description: Unauthorized, token required for authentication.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Error message indicating unauthorized access.
+ *                   example: "Unauthorized access"
+ */
+
 router.post("/pay_wallet", verifyToken, walletDiscountSubscription);
 router.post("/check-pay/:paymentId/:subId", verifyToken, checkPayment);
 router.post("/check-pay-new/:paymentId", verifyToken, checkPaymentNew);
@@ -854,6 +1189,78 @@ router.post("/make_sub/:subId", verifyToken, userMakeSub);
 router.post("/confirm_payment/:subId", verifyToken, confirmPayment);
 router.post("/pay-visa", verifyToken, hyperCheckout);
 router.get("/activities", GetActivities);
+/**
+ * @swagger
+ * /user/filter_by_subscriptionType:
+ *   post:
+ *     summary: Filter clubs by subscription type
+ *     description: Retrieves clubs that have packages of the specified subscription type.
+ *     tags:
+ *       - User
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - subscriptionType
+ *             properties:
+ *               subscriptionType:
+ *                 type: string
+ *                 description: The type of subscription to filter clubs by. Can be one of "weightFitness", "paddle", "yoga", or "another".
+ *                 example: "yoga"
+ *     responses:
+ *       '200':
+ *         description: Successfully retrieved clubs with the specified subscription type.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 Clubs:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       _id:
+ *                         type: string
+ *                         description: The unique identifier for the club.
+ *                         example: "60b8d4a3c2f5b34a8cd89c3f"
+ *                       name:
+ *                         type: string
+ *                         description: The name of the club.
+ *                         example: "Fitness Club"
+ *                       location:
+ *                         type: string
+ *                         description: The location of the club.
+ *                         example: "123 Fitness St, City"
+ *       '400':
+ *         description: Bad request, subscription type is required.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Error message indicating that the subscription type is required.
+ *                   example: "Subscription type is required"
+ *       '401':
+ *         description: Unauthorized, token required for authentication.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Error message indicating unauthorized access.
+ *                   example: "Unauthorized access"
+ */
+
 router.post("/filter_by_subscriptionType", filterClubsBySubscriptionType);
 
 /**
@@ -922,7 +1329,7 @@ router.post("/forget_password", forgetPassowrd);
 //   "/add_order_data",
 //   imgUploader.fields([{ name: "clubImg" }, { name: "logo", maxCount: 1 }]),
 //   AddOrderClub
-// );  
+// );
 
 /**
  * @swagger
