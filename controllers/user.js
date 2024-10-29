@@ -587,26 +587,12 @@ exports.hyperCheckout = asyncHandler(async (req, res, next) => {
       amount: Math.round(price),
       currency: "SAR",
       paymentType: "DB",
-      //  Also please remove testMode=EXTERNAL and customParameters[3DS2_enrolled]=true from this step's code, as they are only required for testing
-      // "customParameters[3DS2_enrolled]": true,
-      // merchantTransactionId: req.body["merchantTransactionId"],
-      // "customer.email": req.body["customer.email"],
-      // "billing.street1": req.body["billing.street1"],
-      // "billing.city": req.body["billing.city"],
-      // "billing.state": req.body["billing.state"],
-      // "billing.country": req.body["billing.country"],
-      // "billing.postcode": req.body["billing.postcode"],
-      // "customer.givenName": req.body["customer.givenName"],
-      // "customer.surname": req.body["customer.surname"],
+
       merchantTransactionId: Math.floor(Math.random() * 900) + 100,
       "customer.email": user.email,
       "customer.givenName": user.username,
       "customer.surname": user.username,
-      // "billing.street1": "30 March Street",
-      // "billing.city": "Naghmade",
-      // "billing.state": "Qena",
-      // "billing.country": "EG",
-      // "billing.postcode": "83511",
+
     });
 
     console.log("Data: ");

@@ -40,7 +40,6 @@ const {
   resetPassowrd,
   forgetPassowrd,
 
-  AddClubOrder,
 } = require("../controllers/user");
 const router = require("express").Router();
 const verifyToken = require("../middlewares/verifyToken");
@@ -1182,11 +1181,138 @@ router.post("/wallet", depositWallet);
  */
 
 router.post("/pay_wallet", verifyToken, walletDiscountSubscription);
-router.post("/check-pay/:paymentId/:subId", verifyToken, checkPayment);
+router.post("/check-pay/:paymentId/:subId", verifyToken, checkPayment); 
+
+/**
+ * @swagger
+ * /user/check-pay-new/{paymentId}:
+ *   post:
+ *     summary: Check the status of a payment.
+ *     description: Retrieves the status of a payment for a specific brand and payment ID.
+ *     tags: 
+ *       - User
+ *     parameters:
+ *       - in: path
+ *         name: paymentId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Unique identifier of the payment to check.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               brand:
+ *                 type: string
+ *                 description: The brand associated with the payment (e.g., VISA, MasterCard).
+ *                 example: "VISA"
+ *     responses:
+ *       200:
+ *         description: Payment status retrieved successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   description: The status of the payment (e.g., pending, successful).
+ *                   example: "successful"
+ *                 result:
+ *                   type: object
+ *                   description: Detailed result of the payment status.
+ *       400:
+ *         description: Bad request - missing or invalid parameters (e.g., brand is required).
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message.
+ *                   example: "brand is required"
+ *       422:
+ *         description: Unprocessable entity - payment status could not be retrieved.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   description: Payment status.
+ *                   example: "cancel"
+ *       500:
+ *         description: Internal server error.
+ */
+
 router.post("/check-pay-new/:paymentId", verifyToken, checkPaymentNew);
 router.post("/wallet_confirm", verifyToken, confirmDeposit);
 router.post("/make_sub/:subId", verifyToken, userMakeSub);
 router.post("/confirm_payment/:subId", verifyToken, confirmPayment);
+
+/**
+ * @swagger
+ * /user/pay-visa:
+ *   post:
+ *     summary: Process a checkout request.
+ *     description: Initiates a payment checkout for a given brand and price.
+ *     tags: 
+ *       - User
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               price:
+ *                 type: number
+ *                 description: The amount to be processed.
+ *                 example: 100.5
+ *               brand:
+ *                 type: string
+ *                 description: The brand for which the payment is being processed.
+ *                 example: "VISA"
+ *     responses:
+ *       200:
+ *         description: Checkout successful.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 result:
+ *                   type: string
+ *                   description: Status of the checkout process.
+ *                   example: "success"
+ *                 transactionId:
+ *                   type: string
+ *                   description: Unique transaction identifier.
+ *                   example: "1234567890"
+ *                 redirectUrl:
+ *                   type: string
+ *                   description: URL for redirecting the user for further processing.
+ *                   example: "https://paymentgateway.com/redirect/12345"
+ *       400:
+ *         description: Bad request - missing or invalid parameters.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message.
+ *                   example: "brand is required"
+ *       500:
+ *         description: Internal server error.
+ */
+
 router.post("/pay-visa", verifyToken, hyperCheckout);
 router.get("/activities", GetActivities);
 /**
