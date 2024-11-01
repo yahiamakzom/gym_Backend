@@ -592,7 +592,6 @@ exports.hyperCheckout = asyncHandler(async (req, res, next) => {
       "customer.email": user.email,
       "customer.givenName": user.username,
       "customer.surname": user.username,
-
     });
 
     console.log("Data: ");
@@ -943,7 +942,6 @@ exports.confirmPayment = asyncHandler(async (req, res, next) => {
 exports.userFreezing = asyncHandler(async (req, res, next) => {
   const { userSubId, freeze } = req.body;
 
-
   const freezeDuration = parseInt(freeze);
 
   // Check if freeze is a valid number
@@ -1260,18 +1258,26 @@ exports.searchClub = asyncHandler(async (req, res, next) => {
 });
 
 exports.getClubByActivity = asyncHandler(async (req, res, next) => {
-  try {
-    const filterCondition = req.body.filterCondition;
+  const filterCondition = req.body.filterCondition.trim();
+  const userId = req.body.userId;
 
-    const clubs = await Club.find({
-      sports: { $elemMatch: { $eq: filterCondition.trim() } },
-    });
+  const clubs = await Club.find({
+    sports: { $elemMatch: { $eq: filterCondition } },
+  });
 
-    res.status(200).json({ result: clubs });
-  } catch (e) {
-    res.status(500).json({ message: e.message });
-  }
+  const result = userId
+    ? await Promise.all(
+        clubs.map(async (club) => {
+          const fav = await Favorite.findOne({ club_id: club._id });
+          return { ...club.toObject(), fav: !!fav };
+        })
+      )
+    : clubs.map(club => club.toObject());
+
+  res.status(200).json({ result });
 });
+
+
 exports.filterClubs = asyncHandler(async (req, res, next) => {
   const { filter } = req.query;
   const { lat, long } = req.query;
@@ -1803,28 +1809,28 @@ exports.filterClubsBySubscriptionType = asyncHandler(async (req, res, next) => {
     switch (subscriptionType) {
       case "weightFitness": {
         const packages = await weightFitnessSchema.find({});
-        clubsWithSubscription = clubs.filter((club) => 
+        clubsWithSubscription = clubs.filter((club) =>
           packages.some((package) => package.club.equals(club._id))
         );
         break;
       }
       case "paddle": {
         const packages = await PaddlePackage.find({});
-        clubsWithSubscription = clubs.filter((club) => 
+        clubsWithSubscription = clubs.filter((club) =>
           packages.some((package) => package.club.equals(club._id))
         );
         break;
       }
       case "yoga": {
         const packages = await YogaPackage.find({});
-        clubsWithSubscription = clubs.filter((club) => 
+        clubsWithSubscription = clubs.filter((club) =>
           packages.some((package) => package.club.equals(club._id))
         );
         break;
       }
       case "another": {
         const packages = await anotherActivityPackage.find({});
-        clubsWithSubscription = clubs.filter((club) => 
+        clubsWithSubscription = clubs.filter((club) =>
           packages.some((package) => package.club.equals(club._id))
         );
         break;
@@ -1839,7 +1845,6 @@ exports.filterClubsBySubscriptionType = asyncHandler(async (req, res, next) => {
     next(error);
   }
 });
-
 
 // DELETE route to delete user along with their subscriptions and favorites
 exports.deleteUser = asyncHandler(async (req, res) => {
@@ -1953,9 +1958,6 @@ exports.forgetPassowrd = asyncHandler(async (req, res) => {
     })
     .catch((err) => console.error(err));
 });
- 
-
-
 
 // exports.AddClubOrder = asyncHandler(async (req, res) => {
 //   try {
