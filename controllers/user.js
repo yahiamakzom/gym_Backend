@@ -13,6 +13,7 @@ const ApiError = require("../utils/ApiError");
 const paypal = require("paypal-rest-sdk");
 const axios = require("axios");
 const bcrypt = require("bcrypt");
+const ClubHours = require("../models/clubHours")
 const nodemailer = require("nodemailer");
 const { getLocationName } = require("../utils/Map");
 const {
@@ -1269,13 +1270,20 @@ exports.getClubByActivity = asyncHandler(async (req, res, next) => {
     ? await Promise.all(
         clubs.map(async (club) => {
           const fav = await Favorite.findOne({ club_id: club._id });
-          return { ...club.toObject(), fav: !!fav };
+          const clubsHour = await ClubHours.find({ club: club._id });
+          return { ...club.toObject(), fav: !!fav, clubsHour };
         })
       )
-    : clubs.map(club => club.toObject());
+    : await Promise.all(
+        clubs.map(async (club) => {
+          const clubsHour = await ClubHours.find({ club: club._id });
+          return { ...club.toObject(), clubsHour };
+        })
+      );
 
   res.status(200).json({ result });
 });
+
 
 
 exports.filterClubs = asyncHandler(async (req, res, next) => {
