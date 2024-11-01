@@ -1264,7 +1264,7 @@ exports.getClubByActivity = asyncHandler(async (req, res, next) => {
     const filterCondition = req.body.filterCondition;
 
     const clubs = await Club.find({
-      sports: { $elemMatch: { $eq: filterCondition } },
+      sports: { $elemMatch: { $eq: filterCondition.trim() } },
     });
 
     res.status(200).json({ result: clubs });
