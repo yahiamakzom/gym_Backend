@@ -39,7 +39,6 @@ const {
   updateUserLocation,
   resetPassowrd,
   forgetPassowrd,
-
 } = require("../controllers/user");
 const router = require("express").Router();
 const verifyToken = require("../middlewares/verifyToken");
@@ -49,7 +48,7 @@ const imgUploader = require("../middlewares/imgUploader");
 /**
  * @swagger
  * /user/clubs:
- *   post:
+ *   get:
  *     summary: Retrieve clubs with daily packages
  *     description: Fetches clubs that offer daily subscription packages, along with optional filtering based on geographic coordinates (latitude and longitude). If `lat` and `long` are provided, the distance from the user's location to each club will be calculated.
  *     tags:
@@ -110,7 +109,7 @@ const imgUploader = require("../middlewares/imgUploader");
  *         description: Internal server error.
  */
 
-router.post("/clubs", getClubs);
+router.get("/clubs", getClubs);
 
 router.get("/minclubs", getMinClubs);
 router.get("/blogs", getBlog);
@@ -1181,7 +1180,7 @@ router.post("/wallet", depositWallet);
  */
 
 router.post("/pay_wallet", verifyToken, walletDiscountSubscription);
-router.post("/check-pay/:paymentId/:subId", verifyToken, checkPayment); 
+router.post("/check-pay/:paymentId/:subId", verifyToken, checkPayment);
 
 /**
  * @swagger
@@ -1189,7 +1188,7 @@ router.post("/check-pay/:paymentId/:subId", verifyToken, checkPayment);
  *   post:
  *     summary: Check the status of a payment.
  *     description: Retrieves the status of a payment for a specific brand and payment ID.
- *     tags: 
+ *     tags:
  *       - User
  *     parameters:
  *       - in: path
@@ -1261,7 +1260,7 @@ router.post("/confirm_payment/:subId", verifyToken, confirmPayment);
  *   post:
  *     summary: Process a checkout request.
  *     description: Initiates a payment checkout for a given brand and price.
- *     tags: 
+ *     tags:
  *       - User
  *     requestBody:
  *       required: true
