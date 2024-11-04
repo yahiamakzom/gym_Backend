@@ -1448,12 +1448,10 @@ exports.getUserFav = asyncHandler(async (req, res, next) => {
           // Extract relevant club data
           const clubData = fav.club_id;
 
-          // Modify club data if needed
-          // Example: clubData.someField = newValue;
-
-          // Add the modified club data to the favorite object
+       const club = await Club.findById(clubData._id);
           const modifiedFav = {
-            ...fav.toObject(),
+            ...fav.toObject(), 
+            ...club.toObject(), 
           };
           return modifiedFav;
         })
