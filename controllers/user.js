@@ -1445,7 +1445,7 @@ exports.getUserFav = asyncHandler(async (req, res, next) => {
     .then(async (data) => {
       const modifiedData = await Promise.all(
         data.map(async (fav) => {
-          // Extract relevant club data
+           
           const clubData = fav.club_id;
 
        const club = await Club.findById(clubData._id);
@@ -1797,7 +1797,6 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
     });
 });
 
-// filter clubs by type
 exports.filterClubsBySubscriptionType = asyncHandler(async (req, res, next) => {
   try {
     const { subscriptionType } = req.body;
@@ -1852,7 +1851,6 @@ exports.filterClubsBySubscriptionType = asyncHandler(async (req, res, next) => {
   }
 });
 
-// DELETE route to delete user along with their subscriptions and favorites
 exports.deleteUser = asyncHandler(async (req, res) => {
   try {
     const userId = req.params.userId;
@@ -1963,7 +1961,10 @@ exports.forgetPassowrd = asyncHandler(async (req, res) => {
       res.status(200).json({ message: "OTP sent", success: true, code: otp });
     })
     .catch((err) => console.error(err));
-});
+}); 
+
+
+
 
 // exports.AddClubOrder = asyncHandler(async (req, res) => {
 //   try {

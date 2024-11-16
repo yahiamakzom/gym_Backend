@@ -17,6 +17,7 @@ const {
   createCompliant,
   getTransfersByClub,
   updateDiscount,
+  generateAndSendFiles,
 } = require("../controllers/club");
 const {
   createWeightFitnessPackage,
@@ -2576,10 +2577,7 @@ router.delete("/delete-another-package/:id", deletePackage);
  *         description: Server error
  */
 
-router.post("/create-another-package", createAnotherPackage); 
-
-
-
+router.post("/create-another-package", createAnotherPackage);
 
 /**
  * @swagger
@@ -2665,8 +2663,82 @@ router.post("/create-another-package", createAnotherPackage);
  *                 error:
  *                   type: string
  *                   example: "Server error message"
- */ 
+ */
 
-router.get("/club-transfers/:clubId", getTransfersByClub);
+router.post("/club-transfers/:clubId", getTransfersByClub);
 
+/**
+ * @swagger
+ * /clubs/club-report/{id}:
+ *   post:
+ *     summary: Generate and send PDF and Excel files as base64.
+ *     description: Generates a PDF and Excel file based on the provided data, then returns the files as base64-encoded strings.
+ *     tags:
+ *       - Club
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: The ID for the report.
+ *         required: true
+ *         type: string
+ *       - name: body
+ *         in: body
+ *         description: Data for generating PDF and Excel files.
+ *         required: true
+ *         schema:
+ *           type: object
+ *           properties:
+ *             relative:
+ *               type: string
+ *               example: "some_relative_value"
+ *             isDate:
+ *               type: boolean
+ *               example: true
+ *             fromData:
+ *               type: string
+ *               format: date
+ *               example: "2023-01-01"
+ *             toData:
+ *               type: string
+ *               format: date
+ *               example: "2023-12-31"
+ *     responses:
+ *       200:
+ *         description: Files generated successfully.
+ *         schema:
+ *           type: object
+ *           properties:
+ *             message:
+ *               type: string
+ *               example: "Files generated successfully."
+ *             data:
+ *               type: array
+ *               items:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *               example:
+ *                 - ["Date", "Type", "Amount", "Description"]
+ *                 - ["2023-07-01", "Transfer", "$100", "Payment for services"]
+ *             status:
+ *               type: string
+ *               example: "success"
+ *             pdf:
+ *               type: string
+ *               format: byte
+ *               description: The base64-encoded PDF file content.
+ *             excel:
+ *               type: string
+ *               format: byte
+ *               description: The base64-encoded Excel file content.
+ *       500:
+ *         description: Internal server error.
+ *         schema:
+ *           type: object
+ *           properties:
+ *             error:
+ *               type: string
+ *               example: "Error generating files."
+ */
+router.post("/club-report/:id", generateAndSendFiles);
 module.exports = router;

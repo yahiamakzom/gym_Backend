@@ -15,6 +15,10 @@ const ClubHours = require("../models/clubHours");
 const TransferOrder = require("../models/TransferOrder");
 const Transfer = require("../models/Transafers");
 const Support = require("../models/support");
+const generatePDF = require("../helper/generatePdf");
+const generateExcel = require("../helper/generateExcel");
+const path = require("path");
+const fs = require("fs");
 
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
@@ -859,13 +863,12 @@ exports.addBankAccount = asyncHandler(async (req, res) => {
     message: "Bank account added successfully",
     data: newBankAccount,
   });
-}); 
+});
 exports.updateDiscount = asyncHandler(async (req, res) => {
   const { code, discountPercentage, validFrom, validTo } = req.body;
 
   let discountCode = await DiscountCode.findOne({
     _id: req.params.id,
-
   });
   if (!discountCode) {
     return res.status(404).json({ message: "Global discount code not found" });
@@ -1107,15 +1110,12 @@ exports.createCompliant = async (req, res) => {
   }
 };
 
-
 exports.getTransfersByClub = asyncHandler(async (req, res) => {
   const { clubId } = req.params;
 
   try {
     // Find all transfers related to the specific club
     const transfers = await Transfer.find({ club: clubId });
-
-
 
     res.status(200).json({
       success: true,
@@ -1124,9 +1124,65 @@ exports.getTransfersByClub = asyncHandler(async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error retrieving transfers.',
+      message: "Error retrieving transfers.",
       error: error.message,
     });
   }
 });
+
+exports.generateAndSendFiles = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { relative, isDate, fromData, toData } = req.body;
+  const data = [
+    ["Date", "Type", "Amount", "Description"],
+    ["2023-07-01", "Transfer", "$100", "Payment for services"],
+    ["2023-07-01", "Transfer", "$100", "Payment for services"],
+    ["2023-07-01", "Transfer", "$100", "Payment for services"],
+    ["2023-07-01", "Transfer", "$100", "Payment for services"],
+    ["2023-07-01", "Transfer", "$100", "Payment for services"],
+    ["2023-07-01", "Transfer", "$100", "Payment for services"],
+    ["2023-07-01", "Transfer", "$100", "Payment for services"],
+    ["2023-07-01", "Transfer", "$100", "Payment for services"],
+    ["2023-07-01", "Transfer", "$100", "Payment for services"],
+    ["2023-07-01", "Transfer", "$100", "Payment for services"],
+    ["2023-07-01", "Transfer", "$100", "Payment for services"],
+    ["2023-07-01", "Transfer", "$100", "Payment for services"],
+    ["2023-07-01", "Transfer", "$100", "Payment for services"],
+    ["2023-07-01", "Transfer", "$100", "Payment for services"],
+    ["2023-07-01", "Transfer", "$100", "Payment for services"],
+  ];
+
+  try {
+    const pdfPath = generatePDF(data);
+    const excelPath = await generateExcel(data);
+
+    const fileToBase64 = (filePath) => {
+      return new Promise((resolve, reject) => {
+        fs.readFile(filePath, (err, data) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(data.toString("base64"));
+          }
+        });
+      });
+    };
+
+    const pdfBase64 = await fileToBase64(pdfPath);
+    const excelBase64 = await fileToBase64(excelPath);
+
+    const responseData = {
+      message: "Files generated successfully.",
+      data: data,
+      status: "success",
+      pdf: pdfBase64,
+      excel: excelBase64,
+    };
+
+    res.status(200).json(responseData);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 exports.clubReports;
