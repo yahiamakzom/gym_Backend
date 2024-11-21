@@ -33,7 +33,10 @@ const {
   getPackagesCommission,
   updateAppBanner,
   getAllUser,
-  stopAppTemporarily
+  stopAppTemporarily,
+  getStats,
+  getGeneralReport,
+  getUsersReport,
 } = require("../controllers/owner");
 
 /**
@@ -1777,8 +1780,7 @@ router.post(
  *         description: Internal Server Error
  */
 
-router.get("/get-users", getAllUser); 
-
+router.get("/get-users", getAllUser);
 
 /**
  * @swagger
@@ -1870,4 +1872,199 @@ router.get("/get-users", getAllUser);
  */
 
 router.post("/stop-app", stopAppTemporarily);
+
+/**
+ * @swagger
+ * /owner/get-app-stats:
+ *   post:
+ *     summary: get app stats information
+ *     description: This endpoint allows the admin to temporarily stop the app, either immediately or by scheduling a stop period.
+ *     tags:
+ *       - Owner
+ *     responses:
+ *       200:
+ *         description: Successfully fetched the stats
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 userCount:
+ *                   type: integer
+ *                   description: Total number of users
+ *                 recentUserCount:
+ *                   type: integer
+ *                   description: Total number of users registered in the last 28 days
+ *                 clubCount:
+ *                   type: integer
+ *                   description: Total number of clubs
+ *                 adminClubCount:
+ *                   type: integer
+ *                   description: Number of clubs with "admin" type
+ *                 superAdminClubCount:
+ *                   type: integer
+ *                   description: Number of clubs with "superadmin" type
+ *       500:
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Server error"
+ */
+router.get("/get-app-stats", getStats);
+
+/**
+ * @swagger
+ * /owner/get-general-report:
+ *   post:
+ *     summary: Get General Report.
+ *     description: Generates a PDF and Excel file based on the provided data, then returns the files as base64-encoded strings.
+ *     tags:
+ *       - Owner
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: The ID for the report.
+ *         required: true
+ *         type: string
+ *       - name: body
+ *         in: body
+ *         description: Data for generating PDF and Excel files.
+ *         required: true
+ *         schema:
+ *           type: object
+ *           properties:
+ *             relative:
+ *               type: string
+ *               example: "some_relative_value"
+ *             isDate:
+ *               type: boolean
+ *               example: true
+ *             fromData:
+ *               type: string
+ *               format: date
+ *               example: "2023-01-01"
+ *             toData:
+ *               type: string
+ *               format: date
+ *               example: "2023-12-31"
+ *     responses:
+ *       200:
+ *         description: Files generated successfully.
+ *         schema:
+ *           type: object
+ *           properties:
+ *             message:
+ *               type: string
+ *               example: "Files generated successfully."
+ *             data:
+ *               type: array
+ *               items:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *               example:
+ *                 - ["Date", "Type", "Amount", "Description"]
+ *                 - ["2023-07-01", "Transfer", "$100", "Payment for services"]
+ *             status:
+ *               type: string
+ *               example: "success"
+ *             pdf:
+ *               type: string
+ *               format: byte
+ *               description: The base64-encoded PDF file content.
+ *             excel:
+ *               type: string
+ *               format: byte
+ *               description: The base64-encoded Excel file content.
+ *       500:
+ *         description: Internal server error.
+ *         schema:
+ *           type: object
+ *           properties:
+ *             error:
+ *               type: string
+ *               example: "Error generating files."
+ */
+router.post("/get-general-report", getGeneralReport);
+
+/**
+ * @swagger
+ * /owner/get-user-report:
+ *   post:
+ *     summary: Get General Report.
+ *     description: Generates a PDF and Excel file based on the provided data, then returns the files as base64-encoded strings.
+ *     tags:
+ *       - Owner
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: The ID for the report.
+ *         required: true
+ *         type: string
+ *       - name: body
+ *         in: body
+ *         description: Data for generating PDF and Excel files.
+ *         required: true
+ *         schema:
+ *           type: object
+ *           properties:
+ *             relative:
+ *               type: string
+ *               example: "some_relative_value"
+ *             isDate:
+ *               type: boolean
+ *               example: true
+ *             fromData:
+ *               type: string
+ *               format: date
+ *               example: "2023-01-01"
+ *             toData:
+ *               type: string
+ *               format: date
+ *               example: "2023-12-31"
+ *     responses:
+ *       200:
+ *         description: Files generated successfully.
+ *         schema:
+ *           type: object
+ *           properties:
+ *             message:
+ *               type: string
+ *               example: "Files generated successfully."
+ *             data:
+ *               type: array
+ *               items:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *               example:
+ *                 - ["Date", "Type", "Amount", "Description"]
+ *                 - ["2023-07-01", "Transfer", "$100", "Payment for services"]
+ *             status:
+ *               type: string
+ *               example: "success"
+ *             pdf:
+ *               type: string
+ *               format: byte
+ *               description: The base64-encoded PDF file content.
+ *             excel:
+ *               type: string
+ *               format: byte
+ *               description: The base64-encoded Excel file content.
+ *       500:
+ *         description: Internal server error.
+ *         schema:
+ *           type: object
+ *           properties:
+ *             error:
+ *               type: string
+ *               example: "Error generating files."
+ */
+router.post("/get-user-report", getUsersReport);
+
 module.exports = router;

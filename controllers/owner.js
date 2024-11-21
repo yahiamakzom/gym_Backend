@@ -19,6 +19,11 @@ const AppSetting = require("../models/AppSetting");
 const Support = require("../models/support.js");
 const CommonQuestions = require("../models/CommonQuestions.js");
 const uploadToCloudinary = require("../helper/uploadCoudinary.js");
+const generatePDF = require("../helper/generatePdf.js");
+const generateExcel = require("../helper/generateExcel.js");
+const path = require("path");
+const fs = require("fs");
+
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.CLOUD_API_KEY,
@@ -894,7 +899,6 @@ exports.getAllUser = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.stopAppTemporarily = asyncHandler(async (req, res, next) => {
   const { start, end, isTemporarilyStopped } = req.body;
 
@@ -924,4 +928,155 @@ exports.stopAppTemporarily = asyncHandler(async (req, res, next) => {
     message: "App status updated",
     data: appSetting,
   });
+});
+
+exports.getStats = async (req, res) => {
+  try {
+    const userCount = await User.countDocuments();
+
+    const last28Days = new Date();
+    last28Days.setDate(last28Days.getDate() - 28);
+    const recentUserCount = await User.countDocuments({
+      createdAt: { $gte: last28Days },
+    });
+
+    // Count the total number of clubs
+    const clubCount = await Club.countDocuments();
+
+    // Count the clubs of type "admin" and "superadmin"
+    const adminClubCount = await Club.countDocuments({ type: "admin" });
+    const superAdminClubCount = await Club.countDocuments({
+      type: "superadmin",
+    });
+
+    // Send the response with counts
+    return res.status(200).json({
+      status: "success",
+      data: {
+        userCount,
+        recentUserCount,
+        clubCount,
+        adminClubCount,
+        superAdminClubCount,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+
+
+exports.getGeneralReport = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { relative, isDate, fromData, toData } = req.body;
+  const data = [
+    ["Date", "Type", "Amount", "Description"],
+    ["2023-07-01", "Transfer", "$100", "Payment for services"],
+    ["2023-07-01", "Transfer", "$100", "Payment for services"],
+    ["2023-07-01", "Transfer", "$100", "Payment for services"],
+    ["2023-07-01", "Transfer", "$100", "Payment for services"],
+    ["2023-07-01", "Transfer", "$100", "Payment for services"],
+    ["2023-07-01", "Transfer", "$100", "Payment for services"],
+    ["2023-07-01", "Transfer", "$100", "Payment for services"],
+    ["2023-07-01", "Transfer", "$100", "Payment for services"],
+    ["2023-07-01", "Transfer", "$100", "Payment for services"],
+    ["2023-07-01", "Transfer", "$100", "Payment for services"],
+    ["2023-07-01", "Transfer", "$100", "Payment for services"],
+    ["2023-07-01", "Transfer", "$100", "Payment for services"],
+    ["2023-07-01", "Transfer", "$100", "Payment for services"],
+    ["2023-07-01", "Transfer", "$100", "Payment for services"],
+    ["2023-07-01", "Transfer", "$100", "Payment for services"],
+  ];
+
+  try {
+    const pdfPath = generatePDF(data);
+    const excelPath = await generateExcel(data);
+
+    const fileToBase64 = (filePath) => {
+      return new Promise((resolve, reject) => {
+        fs.readFile(filePath, (err, data) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(data.toString("base64"));
+          }
+        });
+      });
+    };
+
+    const pdfBase64 = await fileToBase64(pdfPath);
+    const excelBase64 = await fileToBase64(excelPath);
+
+    const responseData = {
+      message: "Files generated successfully.",
+      data: data,
+      status: "success",
+      pdf: pdfBase64,
+      excel: excelBase64,
+    };
+
+    res.status(200).json(responseData);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}); 
+
+
+
+exports.getUsersReport = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { relative, isDate, fromData, toData } = req.body;
+  const data = [
+    ["Date", "Type", "Amount", "Description"],
+    ["2023-07-01", "Transfer", "$100", "Payment for services"],
+    ["2023-07-01", "Transfer", "$100", "Payment for services"],
+    ["2023-07-01", "Transfer", "$100", "Payment for services"],
+    ["2023-07-01", "Transfer", "$100", "Payment for services"],
+    ["2023-07-01", "Transfer", "$100", "Payment for services"],
+    ["2023-07-01", "Transfer", "$100", "Payment for services"],
+    ["2023-07-01", "Transfer", "$100", "Payment for services"],
+    ["2023-07-01", "Transfer", "$100", "Payment for services"],
+    ["2023-07-01", "Transfer", "$100", "Payment for services"],
+    ["2023-07-01", "Transfer", "$100", "Payment for services"],
+    ["2023-07-01", "Transfer", "$100", "Payment for services"],
+    ["2023-07-01", "Transfer", "$100", "Payment for services"],
+    ["2023-07-01", "Transfer", "$100", "Payment for services"],
+    ["2023-07-01", "Transfer", "$100", "Payment for services"],
+    ["2023-07-01", "Transfer", "$100", "Payment for services"],
+  ];
+
+  try {
+    const pdfPath = generatePDF(data);
+    const excelPath = await generateExcel(data);
+
+    const fileToBase64 = (filePath) => {
+      return new Promise((resolve, reject) => {
+        fs.readFile(filePath, (err, data) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(data.toString("base64"));
+          }
+        });
+      });
+    };
+
+    const pdfBase64 = await fileToBase64(pdfPath);
+    const excelBase64 = await fileToBase64(excelPath);
+
+    const responseData = {
+      message: "Files generated successfully.",
+      data: data,
+      status: "success",
+      pdf: pdfBase64,
+      excel: excelBase64,
+    };
+
+    res.status(200).json(responseData);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
