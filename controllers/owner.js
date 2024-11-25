@@ -52,7 +52,6 @@ exports.addClub = asyncHandler(async (req, res, next) => {
     return next(new ApiError("Please Add Club Images and Logo", 409));
   }
   console.log(lat, long);
-  // const place_name = await getLocationName(Number(lat), Number(long));
   const place_name =
     "Awlad Nijm Bahjurah, Nag Hammadi, Qena Governorate, Egypt";
 

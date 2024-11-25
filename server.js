@@ -115,7 +115,9 @@ app.use("/suberadmin", require("./routes/suberAdmin"));
 app.use("/owner", require("./routes/owner"));
 app.use("/clubs", require("./routes/global_clubs"));
 app.get("/rule/:type", getRuleType);
+app.use("/global", require("./routes/global_route")); 
 app.use(require("./middlewares/globalError"));
+
 app.use("*", (req, res, next) =>
   res.status(404).json({ message: "Page Not Found" })
 );
