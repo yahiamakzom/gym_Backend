@@ -970,37 +970,35 @@ exports.getStats = async (req, res) => {
 
 exports.getGeneralReport = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { relative, isDate, fromData, toData } = req.body;
-  const data = [
-    ["Date", "Type", "Amount", "Description"],
-    ["2023-07-01", "Transfer", "$100", "Payment for services"],
-    ["2023-07-01", "Transfer", "$100", "Payment for services"],
-    ["2023-07-01", "Transfer", "$100", "Payment for services"],
-    ["2023-07-01", "Transfer", "$100", "Payment for services"],
-    ["2023-07-01", "Transfer", "$100", "Payment for services"],
-    ["2023-07-01", "Transfer", "$100", "Payment for services"],
-    ["2023-07-01", "Transfer", "$100", "Payment for services"],
-    ["2023-07-01", "Transfer", "$100", "Payment for services"],
-    ["2023-07-01", "Transfer", "$100", "Payment for services"],
-    ["2023-07-01", "Transfer", "$100", "Payment for services"],
-    ["2023-07-01", "Transfer", "$100", "Payment for services"],
-    ["2023-07-01", "Transfer", "$100", "Payment for services"],
-    ["2023-07-01", "Transfer", "$100", "Payment for services"],
-    ["2023-07-01", "Transfer", "$100", "Payment for services"],
-    ["2023-07-01", "Transfer", "$100", "Payment for services"],
-  ];
+  const { relative } = req.body;
+
+  // Define data dynamically based on `relative`
+  let data;
+  if (relative) {
+    data = [
+      ["عدد الأندية", "عدد الأفرع", "المشتركين النشطين", "المشتركين غير النشطين", "عدد المشتركين الكلي", "الأرباح الكلية"],
+      ["234", "20", "50", "200", "250", "$5000"],
+    ];
+  } else {
+    data = [
+      ["عدد الأندية", "عدد الأفرع", "المشتركين النشطين", "المشتركين غير النشطين", "عدد المشتركين الكلي", "الأرباح الكلية"],
+      ["34", "25", "80", "150", "230", "$8000"],
+    ];
+  }
 
   try {
+    // Generate PDF and Excel files
     const pdfPath = generatePDF(data);
     const excelPath = await generateExcel(data);
 
+    // Convert files to Base64
     const fileToBase64 = (filePath) => {
       return new Promise((resolve, reject) => {
-        fs.readFile(filePath, (err, data) => {
+        fs.readFile(filePath, (err, fileData) => {
           if (err) {
             reject(err);
           } else {
-            resolve(data.toString("base64"));
+            resolve(fileData.toString("base64"));
           }
         });
       });
@@ -1009,6 +1007,7 @@ exports.getGeneralReport = asyncHandler(async (req, res) => {
     const pdfBase64 = await fileToBase64(pdfPath);
     const excelBase64 = await fileToBase64(excelPath);
 
+    // Respond with the generated data
     const responseData = {
       message: "Files generated successfully.",
       data: data,
@@ -1021,43 +1020,40 @@ exports.getGeneralReport = asyncHandler(async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-}); 
+});
+
 
 
 
 exports.getUsersReport = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  const { relative, isDate, fromData, toData } = req.body;
-  const data = [
-    ["Date", "Type", "Amount", "Description"],
-    ["2023-07-01", "Transfer", "$100", "Payment for services"],
-    ["2023-07-01", "Transfer", "$100", "Payment for services"],
-    ["2023-07-01", "Transfer", "$100", "Payment for services"],
-    ["2023-07-01", "Transfer", "$100", "Payment for services"],
-    ["2023-07-01", "Transfer", "$100", "Payment for services"],
-    ["2023-07-01", "Transfer", "$100", "Payment for services"],
-    ["2023-07-01", "Transfer", "$100", "Payment for services"],
-    ["2023-07-01", "Transfer", "$100", "Payment for services"],
-    ["2023-07-01", "Transfer", "$100", "Payment for services"],
-    ["2023-07-01", "Transfer", "$100", "Payment for services"],
-    ["2023-07-01", "Transfer", "$100", "Payment for services"],
-    ["2023-07-01", "Transfer", "$100", "Payment for services"],
-    ["2023-07-01", "Transfer", "$100", "Payment for services"],
-    ["2023-07-01", "Transfer", "$100", "Payment for services"],
-    ["2023-07-01", "Transfer", "$100", "Payment for services"],
-  ];
+  const { relative } = req.body;
+
+  let data;
+  if (relative) {
+    data = [
+      ["عدد المشتركين الكلي", "المشتركين آخر 28 يوم", "المشتركين النشطين", "المشتركين غير النشطين", "الأرباح آخر 28 يوم", "المشتركين المنذرين", "الأرباح الكلية"],
+      ["نسبي", "1000", "150", "800", "200", "50", "$5000"],
+    ];
+  } else {
+    data = [
+      ["عدد المشتركين الكلي", "المشتركين آخر 28 يوم", "المشتركين النشطين", "المشتركين غير النشطين", "الأرباح آخر 28 يوم", "المشتركين المنذرين", "الأرباح الكلية"],
+      ["مطلق", "1200", "300", "700", "400", "70", "$8000"],
+    ];
+  }
 
   try {
+    // Generate PDF and Excel files
     const pdfPath = generatePDF(data);
     const excelPath = await generateExcel(data);
 
+    // Convert files to Base64
     const fileToBase64 = (filePath) => {
       return new Promise((resolve, reject) => {
-        fs.readFile(filePath, (err, data) => {
+        fs.readFile(filePath, (err, fileData) => {
           if (err) {
             reject(err);
           } else {
-            resolve(data.toString("base64"));
+            resolve(fileData.toString("base64"));
           }
         });
       });
@@ -1066,6 +1062,7 @@ exports.getUsersReport = asyncHandler(async (req, res) => {
     const pdfBase64 = await fileToBase64(pdfPath);
     const excelBase64 = await fileToBase64(excelPath);
 
+    // Respond with the generated data
     const responseData = {
       message: "Files generated successfully.",
       data: data,

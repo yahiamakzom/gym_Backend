@@ -1133,24 +1133,36 @@ exports.getTransfersByClub = asyncHandler(async (req, res) => {
 exports.generateAndSendFiles = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { relative, isDate, fromData, toData } = req.body;
-  const data = [
-    ["Date", "Type", "Amount", "Description"],
-    ["2023-07-01", "Transfer", "$100", "Payment for services"],
-    ["2023-07-01", "Transfer", "$100", "Payment for services"],
-    ["2023-07-01", "Transfer", "$100", "Payment for services"],
-    ["2023-07-01", "Transfer", "$100", "Payment for services"],
-    ["2023-07-01", "Transfer", "$100", "Payment for services"],
-    ["2023-07-01", "Transfer", "$100", "Payment for services"],
-    ["2023-07-01", "Transfer", "$100", "Payment for services"],
-    ["2023-07-01", "Transfer", "$100", "Payment for services"],
-    ["2023-07-01", "Transfer", "$100", "Payment for services"],
-    ["2023-07-01", "Transfer", "$100", "Payment for services"],
-    ["2023-07-01", "Transfer", "$100", "Payment for services"],
-    ["2023-07-01", "Transfer", "$100", "Payment for services"],
-    ["2023-07-01", "Transfer", "$100", "Payment for services"],
-    ["2023-07-01", "Transfer", "$100", "Payment for services"],
-    ["2023-07-01", "Transfer", "$100", "Payment for services"],
-  ];
+
+  // Define data dynamically based on `relative`
+  let data;
+  if (relative) {
+    data = [
+      [
+        "الحاله",
+        "النادي",
+        "الارباح ",
+        "المشتركيين غير النشطين",
+        "عدد المشتركين",
+        "المشتركيين النشطيين",
+        "الارباح الكليه",
+      ],
+      ["مفتوح", "نادي A", "$200", "50", "500", "450", "$1000"],
+    ];
+  } else {
+    data = [
+      [
+        "الحاله",
+        "النادي",
+        "الارباح المشتركيين",
+        "المشتركيين غير النشطين",
+        "عدد المشتركين",
+        "المشتركيين النشطيين",
+        "الارباح الكليه",
+      ],
+      ["مفتوح", "نادي B", "$500", "30", "300", "270", "$1500"],
+    ];
+  }
 
   try {
     const pdfPath = generatePDF(data);
@@ -1158,11 +1170,11 @@ exports.generateAndSendFiles = asyncHandler(async (req, res) => {
 
     const fileToBase64 = (filePath) => {
       return new Promise((resolve, reject) => {
-        fs.readFile(filePath, (err, data) => {
+        fs.readFile(filePath, (err, fileData) => {
           if (err) {
             reject(err);
           } else {
-            resolve(data.toString("base64"));
+            resolve(fileData.toString("base64"));
           }
         });
       });
