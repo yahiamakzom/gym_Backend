@@ -1196,5 +1196,20 @@ exports.generateAndSendFiles = asyncHandler(async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+ 
+
+// 
+exports.getSubscriptionInfo = asyncHandler(async (req, res) => {
+  const { code } = req.body;
+  res.status(200).json({
+    clubName: "الحاجز",
+    name: "omar ahmed",
+    age: "20",
+    weight: "60",
+    height: "170",
+    start: "2024-01-01",
+    end: "2024-12-31",
+  });
+});
 
 exports.clubReports;

@@ -18,6 +18,7 @@ const {
   getTransfersByClub,
   updateDiscount,
   generateAndSendFiles,
+  getSubscriptionInfo,
 } = require("../controllers/club");
 const {
   createWeightFitnessPackage,
@@ -2741,4 +2742,84 @@ router.post("/club-transfers/:clubId", getTransfersByClub);
  *               example: "Error generating files."
  */
 router.post("/club-report/:id", generateAndSendFiles);
+
+/**
+ * @swagger
+ * /clubs/get-subscription-info:
+ *   post:
+ *     summary: Retrieve subscription information for a user.
+ *     description: Provides details about a user's subscription, including personal and subscription-related data.
+ *     tags:
+ *       - Club
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               code:
+ *                 type: string
+ *                 description: The subscription code used to fetch user information.
+ *                 example: "SUB12345"
+ *     responses:
+ *       200:
+ *         description: Subscription information retrieved successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 clubName:
+ *                   type: string
+ *                   description: Name of the club.
+ *                   example: "الحاجز"
+ *                 name:
+ *                   type: string
+ *                   description: Name of the subscriber.
+ *                   example: "omar ahmed"
+ *                 age:
+ *                   type: string
+ *                   description: Age of the subscriber.
+ *                   example: "20"
+ *                 weight:
+ *                   type: string
+ *                   description: Weight of the subscriber in kilograms.
+ *                   example: "60"
+ *                 height:
+ *                   type: string
+ *                   description: Height of the subscriber in centimeters.
+ *                   example: "170"
+ *                 start:
+ *                   type: string
+ *                   format: date
+ *                   description: Start date of the subscription.
+ *                   example: "2024-01-01"
+ *                 end:
+ *                   type: string
+ *                   format: date
+ *                   description: End date of the subscription.
+ *                   example: "2024-12-31"
+ *       400:
+ *         description: Bad request. Missing or invalid data.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Invalid subscription code."
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "An error occurred while fetching subscription information."
+ */
+router.post("/get-subscription-info", getSubscriptionInfo);
 module.exports = router;
