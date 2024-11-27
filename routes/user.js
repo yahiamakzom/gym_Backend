@@ -1100,22 +1100,15 @@ router.patch(
   [verifyToken, imgUploader.fields([{ name: "photo", maxCount: 1 }])],
   updateProfile
 );
-router.post(
-  "/subscription_confirmation",
-  verifyToken,
-  subscriptionConfirmation
-);
-
-router.post("/wallet", depositWallet);
 
 /**
  * @swagger
- * /user/pay_wallet:
+ * /subscription_confirmation:
  *   post:
- *     summary: Deduct an amount from the user's wallet for a subscription
- *     description: Deducts a specified amount from the user's wallet balance if there are sufficient funds.
+ *     summary: Confirm a user's subscription
+ *     description: Confirms the user's subscription, deducts the appropriate amount, and updates the user subscription data.
  *     tags:
- *       - User
+ *       - Subscription
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -1125,15 +1118,30 @@ router.post("/wallet", depositWallet);
  *           schema:
  *             type: object
  *             required:
- *               - amount
+ *               - packageId
+ *               - packageType
+ *               - userId
+ *               - clubId
  *             properties:
- *               amount:
- *                 type: number
- *                 description: The amount to deduct from the user's wallet.
- *                 example: 50
+ *               packageId:
+ *                 type: string
+ *                 description: The ID of the subscription package.
+ *                 example: "60a1b1b9d77e1e001fbd5a99"
+ *               packageType:
+ *                 type: string
+ *                 description: The type of the subscription package (e.g., weightFitness).
+ *                 example: "weightFitness"
+ *               userId:
+ *                 type: string
+ *                 description: The ID of the user subscribing.
+ *                 example: "60a1b1b9d77e1e001fbd5a98"
+ *               clubId:
+ *                 type: string
+ *                 description: The ID of the club to which the user is subscribing.
+ *                 example: "60a1b1b9d77e1e001fbd5a97"
  *     responses:
  *       '200':
- *         description: Deduction successful; funds have been subtracted from the wallet.
+ *         description: Subscription confirmed and user operation logged successfully.
  *         content:
  *           application/json:
  *             schema:
@@ -1141,21 +1149,39 @@ router.post("/wallet", depositWallet);
  *               properties:
  *                 message:
  *                   type: string
- *                   description: Success message indicating the deduction was successful.
- *                   example: "Discount successful"
- *       '404':
- *         description: User not found.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   description: Error message indicating the user was not found.
- *                   example: "User Not Found"
+ *                   description: Success message indicating the subscription was successful.
+ *                   example: "Subscription created successfully"
+ *                 subscription:
+ *                   type: object
+ *                   properties:
+ *                     user:
+ *                       type: string
+ *                       description: User ID of the subscriber.
+ *                       example: "60a1b1b9d77e1e001fbd5a98"
+ *                     club:
+ *                       type: string
+ *                       description: Club ID the user is subscribed to.
+ *                       example: "60a1b1b9d77e1e001fbd5a97"
+ *                     start_date:
+ *                       type: string
+ *                       format: date-time
+ *                       description: Subscription start date.
+ *                       example: "2024-11-27T12:00:00Z"
+ *                     end_date:
+ *                       type: string
+ *                       format: date-time
+ *                       description: Subscription end date.
+ *                       example: "2025-11-27T12:00:00Z"
+ *                     packageType:
+ *                       type: string
+ *                       description: Type of subscription package (e.g., weightFitness).
+ *                       example: "weightFitness"
+ *                     code:
+ *                       type: number
+ *                       description: Unique subscription code.
+ *                       example: 123456
  *       '400':
- *         description: Insufficient funds or invalid amount.
+ *         description: Invalid package type or missing required data.
  *         content:
  *           application/json:
  *             schema:
@@ -1163,8 +1189,19 @@ router.post("/wallet", depositWallet);
  *               properties:
  *                 message:
  *                   type: string
- *                   description: Message indicating insufficient funds or invalid amount.
- *                   example: "Insufficient funds or invalid amount"
+ *                   description: Error message indicating invalid package type or missing data.
+ *                   example: "Invalid package type or missing required data"
+ *       '404':
+ *         description: User or club not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Error message indicating the user or club was not found.
+ *                   example: "User not found"
  *       '401':
  *         description: Unauthorized, token required for authentication.
  *         content:
@@ -1177,6 +1214,16 @@ router.post("/wallet", depositWallet);
  *                   description: Error message indicating unauthorized access.
  *                   example: "Unauthorized access"
  */
+router.post(
+  "/subscription_confirmation",
+  verifyToken,
+  subscriptionConfirmation
+);
+
+
+router.post("/wallet", depositWallet);
+
+
 
 router.post("/pay_wallet", verifyToken, walletDiscountSubscription);
 router.post("/check-pay/:paymentId/:subId", verifyToken, checkPayment);

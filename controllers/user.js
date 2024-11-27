@@ -270,7 +270,7 @@ exports.getClub = asyncHandler(async (req, res, next) => {
       },
     });
   } else {
-    // Respond without distance
+    
     res.json({
       club,
       packages: {
@@ -1656,145 +1656,83 @@ exports.walletDiscountSubscription = asyncHandler(async (req, res, next) => {
   userData.wallet -= Number(amount);
   await userData.save();
   res.status(200).json({ message: "Discount successful" });
-});
+}); 
 
 exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
-  const yogaDataParsed = req.body;
+  const { packageId, packageType, userId, clubId } = req.body;
 
-  const { subId, brand, price, yogaSubscriptionDate, isYoga, clubId } =
-    yogaDataParsed;
-  const { id } = req.user;
+  // Validate the user
+  const user = await User.findById(userId);
+  if (!user) return next(new ApiError("User not found", 404));
 
-  const userData = await User.findById(id);
-  if (!userData) return next(new ApiError("User Not Found", 404));
+  // Validate the club
+  const club = await Club.findById(clubId);
+  if (!club) return next(new ApiError("Club not found", 404));
 
-  if (isYoga === "true") {
-    const club = await Club.findById({ _id: clubId });
-    console.log(club);
-    if (!club) return next(new ApiError("Club Not Found", 404));
+  let packageData;
+  let startDate = moment().startOf("hour");
+  let endDate;
 
-    const yogaSubscriptionDateParsed = JSON.parse(yogaSubscriptionDate);
-    const userOperations = [];
-    const userSubscriptions = [];
+  // Determine the package type and fetch data
+  switch (packageType) {
+    case "weightFitness":
+      packageData = await WeightFitnessPackage.findById(packageId);
+      if (!packageData) return next(new ApiError("Weight fitness package not found", 404));
 
-    for (let i = 0; i < yogaSubscriptionDateParsed.length; i++) {
-      const date = moment(yogaSubscriptionDateParsed[i].date);
-      const newDate = date.add(24, "hours");
-      console.log(date);
-      console.log(newDate);
-      const subscription = await Subscriptions.create({
-        club: club._id,
-        name: "subPersonal",
-        freezeTime: 0,
-        freezeCountTime: 0,
-        price: yogaSubscriptionDateParsed[i].price,
-        type: "يومي",
-        numberType: 1,
-      });
+      // Calculate subscription duration based on package type
+      switch (packageData.packageType) {
+        case "monthly":
+          endDate = moment(startDate).add(1, "months").endOf("hour");
+          break;
+        case "yearly":
+          endDate = moment(startDate).add(1, "years").endOf("hour");
+          break;
+        case "weekly":
+          endDate = moment(startDate).add(1, "weeks").endOf("hour");
+          break;
+        case "daily":
+          endDate = moment(startDate).add(1, "days").endOf("hour");
+          break;
+        default:
+          return next(new ApiError("Invalid package type in Weight Fitness", 400));
+      }
+      break;
 
-      userOperations.push({
-        operationKind: "خصم",
-        operationQuantity: yogaSubscriptionDateParsed[i].price,
-        paymentKind: brand,
-        clubName: club.name,
-        subscriptionType: subscription.type,
-      });
+    case "yoga":
+      // Add logic for "yoga" if applicable
+      break;
 
-      await userSub
-        .create({
-          user: id,
-          club: club._id,
-          subscription: subscription._id,
-          start_date: date,
-          end_date: newDate,
-          code: userData.code,
-        })
-        .then((res) => {
-          console.log("user sub #####################");
-          console.log(res);
-          console.log("user sub #####################");
-        });
-    }
-
-    userData.operations.push(...userOperations);
-    await userData.save();
-
-    res.status(200).send("Payment successful");
+    default:
+      return next(new ApiError("Invalid package type", 400));
   }
 
-  const subscription = await Subscriptions.findById(subId);
-  const club = await Club.findById(subscription.club);
-  if (!subscription) return next(new ApiError("Can't find subscription", 404));
-
-  let start_date = moment().startOf("hour");
-
-  let end_date;
-  const numberType = subscription.numberType;
-  const type = subscription.type;
-  if (type === "شهري") {
-    end_date = moment(start_date).add(numberType, "months").endOf("hour");
-  } else if (type === "سنوي") {
-    end_date = moment(start_date).add(numberType, "years").endOf("hour");
-  } else if (type === "اسبوعي") {
-    end_date = moment(start_date).add(numberType, "weeks").endOf("hour");
-  } else if (type === "يومي") {
-    end_date = moment(start_date).add(numberType, "days").endOf("hour");
-  } else if (type === "ساعه") {
-    end_date = moment(start_date).add(4, "hours");
-  }
-
-  userData.operations.push({
-    operationKind: "خصم",
-    operationQuantity: price,
-    paymentKind: brand,
-    clubName: club.name,
-    subscriptionType: subscription.type, // Add club name to the operations array
+  // Create a new user subscription
+  const newSubscription = await UserSub.create({
+    user: userId,
+    club: clubId,
+    subscription: packageId,
+    start_date: startDate,
+    end_date: endDate,
+    packageType: packageType,
+    packageName: packageData.packageName,
+    code: Math.floor(100000 + Math.random() * 900000), // Generate a random 6-digit code
   });
 
-  await userData.save();
-  if (!club) return next(new ApiError("Can't find club", 404));
-  if (
-    type === "90Minutes" ||
-    type === "30Minutes" ||
-    type === "60Minutes" ||
-    type === "120Minutes"
-  ) {
-    end_date = moment(subscription.endData);
-    start_date = moment(subscription.startData);
+  // Log the operation for the user
+  user.operations.push({
+    operationKind: "خصم", // Deduction
+    operationQuantity: packageData.price,
+    paymentKind: "Online",
+    clubName: club.name,
+    subscriptionType: packageType,
+  });
 
-    subscription.gymsCount--;
-    await subscription.save();
-    if (subscription.gymsCount <= 0) {
-      // Find all subscriptions that contain the same club ID
-      const allClubSubscriptions = await Subscriptions.find({
-        club: club._id,
-      });
+  await user.save();
 
-      for (const sub of allClubSubscriptions) {
-        if (
-          (moment(sub.endData).isBefore(subscription.endData) ||
-            moment(sub.endData).isSame(subscription.endData)) &&
-          (moment(sub.startData).isSame(subscription.startData) ||
-            moment(sub.startData).isAfter(subscription.startData))
-        ) {
-          sub.gymsCount = 0;
-          await sub.save();
-        }
-      }
-    }
-  }
-  await userSub
-    .create({
-      user: id,
-      club: subscription.club,
-      subscription: subscription._id,
-      start_date,
-      end_date,
-      code: userData.code,
-    })
-    .then(() => {
-      res.status(200).send("Payment successful");
-    });
+  res.status(200).json({
+    message: "Subscription created successfully",
+    subscription: newSubscription,
+  });
 });
 
 exports.filterClubsBySubscriptionType = asyncHandler(async (req, res, next) => {

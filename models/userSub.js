@@ -28,7 +28,10 @@ module.exports = mongoose.model(
     expired: {
       type: Boolean,
       default: false,
-    },
+    }, 
+    packageType:{ 
+      type: String,
+    } ,
     code: Number,
   })
 );
