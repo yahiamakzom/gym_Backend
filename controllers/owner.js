@@ -965,9 +965,6 @@ exports.getStats = async (req, res) => {
   }
 };
 
-
-
-
 exports.getGeneralReport = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { relative } = req.body;
@@ -976,12 +973,26 @@ exports.getGeneralReport = asyncHandler(async (req, res) => {
   let data;
   if (relative) {
     data = [
-      ["عدد الأندية", "عدد الأفرع", "المشتركين النشطين", "المشتركين غير النشطين", "عدد المشتركين الكلي", "الأرباح الكلية"],
+      [
+        "عدد الأندية",
+        "عدد الأفرع",
+        "المشتركين النشطين",
+        "المشتركين غير النشطين",
+        "عدد المشتركين الكلي",
+        "الأرباح الكلية",
+      ],
       ["234", "20", "50", "200", "250", "$5000"],
     ];
   } else {
     data = [
-      ["عدد الأندية", "عدد الأفرع", "المشتركين النشطين", "المشتركين غير النشطين", "عدد المشتركين الكلي", "الأرباح الكلية"],
+      [
+        "عدد الأندية",
+        "عدد الأفرع",
+        "المشتركين النشطين",
+        "المشتركين غير النشطين",
+        "عدد المشتركين الكلي",
+        "الأرباح الكلية",
+      ],
       ["34", "25", "80", "150", "230", "$8000"],
     ];
   }
@@ -1022,21 +1033,34 @@ exports.getGeneralReport = asyncHandler(async (req, res) => {
   }
 });
 
-
-
-
 exports.getUsersReport = asyncHandler(async (req, res) => {
   const { relative } = req.body;
 
   let data;
   if (relative) {
     data = [
-      ["عدد المشتركين الكلي", "المشتركين آخر 28 يوم", "المشتركين النشطين", "المشتركين غير النشطين", "الأرباح آخر 28 يوم", "المشتركين المنذرين", "الأرباح الكلية"],
+      [
+        "عدد المشتركين الكلي",
+        "المشتركين آخر 28 يوم",
+        "المشتركين النشطين",
+        "المشتركين غير النشطين",
+        "الأرباح آخر 28 يوم",
+        "المشتركين المنذرين",
+        "الأرباح الكلية",
+      ],
       ["نسبي", "1000", "150", "800", "200", "50", "$5000"],
     ];
   } else {
     data = [
-      ["عدد المشتركين الكلي", "المشتركين آخر 28 يوم", "المشتركين النشطين", "المشتركين غير النشطين", "الأرباح آخر 28 يوم", "المشتركين المنذرين", "الأرباح الكلية"],
+      [
+        "عدد المشتركين الكلي",
+        "المشتركين آخر 28 يوم",
+        "المشتركين النشطين",
+        "المشتركين غير النشطين",
+        "الأرباح آخر 28 يوم",
+        "المشتركين المنذرين",
+        "الأرباح الكلية",
+      ],
       ["مطلق", "1200", "300", "700", "400", "70", "$8000"],
     ];
   }
@@ -1074,5 +1098,43 @@ exports.getUsersReport = asyncHandler(async (req, res) => {
     res.status(200).json(responseData);
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+});
+
+exports.getHomeStatics = asyncHandler(async (req, res) => {
+  const { type, id, date } = req.body;
+
+  if (!type || !date) {
+    return res.status(400).json({ error: "Type and ID are required." });
+  }
+
+  switch (type) {
+    case "owner": {
+      try {
+        return res.status(400).json({
+          data: [4, 1, 4, 5, 6, 4, 2, 2, 5, 6, 3, 4],
+          diffrence: 50,
+          type: "+",
+        });
+      } catch (error) {
+        return res.status(500).json({ error: "Error fetching owner data." });
+      }
+    }
+
+    case "club": {
+      return res.status(400).json({
+        data: [9, 8, 4, 5, 6, 4, 2, 2, 5, 6, 3, 4],
+        diffrence: 30,
+        type: "-",
+      });
+    }
+
+    default: {
+      return res.status(400).json({
+        data: [1, 3, 4, 5, 6, 4, 2, 2, 5, 6, 3, 4],
+        diffrence: 200,
+        type: "-",
+      });
+    }
   }
 });

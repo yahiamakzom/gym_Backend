@@ -37,6 +37,7 @@ const {
   getStats,
   getGeneralReport,
   getUsersReport,
+  getHomeStatics,
 } = require("../controllers/owner");
 
 /**
@@ -2065,6 +2066,81 @@ router.post("/get-general-report", getGeneralReport);
  *               type: string
  *               example: "Error generating files."
  */
-router.post("/get-user-report", getUsersReport);
+router.post("/get-user-report", getUsersReport); 
 
+/**
+ * @swagger
+ * /owner/get-home-statics:
+ *   post:
+ *     summary: Retrieve statistics for the home screen based on type.
+ *     description: Fetches data arrays, difference, and type based on the provided type ("owner", "club", or default).
+ *     tags:
+ *       - Home
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - type
+ *               - date
+ *             properties:
+ *               type:
+ *                 type: string
+ *                 description: The type of statistic to retrieve ("owner" or "club").
+ *                 example: "owner"
+ *               id:
+ *                 type: string
+ *                 description: The ID of the resource (optional for some types).
+ *                 example: "6473829adbfc9a0001cbe4a7"
+ *               date:
+ *                 type: string
+ *                 format: date
+ *                 description: The date for which to fetch statistics.
+ *                 example: "2024-12-01"
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved statistics.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: integer
+ *                   description: Array of statistics data.
+ *                 diffrence:
+ *                   type: integer
+ *                   description: Difference value.
+ *                 type:
+ *                   type: string
+ *                   description: Indicates the type of operation (e.g., "+" or "-").
+ *       400:
+ *         description: Bad Request - Missing or invalid parameters.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message.
+ *                   example: "Type and date are required."
+ *       500:
+ *         description: Internal Server Error - Failed to fetch data.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message.
+ *                   example: "Internal Server Error."
+ */
+
+router.post("/get-home-statics", getHomeStatics);
 module.exports = router;

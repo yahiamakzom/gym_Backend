@@ -799,13 +799,11 @@ exports.checkPayment = asyncHandler(async (req, res, next) => {
               subscription.gymsCount--;
               await subscription.save();
               if (subscription.gymsCount <= 0) {
-                // Find all subscriptions that contain the same club ID
                 const allClubSubscriptions = await Subscriptions.find({
                   club: club._id,
                 });
 
                 for (const sub of allClubSubscriptions) {
-                  // Check if sub.endData is before subscription.endData OR sub.StartData is the same as subscription.startData
                   if (
                     (moment(sub.endData).isBefore(subscription.endData) ||
                       moment(sub.endData).isSame(subscription.endData)) &&
@@ -1114,18 +1112,21 @@ exports.getUserWallet = asyncHandler(async (req, res, next) => {
               long: club.long,
               subscriptionId: subscription._id,
               freezeTime: subscription.freezeTime,
-              subprice: subscription.price,
+              subprice: subscription.price, 
               type: subscription.type,
               numberType: subscription.numberType,
               club_name: club.name,
               club_logo: club.logo,
               start_date: sub.start_date,
-              end_date: sub.end_date,
-              expired: sub.expired,
+               expired: sub.expired,
             };
           })
         );
+ 
 
+
+
+                
         res.json({
           subs: filterSubs,
           operations: user.operations,
@@ -1144,7 +1145,11 @@ exports.getUserWallet = asyncHandler(async (req, res, next) => {
       }
     });
   });
-});
+}); 
+
+
+
+
 
 exports.depositWallet = asyncHandler(async (req, res, next) => {
   const { amount } = req.body;
