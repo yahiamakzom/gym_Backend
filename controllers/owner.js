@@ -1111,7 +1111,7 @@ exports.getHomeStatics = asyncHandler(async (req, res) => {
   switch (type) {
     case "owner": {
       try {
-        return res.status(400).json({
+        return res.status(200).json({
           data: [4, 1, 4, 5, 6, 4, 2, 2, 5, 6, 3, 4],
           diffrence: 50,
           type: "+",
@@ -1122,7 +1122,7 @@ exports.getHomeStatics = asyncHandler(async (req, res) => {
     }
 
     case "club": {
-      return res.status(400).json({
+      return res.status(200).json({
         data: [9, 8, 4, 5, 6, 4, 2, 2, 5, 6, 3, 4],
         diffrence: 30,
         type: "-",
@@ -1130,7 +1130,7 @@ exports.getHomeStatics = asyncHandler(async (req, res) => {
     }
 
     default: {
-      return res.status(400).json({
+      return res.status(200).json({
         data: [1, 3, 4, 5, 6, 4, 2, 2, 5, 6, 3, 4],
         diffrence: 200,
         type: "-",
