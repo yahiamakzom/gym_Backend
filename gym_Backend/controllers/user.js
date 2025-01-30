@@ -30,8 +30,7 @@ const cloudinary = require("cloudinary").v2;
 const weightFitnessSchema = require("../models/package/weightFitness");
 const anotherActivityPackage = require("../models/package/anotherActivity");
 const PaddlePackage = require("../models/package/paddle");
-const YogaPackage = require("../models/package/yoga"); 
- const ClubUser = require("../models/ClubUser.js");
+const YogaPackage = require("../models/package/yoga");
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.CLOUD_API_KEY,
@@ -1907,22 +1906,239 @@ exports.forgetPassowrd = asyncHandler(async (req, res) => {
     .catch((err) => console.error(err));
 }); 
 
-exports.deleteClubUser = async (req, res) => {
-  try {
-    const userId = req.params.userId;
-
-    const deletedUser = await ClubUser.findOneAndDelete({ _id: userId });
-
-    if (!deletedUser) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    // Delete user's subscriptions (implement logic here)
-
-    return res.status(200).json({ message: "User deleted successfully" });
-  } catch (e) {
-    return res.status(500).json({ message: "Internal server error", error: e.message });
-  }
-};
 
 
+
+// exports.AddClubOrder = asyncHandler(async (req, res) => {
+//   try {
+//     const {
+//       name,
+//       email,
+//       password,
+//       lat,
+//       long,
+//       description,
+//       gender,
+//       from,
+//       to,
+//       allDay,
+//       sports,
+//       days,
+//       mapUrl,
+//     } = req.body;
+//     console.log(lat, long);
+//     let SportData = sports.split(",");
+//     let Days = days.split(",");
+//     if (!req.files.clubImg)
+//       return next(new ApiError("Please Add Club Imgs", 409));
+//     if (!req.files.logo) return next(new ApiError("Please Add Club logo", 409));
+//     const place_name = await getLocationName(lat, long);
+//     if (!place_name) return next(new ApiError("Location Not Found", 404));
+
+//     const imgs_path = await Promise.all(
+//       req.files.clubImg.map(async (img) => {
+//         const uploadImg = await cloudinary.uploader.upload(img.path);
+//         return uploadImg.secure_url;
+//       })
+//     );
+//     const logo = (await cloudinary.uploader.upload(req.files.logo[0].path))
+//       .secure_url;
+//     console.log(imgs_path);
+//     console.log(logo);
+//     await User.findOne({ email }).then(async (user) => {
+//       if (user)
+//         return next(new ApiError("User With This Email is Exists", 409));
+//       console.log(allDay);
+//       if (allDay == "false" || allDay == undefined) {
+//         await CLubOrder.create({
+//           name: name,
+//           country: `${place_name.split(",")[place_name.split(",").length - 1]}`,
+//           city: `${place_name.split(",")[place_name.split(",").length - 2]}`,
+//           location: place_name,
+//           logo,
+//           description,
+//           gender,
+//           images: imgs_path,
+//           lat: Number(lat),
+//           long: Number(long),
+//           // logo,
+//           from,
+//           to,
+//           allDay: false,
+//           email,
+//           password,
+//           sports: [...SportData],
+//           WorkingDays: [...Days],
+//           mapUrl,
+//         }).then(async (club) => {
+//           console.log(club);
+
+//           res.status(201).json({ club });
+//         });
+//       } else {
+//         await CLubOrder.create({
+//           name: name,
+//           country: `${place_name.split(",")[place_name.split(",").length - 1]}`,
+//           city: `${place_name.split(",")[place_name.split(",").length - 2]}`,
+//           location: place_name,
+//           // description,
+//           gender,
+//           images: imgs_path,
+//           lat: Number(lat),
+//           long: Number(long),
+
+//           description,
+//           logo,
+//           allDay,
+//           from: null,
+//           to: null,
+//           email,
+//           password,
+//           mapUrl,
+//           sports: [...SportData],
+//           WorkingDays: [...Days],
+//         }).then(async (club) => {
+//           res.status(201).json({ club });
+//         });
+//       }
+//     });
+//   } catch (e) {
+//     console.log(e);
+//     res.status(500).json({ error: e });
+//   }
+// });
+// exports.getOrderClubs = asyncHandler(async (req, res) => {
+//   try {
+//     // Fetch all orders and select specific fields
+//     const orders = await CLubOrder.find().select("createdAt logo name email");
+
+//     // Ensure that all required fields are included in the response
+//     const formattedOrders = orders.map((order) => ({
+//       _id: order._id,
+//       name: order.name || "N/A", // Default to "N/A" if name is missing
+//       email: order.email || "N/A", // Default to "N/A" if email is missing
+//       createdAt: order.createdAt,
+//       logo: order.logo || "N/A", // Default to "N/A" if logo is missing
+//     }));
+
+//     // Send the response with the fetched data
+//     res.status(200).json({
+//       success: true,
+//       data: formattedOrders,
+//     });
+//   } catch (error) {
+//     res.status(500).json({
+//       success: false,
+//       message: "Server Error",
+//     });
+//   }
+// });
+// exports.getOrderClub = asyncHandler(async (req, res) => {
+//   try {
+//     const { id } = req.body;
+//     const order = await CLubOrder.findOne({ _id: id });
+//     if (!order) {
+//       return next(new ApiError("Order Not Found", 404));
+//     }
+
+//     // Ensure that all required fields are included in the response
+
+//     // Send the response with the fetched data
+//     res.status(200).json({
+//       success: true,
+//       data: order,
+//     });
+//   } catch (error) {
+//     console.log(error);
+//     res.status(500).json({
+//       success: false,
+//       message: "Server Error",
+//     });
+//   }
+// });
+// exports.AddOrderClub = asyncHandler(async (req, res, next) => {
+//   try {
+//     const { id, commission } = req.body;
+
+//     const order = await CLubOrder.findOne({ _id: id });
+//     if (!order) {
+//       return next(new ApiError("Order Not Found", 404));
+//     }
+
+//     await Club.create({
+//       name: order.name,
+//       country: order.country,
+//       city: order.city,
+//       location: order.location,
+//       description: order.description,
+//       gender: order.gender,
+//       images: order.images,
+//       lat: order.lat,
+//       long: order.long,
+//       logo: order.logo,
+//       allDay: order.allDay,
+//       from: order.from,
+//       to: order.to,
+//       mapUrl: order.mapUrl,
+//       commission: commission,
+
+//       sports: [...order.sports],
+//       WorkingDays: [...order.WorkingDays],
+//     })
+//       .then(async (club) => {
+//         console.log(club);
+
+//         const hashedPassword = await bcrypt.hash(order.password, 10);
+
+//         const user = await User.create({
+//           email: order.email,
+//           password: hashedPassword,
+//           role: "club",
+//           club: club.id,
+//           home_location: order.location,
+//           username: order.name,
+//         });
+//         // await CLubOrder.deleteOne({ _id: id });
+//         async function sendOTP() {
+//           let transporter = nodemailer.createTransport({
+//             service: "gmail",
+//             host: "smtp.gmail.com",
+//             port: 587,
+//             secure: false,
+//             auth: {
+//               user: "mostafaisa208@gmail.com",
+//               pass: "bqzl uyxy lvdu bfbk",
+//             },
+//           });
+
+//           let info = await transporter.sendMail({
+//             from: "appgyms.com",
+//             to: user.email,
+//             subject: "Your code for Password Reset",
+//             html: `<h1>Your club order has been successfully added to clubs!</h1>`,
+//           });
+
+//           console.log("Message sent: %s", info.messageId);
+//         }
+
+//         sendOTP()
+//           .then(async (result) => {
+//             await CLubOrder.deleteOne({ _id: id });
+//             console.log("Message sent: %s", result);
+//             res.status(201).json({ club });
+//           })
+//           .catch((err) => console.error(err));
+//       })
+//       .catch((err) => {
+//         res.status(500).json({
+//           success: false,
+//           message: e,
+//         });
+//       });
+//   } catch (error) {
+//     res.status(500).json({
+//       success: false,
+//       message: "Server Error",
+//     });
+//   }
+// });

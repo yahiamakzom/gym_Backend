@@ -241,6 +241,7 @@ exports.LoginControlPanel = asyncHandler(async (req, res, next) => {
       // Fetch sub-clubs associated with the found club
       const subClubs = await club.getSubClubs();
 
+      // Respond with the club information and its sub-clubs
       return res.status(200).json({
         status: true,
         role: "suberadmin",

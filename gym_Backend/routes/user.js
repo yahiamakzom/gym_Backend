@@ -39,7 +39,6 @@ const {
   updateUserLocation,
   resetPassowrd,
   forgetPassowrd,
-  deleteClubUser,
 } = require("../controllers/user");
 const router = require("express").Router();
 const verifyToken = require("../middlewares/verifyToken");
@@ -661,7 +660,14 @@ router.post("/clubs_by_activity", getClubByActivity);
  *                   example: "Unauthorized access"
  */
 
-router.post("/wallet_deposit", verifyToken, walletDeposit);
+router.post("/wallet_deposit", verifyToken, walletDeposit); 
+
+
+
+
+
+
+
 
 router.get("/wallet", verifyToken, getUserWallet);
 
@@ -1222,7 +1228,10 @@ router.post(
   subscriptionConfirmation
 );
 
+
 router.post("/wallet", depositWallet);
+
+
 
 router.post("/pay_wallet", verifyToken, walletDiscountSubscription);
 router.post("/check-pay/:paymentId/:subId", verifyToken, checkPayment);
@@ -1579,55 +1588,4 @@ router.post("/forget_password", forgetPassowrd);
  */
 
 router.post("/reset_password", resetPassowrd);
-
-/**
- * @swagger
- * /user/club-users/{userId}:
- *   delete:
- *     summary: Delete a club user
- *     description: Deletes a user from the club by their user ID.
- *     tags:
- *       - User
- *     parameters:
- *       - in: path
- *         name: userId
- *         required: true
- *         schema:
- *           type: string
- *         description: The ID of the user to be deleted.
- *     responses:
- *       200:
- *         description: User deleted successfully.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "User deleted successfully"
- *       404:
- *         description: User not found.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "User not found"
- *       500:
- *         description: Internal server error.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Internal server error"
- */
-
-router.delete("/club-users/:userId", deleteClubUser);
-
 module.exports = router;
