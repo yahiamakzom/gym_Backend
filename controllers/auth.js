@@ -200,6 +200,7 @@ exports.LoginControlPanel = asyncHandler(async (req, res, next) => {
             success: false,
           });
         }
+
         return res.status(200).json({
           role: "owner",
           id: user.id,
@@ -209,8 +210,8 @@ exports.LoginControlPanel = asyncHandler(async (req, res, next) => {
         });
       }
     } else {
-      // If user is not found, check for club user
       const clubUser = await ClubUser.findOne({ email });
+      
       if (!clubUser) {
         return res
           .status(404)

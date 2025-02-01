@@ -13,7 +13,7 @@ const ApiError = require("../utils/ApiError");
 const paypal = require("paypal-rest-sdk");
 const axios = require("axios");
 const bcrypt = require("bcrypt");
-const ClubHours = require("../models/clubHours")
+const ClubHours = require("../models/clubHours");
 const nodemailer = require("nodemailer");
 const { getLocationName } = require("../utils/Map");
 const {
@@ -30,8 +30,8 @@ const cloudinary = require("cloudinary").v2;
 const weightFitnessSchema = require("../models/package/weightFitness");
 const anotherActivityPackage = require("../models/package/anotherActivity");
 const PaddlePackage = require("../models/package/paddle");
-const YogaPackage = require("../models/package/yoga"); 
- const ClubUser = require("../models/ClubUser.js");
+const YogaPackage = require("../models/package/yoga");
+const ClubUser = require("../models/ClubUser.js");
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.CLOUD_API_KEY,
@@ -271,7 +271,6 @@ exports.getClub = asyncHandler(async (req, res, next) => {
       },
     });
   } else {
-    
     res.json({
       club,
       packages: {
@@ -1113,21 +1112,17 @@ exports.getUserWallet = asyncHandler(async (req, res, next) => {
               long: club.long,
               subscriptionId: subscription._id,
               freezeTime: subscription.freezeTime,
-              subprice: subscription.price, 
+              subprice: subscription.price,
               type: subscription.type,
               numberType: subscription.numberType,
               club_name: club.name,
               club_logo: club.logo,
               start_date: sub.start_date,
-               expired: sub.expired,
+              expired: sub.expired,
             };
           })
         );
- 
 
-
-
-                
         res.json({
           subs: filterSubs,
           operations: user.operations,
@@ -1146,11 +1141,7 @@ exports.getUserWallet = asyncHandler(async (req, res, next) => {
       }
     });
   });
-}); 
-
-
-
-
+});
 
 exports.depositWallet = asyncHandler(async (req, res, next) => {
   const { amount } = req.body;
@@ -1289,8 +1280,6 @@ exports.getClubByActivity = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({ result });
 });
-
-
 
 exports.filterClubs = asyncHandler(async (req, res, next) => {
   const { filter } = req.query;
@@ -1451,13 +1440,12 @@ exports.getUserFav = asyncHandler(async (req, res, next) => {
     .then(async (data) => {
       const modifiedData = await Promise.all(
         data.map(async (fav) => {
-           
           const clubData = fav.club_id;
 
-       const club = await Club.findById(clubData._id);
+          const club = await Club.findById(clubData._id);
           const modifiedFav = {
-            ...fav.toObject(), 
-            ...club.toObject(), 
+            ...fav.toObject(),
+            ...club.toObject(),
           };
           return modifiedFav;
         })
@@ -1662,7 +1650,7 @@ exports.walletDiscountSubscription = asyncHandler(async (req, res, next) => {
   userData.wallet -= Number(amount);
   await userData.save();
   res.status(200).json({ message: "Discount successful" });
-}); 
+});
 
 exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
   const { packageId, packageType, userId, clubId } = req.body;
@@ -1683,7 +1671,8 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
   switch (packageType) {
     case "weightFitness":
       packageData = await WeightFitnessPackage.findById(packageId);
-      if (!packageData) return next(new ApiError("Weight fitness package not found", 404));
+      if (!packageData)
+        return next(new ApiError("Weight fitness package not found", 404));
 
       // Calculate subscription duration based on package type
       switch (packageData.packageType) {
@@ -1700,7 +1689,9 @@ exports.subscriptionConfirmation = asyncHandler(async (req, res, next) => {
           endDate = moment(startDate).add(1, "days").endOf("hour");
           break;
         default:
-          return next(new ApiError("Invalid package type in Weight Fitness", 400));
+          return next(
+            new ApiError("Invalid package type in Weight Fitness", 400)
+          );
       }
       break;
 
@@ -1905,24 +1896,26 @@ exports.forgetPassowrd = asyncHandler(async (req, res) => {
       res.status(200).json({ message: "OTP sent", success: true, code: otp });
     })
     .catch((err) => console.error(err));
-}); 
+});
 
 exports.deleteClubUser = async (req, res) => {
   try {
     const userId = req.params.userId;
+    console.log("User ID:", userId);
+    const data = await ClubUser.find();
 
-    const deletedUser = await ClubUser.findOneAndDelete({ _id: userId });
 
-    if (!deletedUser) {
-      return res.status(404).json({ message: "User not found" });
-    }
 
-    // Delete user's subscriptions (implement logic here)
+
+    // Delete the user
+    await ClubUser.deleteOne({ _id: userId });
+
+    // TODO: Delete user's subscriptions (implement logic here)
 
     return res.status(200).json({ message: "User deleted successfully" });
   } catch (e) {
-    return res.status(500).json({ message: "Internal server error", error: e.message });
+    return res
+      .status(500)
+      .json({ message: "Internal server error", error: e.message });
   }
 };
-
-
