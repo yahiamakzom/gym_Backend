@@ -1904,7 +1904,8 @@ exports.deleteClubUser = async (req, res) => {
     console.log("User ID:", userId);
     const data = await ClubUser.find();
 
-
+ 
+    // 
 
 
     // Delete the user
