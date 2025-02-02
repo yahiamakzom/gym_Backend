@@ -1897,26 +1897,26 @@ exports.forgetPassowrd = asyncHandler(async (req, res) => {
     })
     .catch((err) => console.error(err));
 });
-
 exports.deleteClubUser = async (req, res) => {
   try {
     const userId = req.params.userId;
     console.log("User ID:", userId);
-    const data = await ClubUser.find();
 
- 
-    // 
+    const user = await ClubUser.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
-
-    // Delete the user
     await ClubUser.deleteOne({ _id: userId });
 
-    // TODO: Delete user's subscriptions (implement logic here)
-
-    return res.status(200).json({ message: "User deleted successfully" });
+    return res.status(200).json({
+      message: "User deleted successfully"
+    });
   } catch (e) {
-    return res
-      .status(500)
-      .json({ message: "Internal server error", error: e.message });
+    return res.status(500).json({
+      message: "Internal server error",
+      error: e.message
+    });
   }
 };
+
