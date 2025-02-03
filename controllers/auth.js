@@ -245,7 +245,8 @@ exports.LoginControlPanel = asyncHandler(async (req, res, next) => {
       return res.status(200).json({
         status: true,
         role: "suberadmin",
-        token,
+        token, 
+        userId:clubUser._id,
         id: club._id,
         message: "Login successful",
       });
