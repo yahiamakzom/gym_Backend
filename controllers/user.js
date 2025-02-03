@@ -1899,6 +1899,8 @@ exports.forgetPassowrd = asyncHandler(async (req, res) => {
 });
 exports.deleteClubUser = async (req, res) => {
   try {
+    const m = await ClubUser.find({}); 
+    console.log(m);
     const userId = req.params.userId;
     console.log("User ID:", userId);
 
@@ -1910,13 +1912,12 @@ exports.deleteClubUser = async (req, res) => {
     await ClubUser.deleteOne({ _id: userId });
 
     return res.status(200).json({
-      message: "User deleted successfully"
+      message: "User deleted successfully",
     });
   } catch (e) {
     return res.status(500).json({
       message: "Internal server error",
-      error: e.message
+      error: e.message,
     });
   }
 };
-
