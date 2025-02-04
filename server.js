@@ -108,6 +108,61 @@ app.use("/auth", require("./routes/auth"));
 //     });
 //   }
 // });
+
+app.use("/images", express.static(path.join(__dirname, "images")));
+
+app.get("/delete-account", (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Delete Account</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                text-align: center;
+                padding: 20px;
+                background-color: #f8f9fa;
+            }
+            .container {
+                max-width: 600px;
+                margin: auto;
+                background: white;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            }
+            img {
+                width: 100%;
+                max-width: 400px;
+                margin-top: 20px;
+                border-radius: 5px;
+            }
+            h1 {
+                color: #dc3545;
+            }
+            p {
+                font-size: 16px;
+                color: #333;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>How to Delete Your Account</h1>
+            <p>To delete your account, follow these steps:</p>
+            <p>1. Open the app and go to <strong>Settings</strong>.</p>
+            <p>2. Scroll down and select <strong>Delete Account</strong>.</p>
+            <p>3. Confirm your decision and follow the on-screen instructions.</p>
+            <img src="/images/img.jpeg" alt="Delete Account Steps">
+        </div>
+    </body>
+    </html>
+  `);
+});
+
 app.use("/user", require("./routes/user"));
 app.use("/club", verifyRoles("club"), require("./routes/club"));
 app.use("/orders", require("./routes/clubOrder"));
@@ -115,7 +170,7 @@ app.use("/suberadmin", require("./routes/suberAdmin"));
 app.use("/owner", require("./routes/owner"));
 app.use("/clubs", require("./routes/global_clubs"));
 app.get("/rule/:type", getRuleType);
-app.use("/global", require("./routes/global_route")); 
+app.use("/global", require("./routes/global_route"));
 app.use(require("./middlewares/globalError"));
 
 app.use("*", (req, res, next) =>
